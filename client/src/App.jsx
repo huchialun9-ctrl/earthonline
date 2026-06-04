@@ -115,17 +115,36 @@ function Dashboard({ token, onLogout }) {
   // Fake bound Discord data for UI demo (since backend DB isn't fully updated yet)
   const [boundDiscord, setBoundDiscord] = useState(null);
 
-  const handleBindDiscord = (e) => {
+  const handleBindDiscord = async (e) => {
     e.preventDefault();
     if (!discordId) return;
-    // Simulate API fetch to public Discord avatar
-    const randomAvatarId = Math.floor(Math.random() * 5) + 1; // 1 to 5
-    setBoundDiscord({
-      username: discordId,
-      avatar: `https://cdn.discordapp.com/embed/avatars/${randomAvatarId}.png`
-    });
-    setShowDiscordModal(false);
-    addLog(`系統通知：成功綁定 Discord 帳號 [${discordId}]`);
+    
+    // Check if it's a snowflake ID (numbers only)
+    if (!/^\d{17,20}$/.test(discordId)) {
+      alert('請輸入您的 Discord「使用者 ID」(17~20碼數字)，而非使用者名稱！\n如果您不知道如何取得，請在 Discord 設定 > 進階 中開啟「開發者模式」，然後對著您的頭像點右鍵選擇「複製使用者 ID」。');
+      return;
+    }
+
+    try {
+      addLog(`[SYS] 正在透過中繼伺服器驗證 Discord ID: ${discordId}...`);
+      const res = await fetch(`https://dcdn.dstn.to/profile/${discordId}`);
+      if (!res.ok) throw new Error('API Error');
+      const data = await res.json();
+      
+      const avatarUrl = data.user.avatar 
+        ? `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}.png?size=128`
+        : `https://cdn.discordapp.com/embed/avatars/${(BigInt(data.user.id) >> 22n) % 6n}.png`;
+        
+      setBoundDiscord({
+        username: data.user.global_name || data.user.username,
+        avatar: avatarUrl
+      });
+      setShowDiscordModal(false);
+      addLog(`系統通知：成功綁定 Discord 帳號 [${data.user.global_name || data.user.username}]`);
+    } catch (err) {
+      alert('找不到該 Discord 使用者，請確認 ID 是否正確，或稍後再試。');
+      addLog(`[ERROR] Discord 驗證失敗: 查無此 ID 或 API 限流`);
+    }
   };
 
   const addLog = (msg) => {
@@ -490,13 +509,16 @@ function Dashboard({ token, onLogout }) {
             <h3 style={{display: 'flex', alignItems: 'center', gap: '10px', marginTop: 0}}>
               <LinkIcon size={20} /> 連結您的 Discord
             </h3>
-            <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '20px'}}>
-              請輸入您的 Discord 使用者名稱 (例如: user#1234 或 user)。系統將會抓取您的公開大頭貼，讓您的指揮中心更有個人風格！
+            <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '10px'}}>
+              為了抓取您的真實大頭貼，請輸入您的 <strong style={{color: 'var(--accent-color)'}}>Discord 使用者 ID</strong> (一串數字，非名稱)。
+            </p>
+            <p style={{color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '20px', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '4px'}}>
+              👉 <strong style={{color: '#fff'}}>如何取得？</strong> 請先在 Discord 的「設定 &gt; 進階」開啟「開發者模式」，然後對著您自己的頭像點右鍵選擇「複製使用者 ID」。
             </p>
             <form onSubmit={handleBindDiscord}>
               <input 
                 type="text" 
-                placeholder="輸入 Discord ID..." 
+                placeholder="貼上您的使用者 ID (例如: 123456789012345678)..." 
                 value={discordId}
                 onChange={e => setDiscordId(e.target.value)}
                 className="terminal-input"

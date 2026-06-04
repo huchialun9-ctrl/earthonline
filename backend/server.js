@@ -11,7 +11,14 @@ const db = require('./db');
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// 修改重點 1：配置 Express 的 CORS，明確允許您的 Cloudflare 前端，並啟用憑證支援
+app.use(cors({
+  origin: ['https://earthonline-2m7.pages.dev', 'http://localhost:5173'], // 包含線上與本地開發環境
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
+
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -171,7 +178,6 @@ app.get('/api/auth/discord/callback', async (req, res) => {
     const success = await db.updateUserDiscord(decoded.username, profile);
     
     if (success) {
-      // Redirect back to frontend dynamically based on where they came from
       res.redirect(returnTo || '/');
     } else {
       res.status(404).send('User not found in Earth Online database');
@@ -183,10 +189,13 @@ app.get('/api/auth/discord/callback', async (req, res) => {
 });
 
 const server = http.createServer(app);
+
+// 修改重點 2：精確配置 Socket.IO 的 CORS 來源
 const io = new Server(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
+    origin: ['https://earthonline-2m7.pages.dev', 'http://localhost:5173'],
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
@@ -210,7 +219,6 @@ setInterval(async () => {
 }, 2000);
 
 function calculateSocialCompression(userCount) {
-  // Mock formula: more users = higher compression index
   return (1.0 + (userCount * 0.05)).toFixed(3);
 }
 
@@ -218,14 +226,12 @@ function calculateSocialCompression(userCount) {
 function getRealIP(socket) {
   let forwarded = socket.handshake.headers['x-forwarded-for'];
   if (forwarded) {
-    // x-forwarded-for can be a comma-separated list, the first one is the real client IP
     return forwarded.split(',')[0].trim();
   }
   return socket.handshake.address;
 }
 
 io.on('connection', (socket) => {
-  // Wait for client to authenticate via token
   socket.on('authenticate', async (data) => {
     try {
       const decoded = jwt.verify(data.token, JWT_SECRET);

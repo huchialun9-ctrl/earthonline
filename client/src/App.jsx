@@ -258,30 +258,41 @@ function Dashboard({ token, onLogout }) {
 
     try {
       addLog(`[SYS] 正在透過中繼伺服器驗證 Discord ID: ${discordId}...`);
-      const res = await fetch(`https://dcdn.dstn.to/profile/${discordId}`);
-      if (!res.ok) throw new Error('API Error');
-      const data = await res.json();
       
-      // Save to backend
+      // Save to backend regardless of avatar fetch success
       await fetch(`${API_URL}/api/bind-discord`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, discordId })
       });
 
-      const avatarUrl = data.user.avatar 
-        ? `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}.png?size=128`
-        : `https://cdn.discordapp.com/embed/avatars/${(BigInt(data.user.id) >> 22n) % 6n}.png`;
+      let avatarUrl = `https://cdn.discordapp.com/embed/avatars/${(BigInt(discordId) >> 22n) % 6n}.png`;
+      let globalName = discordId;
+
+      try {
+        const res = await fetch(`https://dcdn.dstn.to/profile/${discordId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            avatarUrl = data.user.avatar 
+              ? `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}.png?size=128`
+              : avatarUrl;
+            globalName = data.user.global_name || data.user.username;
+          }
+        }
+      } catch (e) {
+        addLog(`[WARN] 無法從 CDN 抓取大頭貼，使用預設頭像`);
+      }
         
       setBoundDiscord({
-        username: data.user.global_name || data.user.username,
+        username: globalName,
         avatar: avatarUrl
       });
       setShowDiscordModal(false);
-      addLog(`系統通知：成功綁定 Discord 帳號 [${data.user.global_name || data.user.username}]`);
+      addLog(`系統通知：成功綁定 Discord 帳號 [${globalName}]`);
     } catch (err) {
-      alert('找不到該 Discord 使用者，請確認 ID 是否正確，或稍後再試。');
-      addLog(`[ERROR] Discord 驗證失敗: 查無此 ID 或 API 限流`);
+      alert('綁定失敗，無法連線至伺服器。');
+      addLog(`[ERROR] Discord 綁定失敗`);
     }
   };
 
@@ -315,17 +326,23 @@ function Dashboard({ token, onLogout }) {
       // Auto-load Discord avatar if it's bound in database
       if (data.discordId) {
         try {
+          let avatarUrl = `https://cdn.discordapp.com/embed/avatars/${(BigInt(data.discordId) >> 22n) % 6n}.png`;
+          let globalName = data.discordId;
+
           const res = await fetch(`https://dcdn.dstn.to/profile/${data.discordId}`);
           if (res.ok) {
             const discordData = await res.json();
-            const avatarUrl = discordData.user.avatar 
-              ? `https://cdn.discordapp.com/avatars/${discordData.user.id}/${discordData.user.avatar}.png?size=128`
-              : `https://cdn.discordapp.com/embed/avatars/${(BigInt(discordData.user.id) >> 22n) % 6n}.png`;
-            setBoundDiscord({
-              username: discordData.user.global_name || discordData.user.username,
-              avatar: avatarUrl
-            });
+            if (discordData.user) {
+              avatarUrl = discordData.user.avatar 
+                ? `https://cdn.discordapp.com/avatars/${discordData.user.id}/${discordData.user.avatar}.png?size=128`
+                : avatarUrl;
+              globalName = discordData.user.global_name || discordData.user.username;
+            }
           }
+          setBoundDiscord({
+            username: globalName,
+            avatar: avatarUrl
+          });
         } catch (e) {
           console.error("Failed to load discord data on init");
         }

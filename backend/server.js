@@ -118,14 +118,14 @@ function calculateSocialCompression(userCount) {
   return (1.0 + (userCount * 0.05)).toFixed(3);
 }
 
-// Function to get a mock IP if local
-function getRealOrMockIP(socket) {
-  let ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-  if (ip === '::1' || ip === '127.0.0.1' || ip === '::ffff:127.0.0.1') {
-    // Generate a random public IP for testing locally
-    return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+// Function to get the real IP
+function getRealIP(socket) {
+  let forwarded = socket.handshake.headers['x-forwarded-for'];
+  if (forwarded) {
+    // x-forwarded-for can be a comma-separated list, the first one is the real client IP
+    return forwarded.split(',')[0].trim();
   }
-  return ip;
+  return socket.handshake.address;
 }
 
 io.on('connection', (socket) => {
@@ -134,7 +134,7 @@ io.on('connection', (socket) => {
     try {
       const decoded = jwt.verify(data.token, JWT_SECRET);
       
-      const ip = getRealOrMockIP(socket);
+      const ip = getRealIP(socket);
       const geo = geoip.lookup(ip) || { country: 'UNKNOWN', ll: [0, 0] };
       
       const user = {

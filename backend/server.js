@@ -52,7 +52,7 @@ async function sendDiscordWebhook(message) {
 setInterval(() => {
   const currentTotal = globalProduction;
   const compression = calculateSocialCompression(connectedUsers.size);
-  const msg = `📊 **【每日世界通量報告】**\n目前全球掛機總產出：\`${currentTotal.toLocaleString()} 單位\`\n社會總壓迫常數：\`${compression} Ω\`\n當前真實連線[...]`;
+  const msg = `📊 **【每日世界通量報告】**\n目前全球掛機總產出：\`${currentTotal.toLocaleString()} 單位\`\n社會總壓迫常數：\`${compression} Ω\`\n當前真實連線[...]
   sendDiscordWebhook(msg);
 }, 24 * 60 * 60 * 1000); // Once a day
 
@@ -101,32 +101,13 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-app.post('/api/bind-discord-manual', async (req, res) => {
-  const { token, discordId, username: globalName, avatar: avatarUrl } = req.body;
-  if (!token || !discordId) return res.status(400).json({ error: 'Missing token or discordId' });
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const profile = { id: discordId, username: globalName || discordId, avatar: avatarUrl || `https://cdn.discordapp.com/embed/avatars/${(BigInt(discordId) >> 22n) % 6n}.png` };
-    const success = await db.updateUserDiscord(decoded.username, profile);
-    if (success) {
-      res.json({ success: true, message: 'Discord ID bound successfully manually' });
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
-  } catch (err) {
-    console.error('[SYS] Discord bind error:', err.message);
-    res.status(401).json({ error: 'Invalid token or database error' });
-  }
-});
-
 app.get('/api/auth/discord', (req, res) => {
   const state = req.query.state;
   if (!state) return res.status(400).send('Missing state');
   
   const redirectUri = `${BACKEND_URL}/api/auth/discord/callback`;
   
-  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify&state=${state}`;
+  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify&state=${state}`[...]
   res.redirect(discordAuthUrl);
 });
 
@@ -189,6 +170,7 @@ app.get('/api/auth/discord/callback', async (req, res) => {
     const success = await db.updateUserDiscord(decoded.username, profile);
     
     if (success) {
+      console.log(`[SYS] User ${decoded.username} successfully bound Discord profile: ${userData.id}`);
       res.redirect(returnTo || '/');
     } else {
       res.status(404).send('User not found in Earth Online database');

@@ -146,7 +146,8 @@ function DocumentationOverlay({ onClose }) {
             <li className={activeSection === 'overview' ? 'active' : ''} onClick={() => scrollTo('overview')}>01. OVERVIEW</li>
             <li className={activeSection === 'architecture' ? 'active' : ''} onClick={() => scrollTo('architecture')}>02. ARCHITECTURE</li>
             <li className={activeSection === 'references' ? 'active' : ''} onClick={() => scrollTo('references')}>03. REFERENCES</li>
-            <li className={activeSection === 'author' ? 'active' : ''} onClick={() => scrollTo('author')}>04. AUTHOR</li>
+            <li className={activeSection === 'discord' ? 'active' : ''} onClick={() => scrollTo('discord')}>04. DISCORD RPC</li>
+            <li className={activeSection === 'author' ? 'active' : ''} onClick={() => scrollTo('author')}>05. AUTHOR</li>
           </ul>
         </aside>
 
@@ -210,6 +211,28 @@ function DocumentationOverlay({ onClose }) {
             <div className="doc-grid">
               <div className="doc-grid-label">介面圖示</div>
               <div className="doc-grid-value">Lucide React</div>
+            </div>
+          </section>
+
+          <section id="discord">
+            <div className="doc-tag">TUTORIAL</div>
+            <h1 className="doc-title">Discord Status Integration (Discord 狀態連動教學)</h1>
+            <div className="doc-text">
+              由於 Discord 官方的資安限制，網頁遊戲無法自動更改您的 Discord 狀態為「正在玩 地球在線」。若您希望在自己的 Discord 個人資料上炫耀您正在遊玩本系統，請依照以下步驟手動設定：
+            </div>
+            <div className="doc-text" style={{backgroundColor: 'rgba(255,255,255,0.05)', padding: '15px', borderRadius: '8px', borderLeft: '3px solid #5865F2'}}>
+              <ol style={{margin: 0, paddingLeft: '20px', lineHeight: '1.8'}}>
+                <li>開啟您電腦上的 <strong>Discord 桌面版軟體</strong>。</li>
+                <li>點擊左下角齒輪圖示進入 <strong>使用者設定 (User Settings)</strong>。</li>
+                <li>在左側選單往下滑，找到 <strong>「已註冊的遊戲」 (Registered Games)</strong>。</li>
+                <li>點擊畫面上方的 <strong>「加入它！」 (Add it!)</strong> 藍色按鈕。</li>
+                <li>在下拉選單中選擇您目前正在用來玩地球在線的瀏覽器（例如：Google Chrome、Edge）。</li>
+                <li>點擊「新增遊戲」後，它會出現在清單中。</li>
+                <li>點擊清單中的瀏覽器名稱，將它<strong>重新命名為「地球在線」</strong>。</li>
+              </ol>
+            </div>
+            <div className="doc-text" style={{marginTop: '15px'}}>
+              設定完成後，只要您開著瀏覽器，所有 Discord 好友都會看到您華麗的狀態：<strong>「正在玩 地球在線」</strong>！
             </div>
           </section>
 

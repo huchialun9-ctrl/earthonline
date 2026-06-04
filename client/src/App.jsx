@@ -121,6 +121,13 @@ function MapController({ myNode, mapTheme, setMapTheme }) {
 }
 
 function DocumentationOverlay({ onClose }) {
+  const [activeSection, setActiveSection] = useState('overview');
+
+  const scrollTo = (id) => {
+    setActiveSection(id);
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="pro-doc-overlay">
       <div className="pro-doc-header">
@@ -136,15 +143,15 @@ function DocumentationOverlay({ onClose }) {
         
         <aside className="pro-doc-sidebar">
           <ul>
-            <li className="active">01. OVERVIEW</li>
-            <li>02. ARCHITECTURE</li>
-            <li>03. REFERENCES</li>
-            <li>04. AUTHOR</li>
+            <li className={activeSection === 'overview' ? 'active' : ''} onClick={() => scrollTo('overview')}>01. OVERVIEW</li>
+            <li className={activeSection === 'architecture' ? 'active' : ''} onClick={() => scrollTo('architecture')}>02. ARCHITECTURE</li>
+            <li className={activeSection === 'references' ? 'active' : ''} onClick={() => scrollTo('references')}>03. REFERENCES</li>
+            <li className={activeSection === 'author' ? 'active' : ''} onClick={() => scrollTo('author')}>04. AUTHOR</li>
           </ul>
         </aside>
 
         <main className="pro-doc-content">
-          <section>
+          <section id="overview">
             <div className="doc-tag">CONCEPT_DOCUMENT</div>
             <h1 className="doc-title">Project Overview</h1>
             <p className="doc-lead">
@@ -158,7 +165,7 @@ function DocumentationOverlay({ onClose }) {
             </div>
           </section>
 
-          <section>
+          <section id="architecture">
             <div className="doc-tag">SYS_ARCHITECTURE</div>
             <h1 className="doc-title">Architecture & Data Files</h1>
             <div className="doc-grid">
@@ -179,7 +186,7 @@ function DocumentationOverlay({ onClose }) {
             </div>
           </section>
 
-          <section>
+          <section id="references">
             <div className="doc-tag">SOURCES</div>
             <h1 className="doc-title">Reference Sources</h1>
             <div className="doc-grid">
@@ -206,7 +213,7 @@ function DocumentationOverlay({ onClose }) {
             </div>
           </section>
 
-          <section>
+          <section id="author">
             <div className="doc-tag">CREDITS</div>
             <h1 className="doc-title">Developer Info</h1>
             <div className="doc-text">

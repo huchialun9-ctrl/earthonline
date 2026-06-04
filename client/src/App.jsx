@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Rectangle, CircleMarker, Popup } from 'react-leaflet';
 import { io } from 'socket.io-client';
+import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import './index.css';
 
@@ -45,9 +46,16 @@ function LoginGateway({ onLogin }) {
   return (
     <div className="login-gateway">
       <div className="login-box">
-        <div style={{textAlign: 'center', marginBottom: '20px'}}>
-          <img src="/logo.png" alt="logo" style={{width: '64px', height: '64px'}} />
-          <h2 style={{fontFamily: 'var(--font-sans)', color: 'var(--accent-color)'}}>地球在線登入閘道</h2>
+        {/* Animated Rotating Earth */}
+        <div className="earth-container">
+          <div className="earth-sphere"></div>
+        </div>
+
+        <div style={{textAlign: 'center', marginBottom: '25px', zIndex: 10, position: 'relative'}}>
+          <h2 style={{fontFamily: 'var(--font-sans)', color: 'var(--text-main)', fontSize: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}}>
+            <Globe2 className="icon-glow" size={32} /> 地球在線
+          </h2>
+          <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '5px'}}>全球節點觀測與管理中心</p>
         </div>
         
         <form onSubmit={handleSubmit} className="login-form">
@@ -99,6 +107,24 @@ function Dashboard({ token, onLogout }) {
   const [logs, setLogs] = useState(['[SYS] 地球在線終端連線建立中...', '[SYS] 正在載入全球節點矩陣...']);
   const [ping, setPing] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
+  const [showDiscordModal, setShowDiscordModal] = useState(false);
+  const [discordId, setDiscordId] = useState('');
+  
+  // Fake bound Discord data for UI demo (since backend DB isn't fully updated yet)
+  const [boundDiscord, setBoundDiscord] = useState(null);
+
+  const handleBindDiscord = (e) => {
+    e.preventDefault();
+    if (!discordId) return;
+    // Simulate API fetch to public Discord avatar
+    const randomAvatarId = Math.floor(Math.random() * 5) + 1; // 1 to 5
+    setBoundDiscord({
+      username: discordId,
+      avatar: `https://cdn.discordapp.com/embed/avatars/${randomAvatarId}.png`
+    });
+    setShowDiscordModal(false);
+    addLog(`系統通知：成功綁定 Discord 帳號 [${discordId}]`);
+  };
 
   const addLog = (msg) => {
     setLogs(prev => {
@@ -217,8 +243,9 @@ function Dashboard({ token, onLogout }) {
       {/* Header Panel */}
       <header className="system-header">
         <div className="system-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div className={`status-indicator ${isConnected ? 'online' : 'offline'}`}></div>
-          <span style={{color: 'var(--accent-color)'}}>🌐</span> 地球在線 // 觀測節點 [TW-X1]
+          <Globe2 color="var(--accent-color)" size={24} /> 
+          <span style={{fontWeight: 'bold', fontSize: '1.2rem'}}>地球在線</span> 
+          <span style={{color: 'var(--text-secondary)'}}>// 所在伺服器地區 [{myNode?.country || '連線中...'}]</span>
         </div>
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div className="system-stats" style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
@@ -238,10 +265,38 @@ function Dashboard({ token, onLogout }) {
       <div className="main-content">
         {/* Left Metrics Terminal */}
         <aside className="metrics-terminal floating-panel">
-          <div className="metric-group">
-            <div className="metric-title">使用者帳號 (User ID)</div>
-            <div style={{color: 'var(--accent-color)', fontSize: '1.2rem', fontWeight: 'bold'}}>{myNode?.username}</div>
-            <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '5px'}}>
+          <div className="brand-banner" style={{ textAlign: 'center', paddingBottom: '15px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '15px' }}>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Blue_Marble_2002.png/240px-Blue_Marble_2002.png" alt="earth" style={{width: '60px', height: '60px', borderRadius: '50%', boxShadow: '0 0 15px rgba(0, 255, 204, 0.4)'}} />
+            <h3 style={{margin: '10px 0 0 0', color: 'var(--text-main)'}}>EARTH ONLINE</h3>
+          </div>
+
+          <div className="metric-group profile-card">
+            <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+              <User size={16} /> 使用者帳號 (User ID)
+            </div>
+            
+            {boundDiscord ? (
+              <div style={{display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px'}}>
+                <img src={boundDiscord.avatar} alt="discord-avatar" style={{width: '48px', height: '48px', borderRadius: '50%', border: '2px solid var(--accent-color)'}} />
+                <div>
+                  <div style={{color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: 'bold'}}>{boundDiscord.username}</div>
+                  <div style={{color: 'var(--accent-color)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px'}}>
+                    <ShieldCheck size={14} /> 已認證節點
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{color: 'var(--text-main)', fontSize: '1.2rem', fontWeight: 'bold'}}>{myNode?.username}</div>
+                <div style={{marginTop: '10px'}}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setShowDiscordModal(true); }} className="discord-link">
+                    <LinkIcon size={14} /> 連結 Discord 帳號
+                  </a>
+                </div>
+              </div>
+            )}
+            
+            <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '8px'}}>
               NODE ID: {myNode?.userId}<br/>
               IP: {myNode?.ip}<br/>
               REGION: {myNode?.country}
@@ -249,21 +304,18 @@ function Dashboard({ token, onLogout }) {
           </div>
           
           <div className="metric-group">
-            <div className="metric-title">本次上線時間 (Online Time)</div>
+            <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+              <Activity size={16} /> 本次上線時間 (Online Time)
+            </div>
             <div style={{color: 'var(--accent-color)', fontSize: '1.5rem', fontWeight: 'bold'}}>
               {formatTime(lifespan)}
             </div>
           </div>
 
           <div className="metric-group">
-            <div className="metric-title">健康狀態 (Health Status)</div>
-            <div className="vital-signs">
-              {calculateVitalSigns(lifespan)}
+            <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+              <Server size={16} /> 網路連線狀態 (Network)
             </div>
-          </div>
-          
-          <div className="metric-group" style={{marginTop: '40px'}}>
-            <div className="metric-title">網路連線狀態 (Network)</div>
             <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)'}}>
               上傳 (Uplink): {Math.floor(Math.random()*500 + 100)} KB/s<br/>
               下載 (Downlink): {Math.floor(Math.random()*1500 + 500)} KB/s<br/>
@@ -276,17 +328,23 @@ function Dashboard({ token, onLogout }) {
         <main className="geographic-matrix">
           <div className="map-overlays">
             <div className="overlay-box floating-panel">
-              <div className="overlay-title">全球總掛機時間</div>
+              <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                <Globe2 size={16} /> 全球總掛機時間
+              </div>
               <div className="overlay-value">{formatTime(globalStats.globalProduction)}</div>
             </div>
             <div className="overlay-box floating-panel">
-              <div className="overlay-title">伺服器即時負載</div>
+              <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                <Server size={16} /> 伺服器即時負載
+              </div>
               <div className="overlay-value" style={{color: 'var(--danger-color)'}}>
                 {globalStats.totalPopulation > 0 ? ((globalStats.activeUsers / globalStats.totalPopulation) * 100).toFixed(1) : 0}%
               </div>
             </div>
             <div className="overlay-box floating-panel">
-              <div className="overlay-title">連線延遲 (Ping)</div>
+              <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                <Network size={16} /> 連線延遲 (Ping)
+              </div>
               <div className="overlay-value" style={{fontSize: '1.2rem'}}>{ping} ms</div>
             </div>
           </div>
@@ -364,12 +422,12 @@ function Dashboard({ token, onLogout }) {
 
           {/* Bottom Console Log Module */}
           <div className="bottom-log-console floating-panel">
-            <div className="log-header">
-              系統即時通知 (System Event Log)
+            <div className="log-header" style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-color)'}}>
+              <Activity size={16} /> 系統即時通知 (System Event Log)
             </div>
             <div className="log-content">
               {logs.map((log, i) => (
-                <div key={i} style={{ color: log.includes('警告') ? 'var(--danger-color)' : 'var(--accent-color)' }}>
+                <div key={i} style={{ color: log.includes('警告') ? 'var(--danger-color)' : 'var(--text-main)', marginTop: '4px' }}>
                   {log}
                 </div>
               ))}
@@ -377,6 +435,35 @@ function Dashboard({ token, onLogout }) {
           </div>
         </main>
       </div>
+
+      {/* Discord Binding Modal */}
+      {showDiscordModal && (
+        <div className="modal-overlay">
+          <div className="modal-box floating-panel">
+            <h3 style={{display: 'flex', alignItems: 'center', gap: '10px', marginTop: 0}}>
+              <LinkIcon size={20} /> 連結您的 Discord
+            </h3>
+            <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '20px'}}>
+              請輸入您的 Discord 使用者名稱 (例如: user#1234 或 user)。系統將會抓取您的公開大頭貼，讓您的指揮中心更有個人風格！
+            </p>
+            <form onSubmit={handleBindDiscord}>
+              <input 
+                type="text" 
+                placeholder="輸入 Discord ID..." 
+                value={discordId}
+                onChange={e => setDiscordId(e.target.value)}
+                className="terminal-input"
+                style={{marginBottom: '15px'}}
+                required
+              />
+              <div style={{display: 'flex', gap: '10px'}}>
+                <button type="submit" className="terminal-btn" style={{flex: 1}}>確認綁定</button>
+                <button type="button" className="terminal-btn" style={{flex: 1, background: 'rgba(255,255,255,0.1)'}} onClick={() => setShowDiscordModal(false)}>取消</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

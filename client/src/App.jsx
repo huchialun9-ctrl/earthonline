@@ -176,8 +176,12 @@ function Dashboard({ token, onLogout }) {
           <img src="/logo.png" alt="logo" style={{width: '24px', height: '24px'}} />
           <span>地球在線 // 觀測節點 [TW-X1]</span>
         </div>
-        <div className="header-right">
-          <span>實時連線人數: {globalStats.activeUsers} / 地球總人口: {globalStats.totalPopulation}</span>
+        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            實時連線人數: {globalStats.activeUsers} / 
+            <img src="/logo.png" alt="logo" style={{width: '16px', height: '16px', background: 'transparent'}} />
+            地球總人口: {globalStats.totalPopulation}
+          </span>
           <button onClick={onLogout} className="logout-btn">[ 中斷連線 ]</button>
         </div>
       </header>

@@ -327,25 +327,29 @@ function Dashboard({ token, onLogout }) {
         {/* Right Geographic Matrix */}
         <main className="geographic-matrix">
           <div className="map-overlays">
-            <div className="overlay-box floating-panel">
-              <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-                <Globe2 size={16} /> 全球總掛機時間
+            <div className="floating-panel" style={{display: 'flex', gap: '30px', padding: '15px 25px'}}>
+              <div className="overlay-item">
+                <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                  <Globe2 size={16} /> 全球總掛機時間
+                </div>
+                <div className="overlay-value">{formatTime(globalStats.globalProduction)}</div>
               </div>
-              <div className="overlay-value">{formatTime(globalStats.globalProduction)}</div>
-            </div>
-            <div className="overlay-box floating-panel">
-              <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-                <Server size={16} /> 伺服器即時負載
+              <div style={{width: '1px', background: 'var(--border-color)'}}></div>
+              <div className="overlay-item">
+                <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                  <Server size={16} /> 伺服器即時負載
+                </div>
+                <div className="overlay-value" style={{color: 'var(--danger-color)'}}>
+                  {globalStats.totalPopulation > 0 ? ((globalStats.activeUsers / globalStats.totalPopulation) * 100).toFixed(1) : 0}%
+                </div>
               </div>
-              <div className="overlay-value" style={{color: 'var(--danger-color)'}}>
-                {globalStats.totalPopulation > 0 ? ((globalStats.activeUsers / globalStats.totalPopulation) * 100).toFixed(1) : 0}%
+              <div style={{width: '1px', background: 'var(--border-color)'}}></div>
+              <div className="overlay-item">
+                <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                  <Network size={16} /> 連線延遲 (Ping)
+                </div>
+                <div className="overlay-value" style={{fontSize: '1.2rem', marginTop: '4px'}}>{ping} ms</div>
               </div>
-            </div>
-            <div className="overlay-box floating-panel">
-              <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-                <Network size={16} /> 連線延遲 (Ping)
-              </div>
-              <div className="overlay-value" style={{fontSize: '1.2rem'}}>{ping} ms</div>
             </div>
           </div>
 

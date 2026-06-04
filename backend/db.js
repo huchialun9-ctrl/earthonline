@@ -3,10 +3,20 @@ const User = require('./models/User');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/earthonline';
 
+// 驗證 MongoDB URI 格式
+if (!MONGODB_URI.startsWith('mongodb://') && !MONGODB_URI.startsWith('mongodb+srv://')) {
+  console.error('[SYS] FATAL: MONGODB_URI 必須以 mongodb:// 或 mongodb+srv:// 開頭');
+  console.error('[SYS] 當前值:', MONGODB_URI);
+  process.exit(1);
+}
+
 // Connect without deprecated options (handled automatically by modern Mongoose)
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('[SYS] Database Core Online: MongoDB Connected'))
-  .catch(err => console.error('[SYS] MongoDB Connection Error:', err));
+  .catch(err => {
+    console.error('[SYS] MongoDB Connection Error:', err.message);
+    process.exit(1);
+  });
 
 async function findUserByUsername(username) {
   return await User.findOne({ username });

@@ -122,58 +122,108 @@ function MapController({ myNode, mapTheme, setMapTheme }) {
 
 function DocumentationOverlay({ onClose }) {
   return (
-    <div className="doc-overlay">
-      <div className="doc-header">
-        <h2 style={{margin: 0, display: 'flex', alignItems: 'center', gap: '15px', color: 'var(--text-main)'}}>
-          <BookOpen className="icon-glow" color="var(--accent-color)" size={28} />
-          EARTH ONLINE 系統文獻與參考資料
-        </h2>
-        <button onClick={onClose} className="terminal-btn" style={{padding: '8px 20px', width: 'auto', display: 'flex', alignItems: 'center', gap: '8px'}}>
-          <X size={18} /> 關閉檔案
+    <div className="pro-doc-overlay">
+      <div className="pro-doc-header">
+        <div className="pro-doc-logo">
+          <Database size={16} color="var(--accent-color)" /> EARTH_ONLINE // MANIFEST_V1.0
+        </div>
+        <button onClick={onClose} className="pro-doc-close">
+          ESC_CLOSE <X size={14} />
         </button>
       </div>
 
-      <div className="doc-content">
+      <div className="pro-doc-body">
         
-        <div className="doc-section">
-          <h2><FileText size={24} /> 文獻說明 (Literature & Concept)</h2>
-          <p>
-            「地球在線 (EARTH ONLINE)」是一個基於《三體》概念與賽博龐克美學啟發的實驗性全球網路觀測專案。其核心理念在於將全球四散的網路節點（使用者）具象化為實體地理座標上的「觀測站」，並透過即時的雙向 WebSocket 通訊，建構出一個去中心化且具備高度同步性的虛擬拓樸網路。
-          </p>
-          <p>
-            本系統嘗試探討在高度資訊化的未來，人類個體如何作為巨型系統架構中的微小神經元運作。每一個登入的帳號，皆代表著為全球伺服器矩陣貢獻運算能力與觀測數據的終端節點。
-          </p>
-        </div>
-
-        <div className="doc-section">
-          <h2><Database size={24} /> 資料檔案與技術架構 (Data Files & Architecture)</h2>
+        <aside className="pro-doc-sidebar">
           <ul>
-            <li><strong>前端框架 (Client):</strong> React 18, Vite, React-Leaflet (GIS 地理資訊系統渲染)</li>
-            <li><strong>後端核心 (Server):</strong> Node.js, Express, Socket.IO (處理全雙工即時通訊與封包廣播)</li>
-            <li><strong>部署架構 (Infrastructure):</strong> Render 雲端運算節點、Cloudflare CDN 全球邊緣加速</li>
-            <li><strong>狀態機制 (State Mechanics):</strong> 全局掛機時間 (Global Production)、社會總壓迫常數 (Social Compression)</li>
+            <li className="active">01. OVERVIEW</li>
+            <li>02. ARCHITECTURE</li>
+            <li>03. REFERENCES</li>
+            <li>04. AUTHOR</li>
           </ul>
-        </div>
+        </aside>
 
-        <div className="doc-section">
-          <h2><LinkIcon size={24} /> 參考來源 (Reference Sources)</h2>
-          <ul>
-            <li><strong>GIS 圖資來源:</strong> Esri World Imagery, OpenStreetMap, CartoDB Dark Matter</li>
-            <li><strong>3D 地球紋理貼圖:</strong> ThreeGlobe / Blue Marble (NASA)</li>
-            <li><strong>UI 介面圖示集:</strong> Lucide React Icons</li>
-            <li><strong>Discord API 代理:</strong> dcdn.dstn.to (用於免驗證即時抓取使用者公開資訊)</li>
-          </ul>
-        </div>
+        <main className="pro-doc-content">
+          <section>
+            <div className="doc-tag">CONCEPT_DOCUMENT</div>
+            <h1 className="doc-title">Project Overview</h1>
+            <p className="doc-lead">
+              「地球在線 (EARTH ONLINE)」是一個基於《三體》概念與賽博龐克美學啟發的實驗性全球網路觀測專案。
+            </p>
+            <div className="doc-text">
+              其核心理念在於將全球四散的網路節點（使用者）具象化為實體地理座標上的「觀測站」，並透過即時的雙向 WebSocket 通訊，建構出一個去中心化且具備高度同步性的虛擬拓樸網路。
+            </div>
+            <div className="doc-text">
+              本系統嘗試探討在高度資訊化的未來，人類個體如何作為巨型系統架構中的微小神經元運作。每一個登入的帳號，皆代表著為全球伺服器矩陣貢獻運算能力與觀測數據的終端節點。
+            </div>
+          </section>
 
-        <div className="doc-section">
-          <h2><Code size={24} /> 開發者資訊 (Developer Info)</h2>
-          <p>本系統由獨立開發者進行架構設計、UI/UX 規劃與全端程式撰寫。</p>
-          <ul>
-            <li><strong>開發者 (Developer):</strong> 胡家綸</li>
-            <li><strong>聯絡信箱 (Contact Email):</strong> <a href="mailto:huchialun97@gmail.com" style={{color: 'var(--accent-color)', textDecoration: 'underline'}}>huchialun97@gmail.com</a></li>
-          </ul>
-        </div>
+          <section>
+            <div className="doc-tag">SYS_ARCHITECTURE</div>
+            <h1 className="doc-title">Architecture & Data Files</h1>
+            <div className="doc-grid">
+              <div className="doc-grid-label">Client (前端)</div>
+              <div className="doc-grid-value">React 18, Vite, React-Leaflet (GIS即時渲染)</div>
+            </div>
+            <div className="doc-grid">
+              <div className="doc-grid-label">Server (後端)</div>
+              <div className="doc-grid-value">Node.js, Express, Socket.IO (全雙工通訊廣播)</div>
+            </div>
+            <div className="doc-grid">
+              <div className="doc-grid-label">Infrastructure</div>
+              <div className="doc-grid-value">Render 雲端運算節點、Cloudflare CDN 全球邊緣加速</div>
+            </div>
+            <div className="doc-grid">
+              <div className="doc-grid-label">Mechanics</div>
+              <div className="doc-grid-value">全局掛機時間 (Global Production)、社會總壓迫常數 (Social Compression)</div>
+            </div>
+          </section>
 
+          <section>
+            <div className="doc-tag">SOURCES</div>
+            <h1 className="doc-title">Reference Sources</h1>
+            <div className="doc-grid">
+              <div className="doc-grid-label">GIS 圖資</div>
+              <div className="doc-grid-value">
+                <a href="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer" target="_blank" rel="noreferrer">Esri World Imagery</a>,{' '}
+                <a href="https://www.openstreetmap.org/" target="_blank" rel="noreferrer">OpenStreetMap</a>,{' '}
+                <a href="https://carto.com/basemaps/" target="_blank" rel="noreferrer">CartoDB Dark Matter</a>
+              </div>
+            </div>
+            <div className="doc-grid">
+              <div className="doc-grid-label">3D 貼圖</div>
+              <div className="doc-grid-value">
+                <a href="https://globe.gl/" target="_blank" rel="noreferrer">ThreeGlobe</a> / NASA Blue Marble
+              </div>
+            </div>
+            <div className="doc-grid">
+              <div className="doc-grid-label">API 代理</div>
+              <div className="doc-grid-value">dcdn.dstn.to (無認證 Discord 資料抓取)</div>
+            </div>
+            <div className="doc-grid">
+              <div className="doc-grid-label">介面圖示</div>
+              <div className="doc-grid-value">Lucide React</div>
+            </div>
+          </section>
+
+          <section>
+            <div className="doc-tag">CREDITS</div>
+            <h1 className="doc-title">Developer Info</h1>
+            <div className="doc-text">
+              本系統由獨立開發者進行架構設計、UI/UX 規劃與全端程式撰寫。
+            </div>
+            <div className="doc-grid">
+              <div className="doc-grid-label">Author</div>
+              <div className="doc-grid-value">胡家綸</div>
+            </div>
+            <div className="doc-grid">
+              <div className="doc-grid-label">Contact</div>
+              <div className="doc-grid-value">
+                <a href="mailto:huchialun97@gmail.com">huchialun97@gmail.com</a>
+              </div>
+            </div>
+          </section>
+        </main>
       </div>
     </div>
   );

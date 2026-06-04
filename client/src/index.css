@@ -380,21 +380,23 @@ body {
   filter: drop-shadow(0 0 8px var(--accent-color));
 }
 
-/* Full Page Documentation */
-.doc-overlay {
+/* Professional Docs Redesign */
+.pro-doc-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--bg-color);
+  background: #000000;
   z-index: 10000;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.doc-header {
-  padding: 20px 40px;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--panel-bg);
+.pro-doc-header {
+  padding: 0 40px;
+  height: 60px;
+  border-bottom: 1px solid #1f1f1f;
+  background: #050505;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -402,44 +404,135 @@ body {
   top: 0;
 }
 
-.doc-content {
-  padding: 40px;
-  max-width: 1000px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.doc-section {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
-  padding: 25px;
-  margin-bottom: 30px;
-  border-radius: 8px;
-}
-
-.doc-section h2 {
-  color: var(--accent-color);
-  margin-top: 0;
-  margin-bottom: 20px;
+.pro-doc-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  border-bottom: 1px solid rgba(0, 255, 204, 0.2);
-  padding-bottom: 10px;
+  gap: 12px;
+  color: #ededed;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  font-family: monospace;
 }
 
-.doc-section p {
-  color: var(--text-secondary);
-  line-height: 1.8;
+.pro-doc-close {
+  background: transparent;
+  border: 1px solid #333;
+  color: #888;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.pro-doc-close:hover {
+  border-color: #fff;
+  color: #fff;
+}
+
+.pro-doc-body {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 60px 20px;
+  gap: 80px;
+}
+
+.pro-doc-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.pro-doc-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: sticky;
+  top: 100px;
+}
+
+.pro-doc-sidebar li {
+  color: #666;
+  font-size: 0.85rem;
+  font-family: monospace;
   margin-bottom: 15px;
+  cursor: pointer;
+}
+.pro-doc-sidebar li.active {
+  color: var(--accent-color);
 }
 
-.doc-section ul {
-  color: var(--text-secondary);
+.pro-doc-content {
+  flex-grow: 1;
+  max-width: 700px;
+}
+
+.pro-doc-content section {
+  margin-bottom: 80px;
+}
+
+.doc-tag {
+  display: inline-block;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--accent-color);
+  border: 1px solid rgba(0,255,204,0.2);
+  padding: 4px 8px;
+  border-radius: 2px;
+  margin-bottom: 20px;
+}
+
+.doc-title {
+  color: #ededed;
+  font-size: 2.2rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  margin: 0 0 20px 0;
+}
+
+.doc-lead {
+  color: #a1a1aa;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.doc-text {
+  color: #888;
+  font-size: 0.95rem;
   line-height: 1.8;
-  padding-left: 20px;
+  margin-bottom: 20px;
 }
 
-.doc-section li {
-  margin-bottom: 8px;
+.doc-grid {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 15px;
+  border-top: 1px solid #1f1f1f;
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+.doc-grid-label {
+  color: #ededed;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.doc-grid-value {
+  color: #888;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.doc-grid-value a {
+  color: #ededed;
+  text-decoration: underline;
+  text-decoration-color: #333;
+  text-underline-offset: 4px;
+}
+.doc-grid-value a:hover {
+  text-decoration-color: var(--accent-color);
 }

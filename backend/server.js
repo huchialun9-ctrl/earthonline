@@ -61,34 +61,44 @@ app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Missing credentials' });
   
-  if (await db.findUserByUsername(username)) {
-    return res.status(400).json({ error: 'Username already exists' });
+  try {
+    if (await db.findUserByUsername(username)) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = {
+      id: 'EO-' + Date.now(),
+      username,
+      password: hashedPassword,
+      registeredAt: Date.now()
+    };
+    
+    await db.createUser(newUser);
+    res.json({ success: true, message: 'Registration successful' });
+  } catch (err) {
+    console.error('[SYS] Registration error:', err.message);
+    res.status(500).json({ error: 'Database error during registration' });
   }
-  
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = {
-    id: 'EO-' + Date.now(),
-    username,
-    password: hashedPassword,
-    registeredAt: Date.now()
-  };
-  
-  await db.createUser(newUser);
-  res.json({ success: true, message: 'Registration successful' });
 });
 
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Missing credentials' });
   
-  const user = await db.findUserByUsername(username);
-  if (!user) return res.status(404).json({ error: 'User not found' });
-  
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(400).json({ error: 'Invalid credentials' });
-  
-  const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET);
-  res.json({ success: true, token, user: { id: user.id, username: user.username } });
+  try {
+    const user = await db.findUserByUsername(username);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(400).json({ error: 'Invalid credentials' });
+    
+    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET);
+    res.json({ success: true, token, user: { id: user.id, username: user.username } });
+  } catch (err) {
+    console.error('[SYS] Login error:', err.message);
+    res.status(500).json({ error: 'Database error during login' });
+  }
 });
 
 app.post('/api/bind-discord-manual', async (req, res) => {
@@ -105,7 +115,8 @@ app.post('/api/bind-discord-manual', async (req, res) => {
       res.status(404).json({ error: 'User not found' });
     }
   } catch (err) {
-    res.status(401).json({ error: 'Invalid token' });
+    console.error('[SYS] Discord bind error:', err.message);
+    res.status(401).json({ error: 'Invalid token or database error' });
   }
 });
 
@@ -202,7 +213,7 @@ const io = new Server(server, {
 // State
 const connectedUsers = new Map();
 let globalProduction = 0; // Total accumulated idle time (seconds)
-let globalStatsInterval = null; // Store interval ID
+let globalStatsInterval = null;
 
 // Function to start periodic global calculation (only after DB connection is ready)
 function startGlobalStatsCalculation() {
@@ -210,6 +221,11 @@ function startGlobalStatsCalculation() {
   
   globalStatsInterval = setInterval(async () => {
     try {
+      if (!db.isDBConnected()) {
+        console.warn('[SYS] Database not connected, skipping global stats calculation');
+        return;
+      }
+      
       const now = Date.now();
       globalProduction = await db.getGlobalProduction(now);
       const pop = await db.getTotalPopulation();
@@ -245,6 +261,11 @@ function getRealIP(socket) {
 io.on('connection', (socket) => {
   socket.on('authenticate', async (data) => {
     try {
+      if (!db.isDBConnected()) {
+        socket.emit('auth_error', { message: 'Database connection not ready' });
+        return;
+      }
+
       const decoded = jwt.verify(data.token, JWT_SECRET);
       
       const ip = getRealIP(socket);
@@ -301,7 +322,8 @@ io.on('connection', (socket) => {
       }));
       socket.emit('all_nodes', allNodes);
     } catch (err) {
-      socket.emit('auth_error', { message: 'Invalid token' });
+      console.error('[SYS] Authentication error:', err.message);
+      socket.emit('auth_error', { message: 'Invalid token or database error' });
     }
   });
 
@@ -320,8 +342,19 @@ server.listen(PORT, () => {
   console.log(`[SYS] Earth Online Backend Core initialized on port ${PORT}`);
   
   // Start global stats calculation after server is ready
-  // Add a small delay to ensure MongoDB connection is established
+  // Add a delay to ensure MongoDB connection is established
   setTimeout(() => {
-    startGlobalStatsCalculation();
+    if (db.isDBConnected()) {
+      startGlobalStatsCalculation();
+    } else {
+      console.warn('[SYS] Database not connected yet, retrying in 5 seconds...');
+      setTimeout(() => {
+        if (db.isDBConnected()) {
+          startGlobalStatsCalculation();
+        } else {
+          console.error('[SYS] Database connection failed after retry');
+        }
+      }, 5000);
+    }
   }, 2000);
 });

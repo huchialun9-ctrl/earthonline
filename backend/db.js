@@ -1,66 +1,57 @@
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
+const User = require('./models/User');
 
-const dbPath = path.join(__dirname, 'database.json');
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/earthonline';
 
-// Initialize database
-if (!fs.existsSync(dbPath)) {
-  fs.writeFileSync(dbPath, JSON.stringify({
-    users: [],
-    globalProductionBase: 0
-  }, null, 2));
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => console.log('[SYS] Database Core Online: MongoDB Connected'))
+  .catch(err => console.error('[SYS] MongoDB Connection Error:', err));
+
+async function findUserByUsername(username) {
+  return await User.findOne({ username });
 }
 
-function readDB() {
-  return JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
-}
-
-function writeDB(data) {
-  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
-}
-
-function findUserByUsername(username) {
-  const db = readDB();
-  const user = db.users.find(u => u.username === username);
-  if (user && !user.createdAt) {
-    user.createdAt = Date.now();
-    writeDB(db);
-  }
-  return user;
-}
-
-function createUser(user) {
-  const db = readDB();
+async function createUser(userData) {
+  const user = new User(userData);
   if (!user.createdAt) user.createdAt = Date.now();
-  db.users.push(user);
-  writeDB(db);
+  await user.save();
 }
 
-function getTotalPopulation() {
-  const db = readDB();
-  return db.users.length;
+async function getTotalPopulation() {
+  return await User.countDocuments({});
 }
 
-function updateUserDiscord(username, discordData) {
-  const db = readDB();
-  const user = db.users.find(u => u.username === username);
+async function updateUserDiscord(username, discordData) {
+  const user = await User.findOne({ username });
   if (user) {
     user.discord = discordData;
-    writeDB(db);
+    await user.save();
     return true;
   }
   return false;
 }
 
-function getGlobalProduction(now) {
-  const db = readDB();
-  let total = 0;
-  db.users.forEach(u => {
-    if (u.createdAt) {
-      total += Math.floor((now - u.createdAt) / 1000);
+async function getGlobalProduction(now) {
+  const result = await User.aggregate([
+    {
+      $project: {
+        idleSeconds: {
+          $floor: {
+            $divide: [{ $subtract: [now, "$createdAt"] }, 1000]
+          }
+        }
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalProduction: { $sum: "$idleSeconds" }
+      }
     }
-  });
-  return total;
+  ]);
+  return result.length > 0 ? result[0].totalProduction : 0;
 }
 
 module.exports = {

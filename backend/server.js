@@ -54,7 +54,7 @@ app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Missing credentials' });
   
-  if (db.findUserByUsername(username)) {
+  if (await db.findUserByUsername(username)) {
     return res.status(400).json({ error: 'Username already exists' });
   }
   
@@ -66,15 +66,16 @@ app.post('/api/register', async (req, res) => {
     registeredAt: Date.now()
   };
   
-  db.createUser(newUser);
+  await db.createUser(newUser);
   res.json({ success: true, message: 'Registration successful' });
 });
 
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
-  const user = db.findUserByUsername(username);
+  if (!username || !password) return res.status(400).json({ error: 'Missing credentials' });
   
-  if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+  const user = await db.findUserByUsername(username);
+  if (!user) return res.status(404).json({ error: 'User not found' });
   
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) return res.status(400).json({ error: 'Invalid credentials' });
@@ -90,7 +91,7 @@ app.post('/api/bind-discord-manual', async (req, res) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     const profile = { id: discordId, username: globalName || discordId, avatar: avatarUrl || `https://cdn.discordapp.com/embed/avatars/${(BigInt(discordId) >> 22n) % 6n}.png` };
-    const success = db.updateUserDiscord(decoded.username, profile);
+    const success = await db.updateUserDiscord(decoded.username, profile);
     if (success) {
       res.json({ success: true, message: 'Discord ID bound successfully manually' });
     } else {
@@ -167,7 +168,7 @@ app.get('/api/auth/discord/callback', async (req, res) => {
       avatar: avatarUrl
     };
 
-    const success = db.updateUserDiscord(decoded.username, profile);
+    const success = await db.updateUserDiscord(decoded.username, profile);
     
     if (success) {
       // Redirect back to frontend dynamically based on where they came from
@@ -194,14 +195,15 @@ const connectedUsers = new Map();
 let globalProduction = 0; // Total accumulated idle time (seconds)
 
 // Periodic global calculation
-setInterval(() => {
+setInterval(async () => {
   const now = Date.now();
-  globalProduction = db.getGlobalProduction(now);
+  globalProduction = await db.getGlobalProduction(now);
+  const pop = await db.getTotalPopulation();
 
   // Broadcast global stats to everyone every 2 seconds
   io.emit('global_stats', {
     activeUsers: connectedUsers.size,
-    totalPopulation: db.getTotalPopulation(),
+    totalPopulation: pop,
     globalProduction: globalProduction,
     socialCompression: calculateSocialCompression(connectedUsers.size)
   });
@@ -224,13 +226,13 @@ function getRealIP(socket) {
 
 io.on('connection', (socket) => {
   // Wait for client to authenticate via token
-  socket.on('authenticate', (data) => {
+  socket.on('authenticate', async (data) => {
     try {
       const decoded = jwt.verify(data.token, JWT_SECRET);
       
       const ip = getRealIP(socket);
       const geo = geoip.lookup(ip) || { country: 'UNKNOWN', ll: [0, 0] };
-      const dbUser = db.findUserByUsername(decoded.username);
+      const dbUser = await db.findUserByUsername(decoded.username);
       
       const user = {
         socketId: socket.id,
@@ -249,6 +251,8 @@ io.on('connection', (socket) => {
 
       console.log(`[SYS] Node Authenticated: ${user.username} | IP: ${ip} | Region: ${user.country}`);
 
+      const pop = await db.getTotalPopulation();
+
       socket.emit('init_data', {
         userId: user.id,
         username: user.username,
@@ -260,7 +264,7 @@ io.on('connection', (socket) => {
         createdAt: user.createdAt,
         connectedAt: user.connectedAt,
         activeUsers: connectedUsers.size,
-        totalPopulation: db.getTotalPopulation()
+        totalPopulation: pop
       });
 
       if (connectedUsers.size % 10 === 0 && connectedUsers.size > 0) {

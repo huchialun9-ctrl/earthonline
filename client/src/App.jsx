@@ -109,13 +109,13 @@ function MapController({ myNode, mapTheme, setMapTheme }) {
 
   return (
     <div style={{position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000, display: 'flex', gap: '10px'}}>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(0,0,0,0.8)', border: '1px solid var(--accent-color)'}} onClick={handleLocate}>
+      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(0,0,0,0.8)', border: '1px solid var(--[...]
         <Navigation size={14} /> 定位我的節點
       </button>
       <div style={{width: '1px', background: 'rgba(255,255,255,0.2)', margin: '0 5px'}}></div>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'satellite' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'satellite' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('satellite')}>衛星</button>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'dark' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'dark' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('dark')}>暗黑</button>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'street' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'street' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('street')}>街道</button>
+      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'satellite' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'sate[...]
+      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'dark' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'dark' ? '[...]
+      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'street' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'street'[...]
     </div>
   );
 }
@@ -159,10 +159,10 @@ function DocumentationOverlay({ onClose }) {
               「地球在線 (EARTH ONLINE)」是一個基於《三體》概念與賽博龐克美學啟發的實驗性全球網路觀測專案。
             </p>
             <div className="doc-text">
-              其核心理念在於將全球四散的網路節點（使用者）具象化為實體地理座標上的「觀測站」，並透過即時的雙向 WebSocket 通訊，建構出一個去中心化且具備高度同步性的虛擬拓樸網路。
+              其核心理念在於將全球四散的網路節點（使用者）具象化為實體地理座標上的「觀測站」，並透過即時的雙向 WebSocket 通訊，建構出一個██[...]
             </div>
             <div className="doc-text">
-              本系統嘗試探討在高度資訊化的未來，人類個體如何作為巨型系統架構中的微小神經元運作。每一個登入的帳號，皆代表著為全球伺服器矩陣貢獻運算能力與觀測數據的終端節點。
+              本系統嘗試探討在高度資訊化的未來，人類個體如何作為巨型系統架構中的微小神經元運作。每一個登入的帳號，皆代表著為全球伺服器██[...]
             </div>
           </section>
 
@@ -218,7 +218,7 @@ function DocumentationOverlay({ onClose }) {
             <div className="doc-tag">TUTORIAL</div>
             <h1 className="doc-title">Discord Status Integration (Discord 狀態連動教學)</h1>
             <div className="doc-text">
-              由於 Discord 官方的資安限制，網頁遊戲無法自動更改您的 Discord 狀態為「正在玩 地球在線」。若您希望在自己的 Discord 個人資料上炫耀您正在遊玩本系統，請依照以下步驟手動設定：
+              由於 Discord 官方的資安限制，網頁遊戲無法自動更改您的 Discord 狀態為「正在玩 地球在線」。若您希望在自己的 Discord 個人資料上炫耀您██[...]
             </div>
             <div className="doc-text" style={{backgroundColor: 'rgba(255,255,255,0.05)', padding: '15px', borderRadius: '8px', borderLeft: '3px solid #5865F2'}}>
               <ol style={{margin: 0, paddingLeft: '20px', lineHeight: '1.8'}}>
@@ -271,10 +271,8 @@ function Dashboard({ token, onLogout }) {
   const [showDiscordModal, setShowDiscordModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [mapTheme, setMapTheme] = useState('satellite');
-  const [discordId, setDiscordId] = useState('');
-  const [showManualBind, setShowManualBind] = useState(false);
   
-  // Fake bound Discord data for UI demo (since backend DB isn't fully updated yet)
+  // Bound Discord data from database
   const [boundDiscord, setBoundDiscord] = useState(null);
 
   const handleBindDiscord = (e) => {
@@ -282,35 +280,6 @@ function Dashboard({ token, onLogout }) {
     const statePayload = btoa(JSON.stringify({ token, returnTo: window.location.origin }));
     const discordOAuthUrl = `${API_URL}/api/auth/discord?state=${statePayload}`;
     window.location.href = discordOAuthUrl;
-  };
-
-  const handleBindDiscordManual = async (e) => {
-    e.preventDefault();
-    if (!discordId) return;
-    
-    if (!/^\d{17,20}$/.test(discordId)) {
-      alert('請輸入您的 Discord「使用者 ID」(17~20碼數字)！');
-      return;
-    }
-
-    try {
-      addLog(`[SYS] 嘗試手動綁定 Discord ID: ${discordId}...`);
-      const res = await fetch(`${API_URL}/api/bind-discord-manual`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, discordId })
-      });
-      if (res.ok) {
-        setBoundDiscord({
-          username: discordId,
-          avatar: `https://cdn.discordapp.com/embed/avatars/${(BigInt(discordId) >> 22n) % 6n}.png`
-        });
-        setShowDiscordModal(false);
-        addLog(`系統通知：手動綁定成功！`);
-      }
-    } catch (err) {
-      alert('綁定失敗');
-    }
   };
 
   const addLog = (msg) => {
@@ -346,6 +315,7 @@ function Dashboard({ token, onLogout }) {
           username: data.discordProfile.username,
           avatar: data.discordProfile.avatar
         });
+        addLog(`🔗 Discord 帳號已驗證：${data.discordProfile.username}`);
       }
     });
 
@@ -453,7 +423,7 @@ function Dashboard({ token, onLogout }) {
             </div>
             {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[中斷連線]</span>}
           </div>
-          <button onClick={onLogout} className="logout-btn" style={{padding: '5px 15px', borderRadius: '8px', background: 'rgba(255,50,50,0.1)', border: '1px solid rgba(255,50,50,0.3)', color: 'var(--danger-color)', cursor: 'pointer'}}>中斷連線</button>
+          <button onClick={onLogout} className="logout-btn" style={{padding: '5px 15px', borderRadius: '8px', background: 'rgba(255,50,50,0.1)', border: '1px solid rgba(255,50,50,0.3)', color: 'v[...]
         </div>
       </header>
 
@@ -528,7 +498,7 @@ function Dashboard({ token, onLogout }) {
 
           <div className="metric-group">
             <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-              <Server size={16} /> 網路連線狀態 (Network)
+              <Server size={16} /> 網路��線狀態 (Network)
             </div>
             <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)'}}>
               上傳 (Uplink): {Math.floor(Math.random()*500 + 100)} KB/s<br/>
@@ -599,7 +569,7 @@ function Dashboard({ token, onLogout }) {
             )}
             {mapTheme === 'street' && (
               <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url="https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png"
                 attribution='&copy; OpenStreetMap contributors'
               />
             )}
@@ -686,46 +656,16 @@ function Dashboard({ token, onLogout }) {
               <LinkIcon /> 連結 Discord 帳號
             </h3>
             
-            {!showManualBind ? (
-              <>
-                <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '25px', lineHeight: '1.6'}}>
-                  透過官方驗證安全登入，連結後將即時同步您最新的 Discord 大頭貼與暱稱。<br/>
-                  <span style={{color: 'var(--accent-color)'}}>※ 我們僅會獲取您的公開基本資料，絕對安全。</span>
-                </p>
-                <div style={{display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center'}}>
-                  <a href="#" onClick={(e) => { e.preventDefault(); setShowManualBind(true); }} style={{color: '#888', fontSize: '0.85rem', marginRight: 'auto', textDecoration: 'underline'}}>無法使用授權？點此手動綁定</a>
-                  <button type="button" onClick={() => setShowDiscordModal(false)} className="terminal-btn" style={{padding: '10px 15px', background: 'rgba(255,255,255,0.1)'}}>取消</button>
-                  <button onClick={handleBindDiscord} className="terminal-btn" style={{padding: '10px 20px', background: '#5865F2', color: '#fff', border: 'none', fontWeight: 'bold'}}>
-                    🔗 前往 Discord 官方授權
-                  </button>
-                </div>
-              </>
-            ) : (
-              <form onSubmit={handleBindDiscordManual}>
-                <p style={{color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '15px', lineHeight: '1.6'}}>
-                  手動輸入需開啟開發者模式，請依照下方圖示指示，對著您的頭像點擊右鍵複製。
-                </p>
-                <div className="discord-mock-menu">
-                  <div className="discord-mock-item">編輯個人資料</div>
-                  <div className="discord-mock-item" style={{color: '#ed4245'}}>請勿打擾</div>
-                  <div className="discord-mock-item">切換帳號</div>
-                  <div className="discord-mock-item discord-mock-highlight">複製使用者 ID</div>
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="在此貼上您複製的 ID (例如: 123456789012345678)" 
-                  value={discordId}
-                  onChange={e => setDiscordId(e.target.value)}
-                  className="terminal-input"
-                  style={{marginBottom: '20px', marginTop: '15px', width: '100%', boxSizing: 'border-box'}}
-                  required
-                />
-                <div style={{display: 'flex', gap: '10px'}}>
-                  <button type="button" className="terminal-btn" style={{flex: 1, background: 'rgba(255,255,255,0.1)'}} onClick={() => setShowManualBind(false)}>返回</button>
-                  <button type="submit" className="terminal-btn" style={{flex: 1}}>確認手動綁定</button>
-                </div>
-              </form>
-            )}
+            <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '25px', lineHeight: '1.6'}}>
+              透過官方驗證安全登入，連結後將即時同步您最新的 Discord 大頭貼與暱稱。<br/>
+              <span style={{color: 'var(--accent-color)'}}>※ 我們僅會獲取您的公開基本資料，絕對安全。</span>
+            </p>
+            <div style={{display: 'flex', gap: '10px', justifyContent: 'flex-end'}}>
+              <button type="button" onClick={() => setShowDiscordModal(false)} className="terminal-btn" style={{padding: '10px 15px', background: 'rgba(255,255,255,0.1)'}}>取消</button>
+              <button onClick={handleBindDiscord} className="terminal-btn" style={{padding: '10px 20px', background: '#5865F2', color: '#fff', border: 'none', fontWeight: 'bold'}}>
+                🔗 前往 Discord 官方授權
+              </button>
+            </div>
           </div>
         </div>
       )}

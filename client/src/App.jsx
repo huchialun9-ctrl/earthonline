@@ -286,10 +286,10 @@ function Dashboard({ token, onLogout }) {
             style={{ height: '100%', width: '100%' }}
             zoomControl={false}
           >
-            {/* Dark Matter Base Map */}
+            {/* Earth Satellite Base Map (Colorful) */}
             <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
             />
             
             {/* Grid Pixel Blocks or Individual Points */}

@@ -1,13 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Nunito:wght@400;600;700&display=swap');
+
 :root {
   --bg-color: #050505;
-  --panel-bg: #0d0d0d;
+  --panel-bg: rgba(10, 10, 10, 0.85);
   --border-color: #333;
-  --text-primary: #e0e0e0;
-  --text-secondary: #888;
   --accent-color: #00ffcc;
   --danger-color: #ff3333;
-  --font-mono: 'Courier New', Courier, monospace;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --text-main: #e0e0e0;
+  --text-secondary: #888;
+  --font-mono: 'Nunito', 'Noto Sans TC', sans-serif;
+  --font-sans: 'Nunito', 'Noto Sans TC', sans-serif;
 }
 
 * {
@@ -172,11 +174,13 @@ body {
   bottom: 20px;
   left: 20px;
   right: 20px;
-  background: var(--panel-bg);
-  border: 1px solid var(--border-color);
+  background: rgba(15, 15, 15, 0.75);
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
   padding: 10px 15px;
   z-index: 1000;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   max-height: 150px;
   overflow: hidden;
   display: flex;

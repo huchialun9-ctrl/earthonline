@@ -52,7 +52,7 @@ async function sendDiscordWebhook(message) {
 setInterval(() => {
   const currentTotal = globalProduction;
   const compression = calculateSocialCompression(connectedUsers.size);
-  const msg = `📊 **【每日世界通量報告】**\n目前全球掛機總產出：\`${currentTotal.toLocaleString()} 單位\`\n社會總壓迫常數：\`${compression} Ω\`\n當前真實連線節點數：\`${connectedUsers.size}\``;
+  const msg = `📊 **【每日世界通量報告】**\n目前全球掛機總產出：\`${currentTotal.toLocaleString()} 單位\`\n社會總壓迫常數：\`${compression} Ω\`\n當前真實連線[...]`;
   sendDiscordWebhook(msg);
 }, 24 * 60 * 60 * 1000); // Once a day
 
@@ -202,21 +202,32 @@ const io = new Server(server, {
 // State
 const connectedUsers = new Map();
 let globalProduction = 0; // Total accumulated idle time (seconds)
+let globalStatsInterval = null; // Store interval ID
 
-// Periodic global calculation
-setInterval(async () => {
-  const now = Date.now();
-  globalProduction = await db.getGlobalProduction(now);
-  const pop = await db.getTotalPopulation();
+// Function to start periodic global calculation (only after DB connection is ready)
+function startGlobalStatsCalculation() {
+  if (globalStatsInterval) return; // Prevent multiple intervals
+  
+  globalStatsInterval = setInterval(async () => {
+    try {
+      const now = Date.now();
+      globalProduction = await db.getGlobalProduction(now);
+      const pop = await db.getTotalPopulation();
 
-  // Broadcast global stats to everyone every 2 seconds
-  io.emit('global_stats', {
-    activeUsers: connectedUsers.size,
-    totalPopulation: pop,
-    globalProduction: globalProduction,
-    socialCompression: calculateSocialCompression(connectedUsers.size)
-  });
-}, 2000);
+      // Broadcast global stats to everyone every 2 seconds
+      io.emit('global_stats', {
+        activeUsers: connectedUsers.size,
+        totalPopulation: pop,
+        globalProduction: globalProduction,
+        socialCompression: calculateSocialCompression(connectedUsers.size)
+      });
+    } catch (err) {
+      console.error('[SYS] Error calculating global stats:', err.message);
+    }
+  }, 2000);
+  
+  console.log('[SYS] Global stats calculation started');
+}
 
 function calculateSocialCompression(userCount) {
   return (1.0 + (userCount * 0.05)).toFixed(3);
@@ -274,7 +285,7 @@ io.on('connection', (socket) => {
       });
 
       if (connectedUsers.size % 10 === 0 && connectedUsers.size > 0) {
-        sendDiscordWebhook(`🌐 **【地理節點高載通報】**\n偵測到大量節點湧入，目前全服掛機人數已達 **${connectedUsers.size}** 人！\n來自 \`${user.country}\` 的節點點亮了板塊。`);
+        sendDiscordWebhook(`🌐 **【地理節點高載通報】**\n偵測到大量節點湧入，目前全服掛機人數已達 **${connectedUsers.size}** 人！\n來自 \`${user.country}\` 的[...]`);
       }
 
       io.emit('node_connected', {
@@ -307,4 +318,10 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`[SYS] Earth Online Backend Core initialized on port ${PORT}`);
+  
+  // Start global stats calculation after server is ready
+  // Add a small delay to ensure MongoDB connection is established
+  setTimeout(() => {
+    startGlobalStatsCalculation();
+  }, 2000);
 });

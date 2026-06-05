@@ -273,7 +273,21 @@ function Dashboard({ token, onLogout }) {
   const [mapTheme, setMapTheme] = useState('satellite');
   const [discordId, setDiscordId] = useState('');
   const [showManualBind, setShowManualBind] = useState(false);
+  const [leaderboard, setLeaderboard] = useState([]);
   
+  // Fetch leaderboard data
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/leaderboard`);
+        if (res.ok) setLeaderboard(await res.json());
+      } catch(err) {}
+    };
+    fetchLeaderboard();
+    const intv = setInterval(fetchLeaderboard, 5000);
+    return () => clearInterval(intv);
+  }, []);
+
   // Fake bound Discord data for UI demo (since backend DB isn't fully updated yet)
   const [boundDiscord, setBoundDiscord] = useState(null);
 
@@ -387,15 +401,22 @@ function Dashboard({ token, onLogout }) {
   useEffect(() => {
     if (!myNode || !myNode.createdAt) return;
     
+    // Check if we are currently boosted
+    const isBoosted = globalStats.multiplier && globalStats.multiplier > 1.0;
+    const rate = isBoosted ? 1.2 : 1.0;
+    
+    let currentLocalLifespan = Math.floor((Date.now() - myNode.createdAt) / 1000) + (myNode.accumulatedBonusPoints || 0);
+
     const interval = setInterval(() => {
-      setLifespan(Math.floor((Date.now() - myNode.createdAt) / 1000));
+      currentLocalLifespan += rate;
+      setLifespan(Math.floor(currentLocalLifespan));
     }, 1000);
 
-    // Run once immediately so it doesn't wait 1s to show
-    setLifespan(Math.floor((Date.now() - myNode.createdAt) / 1000));
+    // Run once immediately
+    setLifespan(Math.floor(currentLocalLifespan));
 
     return () => clearInterval(interval);
-  }, [myNode]);
+  }, [myNode, globalStats.multiplier]);
 
   // Format time HH:MM:SS
   const formatTime = (seconds) => {
@@ -537,6 +558,21 @@ function Dashboard({ token, onLogout }) {
             </div>
           </div>
 
+          <div className="metric-group" style={{ 
+            border: globalStats.multiplier > 1.0 ? '1px solid var(--accent-color)' : '1px solid rgba(255,255,255,0.1)',
+            transition: 'border 0.3s'
+          }}>
+            <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px', color: globalStats.multiplier > 1.0 ? 'var(--accent-color)' : 'var(--text-primary)'}}>
+              🔥 區間群聚超載系統
+            </div>
+            <div style={{fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '8px'}}>
+              當前伺服器共同在線掛機人數：<strong style={{color: globalStats.activeUsers >= 5 ? 'var(--accent-color)' : 'inherit'}}>{globalStats.activeUsers} / 5 人</strong>
+            </div>
+            <div style={{fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '4px'}}>
+              後台點數產出倍率：<strong style={{color: globalStats.multiplier > 1.0 ? 'var(--accent-color)' : 'inherit'}}>{globalStats.multiplier?.toFixed(1) || '1.0'}x</strong>
+            </div>
+          </div>
+
           <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <button className="terminal-btn" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}} onClick={() => setShowAboutModal(true)}>
               <Info size={16} /> 檔案說明與系統資訊
@@ -662,6 +698,43 @@ function Dashboard({ token, onLogout }) {
               }
             })}
           </MapContainer>
+
+          {/* Leaderboard Table Overlay */}
+          <div className="leaderboard-panel floating-panel" style={{
+            position: 'absolute', bottom: '150px', left: '20px', zIndex: 1000, 
+            width: 'calc(100% - 40px)', background: 'rgba(10, 15, 25, 0.85)',
+            maxHeight: '30vh', overflowY: 'auto'
+          }}>
+            <div className="overlay-title" style={{marginBottom: '10px'}}>全球節點排行榜 (GLOBAL LEADERBOARD)</div>
+            <table style={{width: '100%', fontSize: '0.85rem', color: 'var(--text-secondary)', borderCollapse: 'collapse', textAlign: 'left'}}>
+              <thead>
+                <tr style={{borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
+                  <th style={{padding: '8px'}}>排名</th>
+                  <th style={{padding: '8px'}}>頭像</th>
+                  <th style={{padding: '8px'}}>使用者 ID</th>
+                  <th style={{padding: '8px'}}>累積在線時間</th>
+                  <th style={{padding: '8px'}}>累積點數</th>
+                  <th style={{padding: '8px'}}>目前 Discord 實際身分組</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leaderboard.map((user, idx) => (
+                  <tr key={user.username} style={{borderBottom: '1px solid rgba(255,255,255,0.05)', color: idx === 0 ? 'var(--accent-color)' : 'inherit'}}>
+                    <td style={{padding: '8px'}}>#{idx + 1}</td>
+                    <td style={{padding: '8px'}}>
+                      {user.avatar ? <img src={user.avatar} alt="avatar" style={{width: '24px', height: '24px', borderRadius: '50%'}} /> : '無'}
+                    </td>
+                    <td style={{padding: '8px'}}>{user.discordName !== '未綁定' ? user.discordName : user.username}</td>
+                    <td style={{padding: '8px'}}>{formatTime(user.idleTime)}</td>
+                    <td style={{padding: '8px'}}>{Number(user.points).toFixed(1)}</td>
+                    <td style={{padding: '8px', color: user.role.includes('無業遊民') ? '#F1C40F' : user.role.includes('財務自由') ? '#2ECC71' : user.role.includes('月光族') ? '#E67E22' : 'var(--text-secondary)'}}>
+                      {user.role || '平民'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {/* Bottom Console Log Module */}
           <div className="bottom-log-console floating-panel">

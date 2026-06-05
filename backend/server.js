@@ -7,6 +7,8 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
+const User = require('./models/User'); // Required for updateMany
+const discordBot = require('./discordBot');
 
 dotenv.config();
 
@@ -182,6 +184,52 @@ app.get('/api/auth/discord/callback', async (req, res) => {
   }
 });
 
+// Leaderboard Endpoint
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const users = await User.find({}, 'username createdAt accumulatedBonusPoints discord').lean();
+    const now = Date.now();
+    let leaderboard = users.map(u => {
+      const idleTimeSeconds = Math.floor((now - u.createdAt) / 1000);
+      const points = idleTimeSeconds + (u.accumulatedBonusPoints || 0);
+      return {
+        username: u.username,
+        discordId: u.discord?.id || '無',
+        discordName: u.discord?.username || '未綁定',
+        avatar: u.discord?.avatar || null,
+        idleTime: idleTimeSeconds,
+        points: points,
+        role: ''
+      };
+    });
+
+    const boundUsers = leaderboard.filter(u => u.discordId !== '無');
+    if (boundUsers.length > 0) {
+      const sortedByTime = [...boundUsers].sort((a, b) => b.idleTime - a.idleTime);
+      const sortedByPoints = [...boundUsers].sort((a, b) => b.points - a.points);
+      
+      sortedByTime[0].role = '【24小時在線 the 無業遊民】';
+      if (sortedByTime.length > 1) {
+        sortedByTime[sortedByTime.length - 1].role = '【現充（有現實生活的人）】';
+      }
+      
+      const topPoints = sortedByPoints[0];
+      const bottomPoints = sortedByPoints[sortedByPoints.length - 1];
+      
+      topPoints.role += (topPoints.role ? ' / ' : '') + '【已實現財務自由的人】';
+      if (sortedByPoints.length > 1) {
+        bottomPoints.role += (bottomPoints.role ? ' / ' : '') + '【戶頭剩三位數的月光族】';
+      }
+    }
+
+    // Sort by points descending
+    leaderboard.sort((a, b) => b.points - a.points);
+    res.json(leaderboard);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -200,12 +248,30 @@ setInterval(async () => {
   globalProduction = await db.getGlobalProduction(now);
   const pop = await db.getTotalPopulation();
 
+  const isBoosted = connectedUsers.size >= 5;
+  const multiplier = isBoosted ? 1.2 : 1.0;
+
+  // Distribute bonus points to online users (2 seconds interval)
+  if (multiplier > 1.0 && connectedUsers.size > 0) {
+    const bonusPoints = 2 * (multiplier - 1.0);
+    const usernames = Array.from(connectedUsers.values()).map(u => u.username);
+    await User.updateMany(
+      { username: { $in: usernames } },
+      { $inc: { accumulatedBonusPoints: bonusPoints } }
+    );
+  }
+
+  // Discord Bot Interactions
+  discordBot.updateBotPresence(connectedUsers.size);
+  discordBot.updateChannelName(isBoosted);
+
   // Broadcast global stats to everyone every 2 seconds
   io.emit('global_stats', {
     activeUsers: connectedUsers.size,
     totalPopulation: pop,
     globalProduction: globalProduction,
-    socialCompression: calculateSocialCompression(connectedUsers.size)
+    socialCompression: calculateSocialCompression(connectedUsers.size),
+    multiplier: multiplier
   });
 }, 2000);
 

@@ -90,6 +90,20 @@ async function migrateOfflineTime() {
     if (timeCount > 0 || countryCount > 0) {
       console.log(`[SYS] Migration: Restored time for ${timeCount} users, fixed country for ${countryCount} legacy users.`);
     }
+
+    // --- Cleanup Fake Bot Accounts ---
+    let deletedCount = 0;
+    for (const u of users) {
+      // Fake accounts typically have 15+ alphanumeric chars and no discord id
+      if (/^[a-zA-Z0-9]{15,35}$/.test(u.username) && !u.discord?.id) {
+        await User.deleteOne({ _id: u._id });
+        deletedCount++;
+      }
+    }
+    if (deletedCount > 0) {
+      console.log(`[SYS] Cleanup: Deleted ${deletedCount} fake bot accounts.`);
+    }
+    // ---------------------------------
   } catch (err) {
     console.error('[SYS] Migration Error:', err);
   }

@@ -477,6 +477,7 @@ function Dashboard({ token, onLogout }) {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [terminalHistory, setTerminalHistory] = useState(['Earth Online Terminal v1.0.1', 'Type "help" for a list of available commands.']);
   const [terminalInput, setTerminalInput] = useState('');
+  const [chatInput, setChatInput] = useState('');
   const terminalEndRef = useRef(null);
 
   // Global keydown listener for Terminal
@@ -601,7 +602,11 @@ function Dashboard({ token, onLogout }) {
 
     s.on('global_broadcast', (data) => {
       setTerminalHistory(prev => [...prev, `[BROADCAST] ${data.username}: ${data.message}`]);
-      addLog(`📢 [全域廣播] ${data.username}: ${data.message}`);
+      addLog(`[CHAT] ${data.username}: ${data.message}`);
+    });
+
+    s.on('chat_message', (data) => {
+      addLog(`[CHAT] ${data.username}: ${data.message}`);
     });
 
     s.on('all_nodes', (data) => {
@@ -717,6 +722,13 @@ function Dashboard({ token, onLogout }) {
     return currentEvent.type === 'QUANTUM_BURST' 
       ? 'inset 0 0 80px rgba(0, 210, 255, 0.4)' 
       : 'inset 0 0 80px rgba(255, 65, 108, 0.4)';
+  };
+
+  const handleChatSubmit = (e) => {
+    e.preventDefault();
+    if (!chatInput.trim() || !socket) return;
+    socket.emit('send_chat', { message: chatInput });
+    setChatInput('');
   };
 
   const handleTerminalSubmit = (e) => {
@@ -1021,9 +1033,9 @@ function Dashboard({ token, onLogout }) {
           </MapContainer>
 
           {/* Bottom Console Log Module */}
-          <div className="bottom-log-console">
+          <div className="bottom-log-console" style={{display: 'flex', flexDirection: 'column', height: '250px'}}>
             <div className="log-header" style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-color)'}}>
-              <Activity size={16} /> 系統即時通知 (System Event Log)
+              <Activity size={16} /> 世界頻道 / 系統日誌 (World Chat)
               <button 
                 onClick={() => setIsTerminalOpen(true)}
                 style={{marginLeft: 'auto', background: 'var(--accent-color)', color: '#000', border: 'none', padding: '2px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'}}
@@ -1031,13 +1043,37 @@ function Dashboard({ token, onLogout }) {
                 <Code size={14} /> 開啟終端機
               </button>
             </div>
-            <div className="log-content">
-              {logs.map((log, i) => (
-                <div key={i} style={{ color: log.includes('警告') ? 'var(--danger-color)' : 'inherit', marginTop: '4px', display: 'flex', gap: '8px' }}>
-                  <span style={{color: 'var(--accent-color)', opacity: 0.7}}>&gt;</span> <span>{log}</span>
-                </div>
-              ))}
+            <div className="log-content" style={{flex: 1, overflowY: 'auto'}}>
+              {logs.map((log, i) => {
+                const isChat = log.includes('[CHAT]');
+                const isWarning = log.includes('警告');
+                return (
+                  <div key={i} style={{ 
+                    color: isChat ? '#FF1493' : isWarning ? 'var(--danger-color)' : 'inherit', 
+                    marginTop: '4px', 
+                    display: 'flex', 
+                    gap: '8px',
+                    textShadow: isChat ? '0 0 5px rgba(255,20,147,0.5)' : 'none'
+                  }}>
+                    <span style={{color: isChat ? '#FF1493' : 'var(--accent-color)', opacity: 0.7}}>&gt;</span> 
+                    <span style={{wordBreak: 'break-all'}}>{log}</span>
+                  </div>
+                );
+              })}
             </div>
+            <form onSubmit={handleChatSubmit} style={{display: 'flex', borderTop: '1px solid rgba(255,255,255,0.1)', padding: '5px'}}>
+              <input 
+                type="text" 
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                placeholder="輸入訊息，與全球節點交流..."
+                maxLength={200}
+                style={{flex: 1, background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '4px', outline: 'none', fontSize: '0.9rem'}}
+              />
+              <button type="submit" style={{background: 'var(--accent-color)', color: '#000', border: 'none', padding: '0 15px', borderRadius: '4px', marginLeft: '5px', fontWeight: 'bold', cursor: 'pointer'}}>
+                發送
+              </button>
+            </form>
           </div>
         </main>
       </div>

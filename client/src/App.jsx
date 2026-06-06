@@ -482,6 +482,7 @@ function Dashboard({ token, onLogout }) {
   const [terminalInput, setTerminalInput] = useState('');
   const [chatInput, setChatInput] = useState('');
   const terminalEndRef = useRef(null);
+  const logEndRef = useRef(null);
 
   // Global keydown listener for Terminal
   useEffect(() => {
@@ -501,6 +502,13 @@ function Dashboard({ token, onLogout }) {
       terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [terminalHistory, isTerminalOpen]);
+
+  // Scroll chat/log to bottom
+  useEffect(() => {
+    if (logEndRef.current) {
+      logEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [logs]);
 
   // Fetch social data when modal opens
   useEffect(() => {
@@ -563,7 +571,7 @@ function Dashboard({ token, onLogout }) {
   const addLog = (msg) => {
     setLogs(prev => {
       const time = new Date().toISOString().substring(11, 19);
-      return [...prev, `[${time}] ${msg}`].slice(-8);
+      return [...prev, `[${time}] ${msg}`].slice(-150);
     });
   };
 
@@ -1085,6 +1093,7 @@ function Dashboard({ token, onLogout }) {
                   </div>
                 );
               })}
+              <div ref={logEndRef} />
             </div>
             <form onSubmit={handleChatSubmit} style={{display: 'flex', borderTop: '1px solid rgba(255,255,255,0.1)', padding: '5px'}}>
               <input 

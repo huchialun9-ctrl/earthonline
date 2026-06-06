@@ -847,8 +847,8 @@ function Dashboard({ token, onLogout }) {
 
           <MapContainer 
             center={[20, 0]} 
-            zoom={2.5} 
-            minZoom={2.5}
+            zoom={2.0} 
+            minZoom={2.0}
             maxBounds={[[-90, -180], [90, 180]]}
             maxBoundsViscosity={1.0}
             worldCopyJump={false}
@@ -916,11 +916,11 @@ function Dashboard({ token, onLogout }) {
                   <CircleMarker
                     key={`node-${node.id}`}
                     center={[node.lat, node.lon]}
-                    radius={5}
+                    radius={8}
                     pathOptions={{ 
-                      color: 'var(--accent-color)', 
-                      fillColor: 'var(--accent-color)', 
-                      fillOpacity: 0.9,
+                      color: '#ffffff', 
+                      fillColor: '#ff3b30', 
+                      fillOpacity: 1.0,
                       weight: 2
                     }}
                   >

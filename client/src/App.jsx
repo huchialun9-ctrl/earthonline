@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Rectangle, CircleMarker, Popup, useMap } from 'react-leaflet';
 import { io } from 'socket.io-client';
-import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock } from 'lucide-react';
+import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import './index.css';
 
@@ -455,7 +455,24 @@ function Dashboard({ token, onLogout }) {
   const [leaderboard, setLeaderboard] = useState([]);
   const [sortMode, setSortMode] = useState('points');
   const [currentEvent, setCurrentEvent] = useState(null);
-  
+
+  const [bgmEnabled, setBgmEnabled] = useState(false);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.2;
+      if (bgmEnabled) {
+        audioRef.current.play().catch(e => {
+          console.log('BGM Autoplay prevented:', e);
+          setBgmEnabled(false);
+        });
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [bgmEnabled]);
+
   // Terminal State
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [terminalHistory, setTerminalHistory] = useState(['Earth Online Terminal v1.0.1', 'Type "help" for a list of available commands.']);
@@ -777,6 +794,16 @@ function Dashboard({ token, onLogout }) {
             </div>
             {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[已斷線]</span>}
           </div>
+          
+          <button 
+            onClick={() => setBgmEnabled(!bgmEnabled)}
+            className="terminal-btn"
+            style={{display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 15px', borderRadius: '8px', background: bgmEnabled ? 'rgba(0, 210, 255, 0.2)' : 'rgba(255,255,255,0.05)', border: `1px solid ${bgmEnabled ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)'}`, color: bgmEnabled ? 'var(--accent-color)' : 'var(--text-secondary)', cursor: 'pointer', transition: 'all 0.3s'}}
+          >
+            {bgmEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+            {bgmEnabled ? 'BGM ON' : 'BGM OFF'}
+          </button>
+
           <a href="https://discord.gg/6P6NG49Mus" target="_blank" rel="noreferrer" style={{
             display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 15px', borderRadius: '8px', 
             background: 'rgba(88, 101, 242, 0.2)', border: '1px solid #5865F2', color: '#fff', 
@@ -1158,6 +1185,8 @@ function Dashboard({ token, onLogout }) {
       {/* Full Page About Documentation */}
       {showAboutModal && <DocumentationOverlay onClose={() => setShowAboutModal(false)} />}
       {showAccountInfo && <AccountInfoModal token={token} onClose={() => setShowAccountInfo(false)} onLogout={onLogout} />}
+      
+      <audio ref={audioRef} src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Ambient_music_-_beautiful_piano.ogg" loop />
     </div>
   );
 }

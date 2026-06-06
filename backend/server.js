@@ -286,6 +286,9 @@ function calculateSocialCompression(userCount) {
 
 // Function to get the real IP
 function getRealIP(socket) {
+  let cfIP = socket.handshake.headers['cf-connecting-ip'];
+  if (cfIP) return cfIP.split(',')[0].trim();
+  
   let forwarded = socket.handshake.headers['x-forwarded-for'];
   if (forwarded) {
     // x-forwarded-for can be a comma-separated list, the first one is the real client IP
@@ -301,8 +304,21 @@ io.on('connection', (socket) => {
       const decoded = jwt.verify(data.token, JWT_SECRET);
       
       const ip = getRealIP(socket);
-      const geo = geoip.lookup(ip) || { country: 'UNKNOWN', ll: [0, 0] };
+      let geo = geoip.lookup(ip);
+      
+      // Fallback for local IPs or if geoip fails
+      if (!geo) {
+        if (ip.includes('127.0.0.1') || ip.includes('::1') || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+          geo = { country: 'TW', ll: [23.6978, 120.9605] };
+        } else {
+          geo = { country: 'TW', ll: [0, 0] }; // Force TW as default instead of UNKNOWN for better UI
+        }
+      }
       const dbUser = await db.findUserByUsername(decoded.username);
+      
+      if (geo.country !== 'UNKNOWN') {
+        await User.updateOne({ username: decoded.username }, { $set: { country: geo.country } });
+      }
       
       const user = {
         socketId: socket.id,
@@ -313,6 +329,7 @@ io.on('connection', (socket) => {
         country: geo.country,
         lat: geo.ll[0],
         lon: geo.ll[1],
+        accumulatedTime: dbUser?.accumulatedTime || 0,
         createdAt: dbUser?.createdAt || Date.now(),
         connectedAt: Date.now()
       };
@@ -331,6 +348,7 @@ io.on('connection', (socket) => {
         country: user.country,
         lat: user.lat,
         lon: user.lon,
+        accumulatedTime: user.accumulatedTime,
         createdAt: user.createdAt,
         connectedAt: user.connectedAt,
         activeUsers: connectedUsers.size,

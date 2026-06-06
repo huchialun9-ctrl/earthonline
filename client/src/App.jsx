@@ -274,12 +274,20 @@ function CountdownBanner() {
   useEffect(() => {
     const calcTime = () => {
       const now = new Date();
-      const nextMonday = new Date(now);
-      const daysUntilMonday = (1 - now.getDay() + 7) % 7 || 7;
-      nextMonday.setDate(now.getDate() + daysUntilMonday);
-      nextMonday.setHours(0, 0, 0, 0);
+      const currentDayUTC = now.getUTCDay();
+      const currentHourUTC = now.getUTCHours();
       
-      const diff = nextMonday - now;
+      // We are looking for Sunday (0) 16:00:00 UTC (Which is Monday 00:00:00 Asia/Taipei)
+      let daysUntilTarget = (0 - currentDayUTC + 7) % 7;
+      if (daysUntilTarget === 0 && currentHourUTC >= 16) {
+         daysUntilTarget = 7;
+      }
+      
+      const nextTarget = new Date(now);
+      nextTarget.setUTCDate(now.getUTCDate() + daysUntilTarget);
+      nextTarget.setUTCHours(16, 0, 0, 0);
+      
+      const diff = nextTarget.getTime() - now.getTime();
       if (diff <= 0) return { d: 0, h: 0, m: 0, s: 0 };
 
       return {

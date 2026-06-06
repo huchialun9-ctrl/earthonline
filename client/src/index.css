@@ -596,18 +596,3 @@ body {
   font-weight: bold;
   font-size: 13px;
 }
-
-.system-header button, .system-header a {
-  white-space: nowrap;
-}
-
-@media (max-width: 1300px) {
-  .system-stats {
-    display: none !important;
-  }
-}
-@media (max-width: 900px) {
-  .system-title span:last-child {
-    display: none !important;
-  }
-}

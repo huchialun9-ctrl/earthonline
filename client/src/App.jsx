@@ -787,22 +787,13 @@ function Dashboard({ token, onLogout }) {
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div className="system-stats" style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
             <div style={{display: 'flex', alignItems: 'center'}}>
-              <span style={{color: 'var(--text-secondary)'}}>連線: <strong style={{color: 'var(--accent-color)'}}>{globalStats.activeUsers}</strong></span>
+              <span style={{color: 'var(--text-secondary)'}}>實時連線人數: <strong style={{color: 'var(--accent-color)'}}>{globalStats.activeUsers}</strong></span>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
-              <span style={{color: 'var(--text-secondary)'}}>總人口: <strong style={{color: 'var(--text-primary)'}}>{globalStats.totalPopulation}</strong></span>
+              <span style={{color: 'var(--text-secondary)'}}>地球總人口: <strong style={{color: 'var(--text-primary)'}}>{globalStats.totalPopulation}</strong></span>
             </div>
             {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[已斷線]</span>}
           </div>
-          
-          <button 
-            onClick={() => setBgmEnabled(!bgmEnabled)}
-            className="terminal-btn"
-            style={{display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 15px', borderRadius: '8px', background: bgmEnabled ? 'rgba(0, 210, 255, 0.2)' : 'rgba(255,255,255,0.05)', border: `1px solid ${bgmEnabled ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)'}`, color: bgmEnabled ? 'var(--accent-color)' : 'var(--text-secondary)', cursor: 'pointer', transition: 'all 0.3s'}}
-          >
-            {bgmEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-            {bgmEnabled ? 'BGM ON' : 'BGM OFF'}
-          </button>
 
           <a href="https://discord.gg/6P6NG49Mus" target="_blank" rel="noreferrer" style={{
             display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 15px', borderRadius: '8px', 

@@ -638,6 +638,67 @@ body {
 }
 
 /* =========================================
+   Header Dropdown Menu
+   ========================================= */
+.header-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.header-dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #12151a;
+  min-width: 180px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  z-index: 2000;
+  padding: 8px 0;
+  margin-top: 10px;
+}
+
+/* Support hover but also add a gap-filling invisible block so mouse doesn't fall off */
+.header-dropdown::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 10px;
+}
+
+.header-dropdown:hover .header-dropdown-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item {
+  color: var(--text-primary);
+  padding: 10px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-sans);
+}
+
+.dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* =========================================
    Mobile UI Responsive Layout
    ========================================= */
 @media (max-width: 768px) {

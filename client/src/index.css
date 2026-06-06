@@ -184,7 +184,9 @@ body {
   position: absolute;
   bottom: 20px;
   left: 20px;
-  right: 20px;
+  right: auto;
+  width: 600px;
+  max-width: calc(100vw - 40px);
   padding: 12px 18px;
   z-index: 1000;
   max-height: 180px;

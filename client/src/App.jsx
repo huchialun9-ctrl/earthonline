@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Rectangle, CircleMarker, Popup, useMap } from 'react-leaflet';
 import { io } from 'socket.io-client';
-import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX } from 'lucide-react';
+import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import './index.css';
 
@@ -599,6 +599,11 @@ function Dashboard({ token, onLogout }) {
       setTerminalHistory(prev => [...prev, msg]);
     });
 
+    s.on('global_broadcast', (data) => {
+      setTerminalHistory(prev => [...prev, `[BROADCAST] ${data.username}: ${data.message}`]);
+      addLog(`📢 [全域廣播] ${data.username}: ${data.message}`);
+    });
+
     s.on('all_nodes', (data) => {
       setNodes(data);
       addLog(`成功同步 ${data.length} 個物理座標節點資料`);
@@ -724,7 +729,7 @@ function Dashboard({ token, onLogout }) {
 
     const lowerCmd = cmd.toLowerCase();
     if (lowerCmd === 'help') {
-      setTerminalHistory(prev => [...prev, 'Available commands: help, ping, whoami, clear, sysinfo']);
+      setTerminalHistory(prev => [...prev, 'Available commands: help, ping, whoami, clear, sysinfo, broadcast <msg>']);
     } else if (lowerCmd === 'ping') {
       setTerminalHistory(prev => [...prev, 'Pong! Latency: 12ms']);
     } else if (lowerCmd === 'whoami') {
@@ -794,6 +799,15 @@ function Dashboard({ token, onLogout }) {
             </div>
             {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[已斷線]</span>}
           </div>
+
+          <a href="https://buymeacoffee.com/lucas1126" target="_blank" rel="noreferrer" style={{
+            display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 15px', borderRadius: '8px', 
+            background: 'rgba(255, 221, 0, 0.15)', border: '1px solid #FFDD00', color: '#FFDD00', 
+            textDecoration: 'none', fontWeight: 'bold', transition: 'all 0.2s', cursor: 'pointer'
+          }} onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 221, 0, 0.3)'; e.currentTarget.style.boxShadow = '0 0 10px rgba(255,221,0,0.5)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255, 221, 0, 0.15)'; e.currentTarget.style.boxShadow = 'none'; }}>
+            <Coffee size={18} />
+            贊助支持
+          </a>
 
           <a href="https://discord.gg/6P6NG49Mus" target="_blank" rel="noreferrer" style={{
             display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 15px', borderRadius: '8px', 

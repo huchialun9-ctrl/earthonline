@@ -544,7 +544,48 @@ io.on('connection', (socket) => {
     const user = connectedUsers.get(socket.id);
     if (!user) return;
     
-    const cmd = data.command.trim().toUpperCase();
+    const rawCmd = data.command.trim();
+    const cmdUpper = rawCmd.toUpperCase();
+    
+    if (cmdUpper.startsWith('BROADCAST ')) {
+      const message = rawCmd.substring(10).trim();
+      if (!message) {
+        return socket.emit('terminal_response', `[ERROR] BROADCAST REQUIRES A MESSAGE.`);
+      }
+      
+      const BROADCAST_COST = 3600;
+      try {
+        const dbUser = await User.findOne({ username: user.username });
+        if (!dbUser) return;
+        
+        const idleTimeSeconds = Math.floor((dbUser.accumulatedTime || 0) / 1000);
+        const totalPoints = idleTimeSeconds + (dbUser.accumulatedBonusPoints || 0);
+        
+        if (totalPoints < BROADCAST_COST) {
+          return socket.emit('terminal_response', `[ERROR] INSUFFICIENT POINTS. BROADCAST REQUIRES ${BROADCAST_COST} PT (CURRENT: ${totalPoints} PT).`);
+        }
+        
+        await User.updateOne({ username: user.username }, { $inc: { accumulatedBonusPoints: -BROADCAST_COST } });
+        user.accumulatedBonusPoints = (user.accumulatedBonusPoints || 0) - BROADCAST_COST;
+        
+        io.emit('global_broadcast', { username: user.username, message: message });
+        socket.emit('terminal_response', `[SUCCESS] BROADCAST TRANSMITTED GLOBALLY. -${BROADCAST_COST} PT.`);
+        
+        // Log to terminal console
+        console.log(`[SYS] Global Broadcast by ${user.username}: ${message}`);
+        
+        // Optionally send to discord if webhook is configured
+        if (typeof sendDiscordWebhook === 'function') {
+          sendDiscordWebhook(`📢 **全域廣播**\n**${user.username}**：${message}`);
+        }
+      } catch (err) {
+        console.error('[SYS] Broadcast Error:', err);
+        socket.emit('terminal_response', `[ERROR] SYSTEM FAILURE DURING BROADCAST.`);
+      }
+      return;
+    }
+
+    const cmd = cmdUpper;
     const cheatCodes = {
       'IDDQD': 10000,
       'HESOYAM': 5000

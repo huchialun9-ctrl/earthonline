@@ -1024,6 +1024,12 @@ function Dashboard({ token, onLogout }) {
           <div className="bottom-log-console">
             <div className="log-header" style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-color)'}}>
               <Activity size={16} /> 系統即時通知 (System Event Log)
+              <button 
+                onClick={() => setIsTerminalOpen(true)}
+                style={{marginLeft: 'auto', background: 'var(--accent-color)', color: '#000', border: 'none', padding: '2px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'}}
+              >
+                <Code size={14} /> 開啟終端機
+              </button>
             </div>
             <div className="log-content">
               {logs.map((log, i) => (

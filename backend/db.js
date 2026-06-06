@@ -46,13 +46,37 @@ async function getGlobalProduction() {
 async function migrateOfflineTime() {
   try {
     const now = Date.now();
-    // Only migrate documents that don't have accumulatedTime in the database yet
-    const result = await User.updateMany(
-      { accumulatedTime: { $exists: false } },
-      [{ $set: { accumulatedTime: { $subtract: [ now, "$createdAt" ] } } }]
-    );
-    if (result.modifiedCount > 0) {
-      console.log(`[SYS] Migration: Converted offline time for ${result.modifiedCount} old users.`);
+    const users = await User.find();
+    let timeCount = 0;
+    let countryCount = 0;
+    
+    for (const u of users) {
+      let changed = false;
+      
+      // Fix lost accumulated time
+      if (u.accumulatedTime === undefined || u.accumulatedTime < 60000) {
+        // Only restore if they actually have a valid createdAt
+        if (u.createdAt) {
+          u.accumulatedTime = now - u.createdAt;
+          changed = true;
+          timeCount++;
+        }
+      }
+      
+      // Fix unknown country for legacy users
+      if (!u.country || u.country === 'UNKNOWN') {
+        u.country = 'TW';
+        changed = true;
+        countryCount++;
+      }
+      
+      if (changed) {
+        await u.save();
+      }
+    }
+    
+    if (timeCount > 0 || countryCount > 0) {
+      console.log(`[SYS] Migration: Restored time for ${timeCount} users, fixed country for ${countryCount} legacy users.`);
     }
   } catch (err) {
     console.error('[SYS] Migration Error:', err);

@@ -268,6 +268,69 @@ function DocumentationOverlay({ onClose }) {
   );
 }
 
+function CountdownBanner() {
+  const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
+
+  useEffect(() => {
+    const calcTime = () => {
+      const now = new Date();
+      const nextMonday = new Date(now);
+      const daysUntilMonday = (1 - now.getDay() + 7) % 7 || 7;
+      nextMonday.setDate(now.getDate() + daysUntilMonday);
+      nextMonday.setHours(0, 0, 0, 0);
+      
+      const diff = nextMonday - now;
+      if (diff <= 0) return { d: 0, h: 0, m: 0, s: 0 };
+
+      return {
+        d: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        h: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        m: Math.floor((diff / 1000 / 60) % 60),
+        s: Math.floor((diff / 1000) % 60)
+      };
+    };
+
+    setTimeLeft(calcTime());
+    const intv = setInterval(() => {
+      setTimeLeft(calcTime());
+    }, 1000);
+    return () => clearInterval(intv);
+  }, []);
+
+  const format = (num) => num.toString().padStart(2, '0');
+
+  return (
+    <div style={{
+      width: '100%',
+      background: 'linear-gradient(90deg, #1B2845, #274060, #335C81)',
+      color: '#fff',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '10px 20px',
+      fontFamily: '"Inter", "Segoe UI", sans-serif',
+      boxSizing: 'border-box',
+      borderBottom: '1px solid rgba(255,255,255,0.1)',
+      gap: '15px',
+      flexWrap: 'wrap'
+    }}>
+      <div style={{display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.95rem', fontWeight: '600'}}>
+        <span style={{color: '#ffcc00'}}>✧</span> 
+        每週任務結算 — 獲取 <span style={{background: '#ed4245', padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'}}>專屬身分組</span> | 距離結算剩餘:
+      </div>
+      <div style={{display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold', fontSize: '1rem'}}>
+        <div style={{background: '#f2f3f5', color: '#23272a', padding: '4px 8px', borderRadius: '6px', minWidth: '28px', textAlign: 'center'}}>{format(timeLeft.d)}</div>
+        <span>:</span>
+        <div style={{background: '#f2f3f5', color: '#23272a', padding: '4px 8px', borderRadius: '6px', minWidth: '28px', textAlign: 'center'}}>{format(timeLeft.h)}</div>
+        <span>:</span>
+        <div style={{background: '#f2f3f5', color: '#23272a', padding: '4px 8px', borderRadius: '6px', minWidth: '28px', textAlign: 'center'}}>{format(timeLeft.m)}</div>
+        <span>:</span>
+        <div style={{background: '#f2f3f5', color: '#23272a', padding: '4px 8px', borderRadius: '6px', minWidth: '28px', textAlign: 'center'}}>{format(timeLeft.s)}</div>
+      </div>
+    </div>
+  );
+}
+
 function Dashboard({ token, onLogout }) {
   const [socket, setSocket] = useState(null);
   const [nodes, setNodes] = useState([]);
@@ -468,6 +531,7 @@ function Dashboard({ token, onLogout }) {
 
   return (
     <div className="app-container">
+      <CountdownBanner />
       {/* Header Panel */}
       <header className="system-header">
         <div className="system-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

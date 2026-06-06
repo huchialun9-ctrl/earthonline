@@ -757,7 +757,7 @@ io.on('connection', (socket) => {
     if (!user || !data || typeof data.command !== 'string') return;
     
     const rawCmd = data.command.trim();
-    const cmdUpper = rawCmd.toUpperCase();
+    const cmdUpper = rawCmd.toUpperCase().replace(/^\//, '');
     
     if (cmdUpper.startsWith('BROADCAST ')) {
       const message = rawCmd.substring(10).trim();

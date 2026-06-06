@@ -539,6 +539,153 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Handle World Chat
+  socket.on('send_chat', (data) => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    
+    const message = (data.message || '').trim().substring(0, 200); // Max length 200
+    if (!message) return;
+    
+    io.emit('chat_message', { username: user.username, message: message });
+    console.log(`[CHAT] ${user.username}: ${message}`);
+  });
+
+  // Friend System Handlers
+  const isUserOnline = (username) => {
+    for (const [id, user] of connectedUsers.entries()) {
+      if (user.username === username) return true;
+    }
+    return false;
+  };
+
+  socket.on('get_social_data', async () => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    try {
+      const dbUser = await User.findOne({ username: user.username });
+      if (!dbUser) return;
+      
+      const allUsersCursor = await User.find({}, { username: 1, country: 1 }).lean();
+      
+      const allPlayers = allUsersCursor.map(u => ({
+        username: u.username,
+        country: u.country,
+        online: isUserOnline(u.username)
+      }));
+
+      const friendsData = (dbUser.friends || []).map(f => ({
+        username: f,
+        online: isUserOnline(f)
+      }));
+
+      socket.emit('social_data', {
+        allPlayers,
+        friends: friendsData,
+        friendRequests: dbUser.friendRequests || []
+      });
+    } catch (err) {
+      console.error('[SYS] get_social_data error:', err);
+    }
+  });
+
+  socket.on('send_friend_request', async ({ targetUsername }) => {
+    const user = connectedUsers.get(socket.id);
+    if (!user || user.username === targetUsername) return;
+    
+    try {
+      const dbTarget = await User.findOne({ username: targetUsername });
+      if (!dbTarget) return;
+
+      if ((dbTarget.friends || []).includes(user.username)) return;
+      if ((dbTarget.friendRequests || []).includes(user.username)) return;
+
+      await User.updateOne({ username: targetUsername }, { $push: { friendRequests: user.username } });
+      
+      // Notify target if online
+      for (const [sid, u] of connectedUsers.entries()) {
+        if (u.username === targetUsername) {
+          io.to(sid).emit('friend_request_received', { from: user.username });
+          break;
+        }
+      }
+    } catch (err) {
+      console.error('[SYS] send_friend_request error:', err);
+    }
+  });
+
+  socket.on('accept_friend_request', async ({ targetUsername }) => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    try {
+      const dbUser = await User.findOne({ username: user.username });
+      if (!dbUser || !(dbUser.friendRequests || []).includes(targetUsername)) return;
+
+      await User.updateOne(
+        { username: user.username },
+        { 
+          $pull: { friendRequests: targetUsername },
+          $addToSet: { friends: targetUsername }
+        }
+      );
+
+      await User.updateOne(
+        { username: targetUsername },
+        { $addToSet: { friends: user.username } }
+      );
+      
+      // Update clients
+      socket.emit('social_data_updated');
+      for (const [sid, u] of connectedUsers.entries()) {
+        if (u.username === targetUsername) {
+          io.to(sid).emit('social_data_updated');
+          break;
+        }
+      }
+    } catch (err) {
+      console.error('[SYS] accept_friend_request error:', err);
+    }
+  });
+
+  socket.on('reject_friend_request', async ({ targetUsername }) => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    try {
+      await User.updateOne(
+        { username: user.username },
+        { $pull: { friendRequests: targetUsername } }
+      );
+      socket.emit('social_data_updated');
+    } catch (err) {
+      console.error('[SYS] reject_friend_request error:', err);
+    }
+  });
+
+  socket.on('remove_friend', async ({ targetUsername }) => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    try {
+      await User.updateOne(
+        { username: user.username },
+        { $pull: { friends: targetUsername } }
+      );
+      await User.updateOne(
+        { username: targetUsername },
+        { $pull: { friends: user.username } }
+      );
+      socket.emit('social_data_updated');
+      for (const [sid, u] of connectedUsers.entries()) {
+        if (u.username === targetUsername) {
+          io.to(sid).emit('social_data_updated');
+          break;
+        }
+      }
+    } catch (err) {
+      console.error('[SYS] remove_friend error:', err);
+    }
+  });
+
+
   // Handle Terminal Commands
   socket.on('terminal_command', async (data) => {
     const user = connectedUsers.get(socket.id);

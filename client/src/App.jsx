@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Rectangle, CircleMarker, Popup, useMap } from 'react-leaflet';
 import { io } from 'socket.io-client';
-import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee } from 'lucide-react';
+import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee, Users } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import './index.css';
 
@@ -452,6 +452,9 @@ function Dashboard({ token, onLogout }) {
   const [showManualBind, setShowManualBind] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAccountInfo, setShowAccountInfo] = useState(false);
+  const [showSocialModal, setShowSocialModal] = useState(false);
+  const [socialTab, setSocialTab] = useState('friends'); // 'friends', 'all', 'requests'
+  const [socialData, setSocialData] = useState({ allPlayers: [], friends: [], friendRequests: [] });
   const [leaderboard, setLeaderboard] = useState([]);
   const [sortMode, setSortMode] = useState('points');
   const [currentEvent, setCurrentEvent] = useState(null);
@@ -498,6 +501,13 @@ function Dashboard({ token, onLogout }) {
       terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [terminalHistory, isTerminalOpen]);
+
+  // Fetch social data when modal opens
+  useEffect(() => {
+    if (showSocialModal && socket) {
+      socket.emit('get_social_data');
+    }
+  }, [showSocialModal, socket]);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -607,6 +617,19 @@ function Dashboard({ token, onLogout }) {
 
     s.on('chat_message', (data) => {
       addLog(`[CHAT] ${data.username}: ${data.message}`);
+    });
+
+    s.on('social_data', (data) => {
+      setSocialData(data);
+    });
+
+    s.on('social_data_updated', () => {
+      s.emit('get_social_data');
+    });
+
+    s.on('friend_request_received', (data) => {
+      addLog(`[SYSTEM] 收到來自 ${data.from} 的好友邀請！`);
+      s.emit('get_social_data');
     });
 
     s.on('all_nodes', (data) => {
@@ -811,6 +834,15 @@ function Dashboard({ token, onLogout }) {
             </div>
             {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[已斷線]</span>}
           </div>
+
+          <button onClick={() => setShowSocialModal(true)} style={{
+            display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 15px', borderRadius: '8px', 
+            background: 'rgba(0, 255, 136, 0.2)', border: '1px solid #00FF88', color: '#00FF88', 
+            cursor: 'pointer', fontWeight: 'bold', transition: 'all 0.2s'
+          }}>
+            <Users size={18} />
+            社交網路
+          </button>
 
           <a href="https://buymeacoffee.com/lucas1126" target="_blank" rel="noreferrer" style={{
             display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 15px', borderRadius: '8px', 
@@ -1036,12 +1068,6 @@ function Dashboard({ token, onLogout }) {
           <div className="bottom-log-console" style={{display: 'flex', flexDirection: 'column', height: '250px'}}>
             <div className="log-header" style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-color)'}}>
               <Activity size={16} /> 世界頻道 / 系統日誌 (World Chat)
-              <button 
-                onClick={() => setIsTerminalOpen(true)}
-                style={{marginLeft: 'auto', background: 'var(--accent-color)', color: '#000', border: 'none', padding: '2px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'}}
-              >
-                <Code size={14} /> 開啟終端機
-              </button>
             </div>
             <div className="log-content" style={{flex: 1, overflowY: 'auto'}}>
               {logs.map((log, i) => {
@@ -1400,6 +1426,86 @@ function App() {
   }
 
   return <Dashboard token={token} onLogout={handleLogout} />;
+}
+
+function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket }) {
+  return (
+    <div className="modal-overlay" onClick={onClose} style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(5px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+    }}>
+      <div className="modal-content" onClick={e => e.stopPropagation()} style={{
+        background: 'rgba(10, 15, 30, 0.95)',
+        border: '1px solid var(--accent-color)',
+        borderRadius: '10px', padding: '20px', width: '90%', maxWidth: '500px',
+        boxShadow: '0 0 20px rgba(0, 255, 136, 0.2)', color: '#fff', position: 'relative',
+        maxHeight: '80vh', display: 'flex', flexDirection: 'column'
+      }}>
+        <button onClick={onClose} style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}>
+          <X size={24} />
+        </button>
+        <h2 style={{ color: 'var(--accent-color)', marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Users size={24} /> 社交網路 (Social Matrix)
+        </h2>
+
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
+          <button onClick={() => setSocialTab('all')} style={{ flex: 1, padding: '8px', background: socialTab === 'all' ? 'var(--accent-color)' : 'transparent', color: socialTab === 'all' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>全服玩家</button>
+          <button onClick={() => setSocialTab('friends')} style={{ flex: 1, padding: '8px', background: socialTab === 'friends' ? 'var(--accent-color)' : 'transparent', color: socialTab === 'friends' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>好友列表</button>
+          <button onClick={() => setSocialTab('requests')} style={{ flex: 1, padding: '8px', background: socialTab === 'requests' ? 'var(--accent-color)' : 'transparent', color: socialTab === 'requests' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+            交友邀請 {socialData.friendRequests?.length > 0 && <span style={{ background: 'var(--danger-color)', color: '#fff', padding: '2px 6px', borderRadius: '10px', fontSize: '0.8rem', marginLeft: '5px' }}>{socialData.friendRequests.length}</span>}
+          </button>
+        </div>
+
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {socialTab === 'all' && (
+            socialData.allPlayers?.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>查無資料</div> :
+            socialData.allPlayers?.map(p => (
+              <div key={p.username} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '5px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ color: p.online ? '#0f0' : '#888', fontWeight: 'bold' }}>●</span>
+                  <span>{p.username} [{p.country}]</span>
+                </div>
+                {!socialData.friends?.find(f => f.username === p.username) && (
+                  <button onClick={() => socket.emit('send_friend_request', { targetUsername: p.username })} style={{ background: 'rgba(0,255,136,0.2)', border: '1px solid var(--accent-color)', color: 'var(--accent-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>加好友</button>
+                )}
+              </div>
+            ))
+          )}
+
+          {socialTab === 'friends' && (
+            socialData.friends?.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>目前沒有好友</div> :
+            socialData.friends?.map(f => (
+              <div key={f.username} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '5px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ color: f.online ? '#0f0' : '#888', fontWeight: 'bold' }}>●</span>
+                  <span>{f.username}</span>
+                </div>
+                <button onClick={() => {
+                  if (window.confirm(`確定要刪除好友 ${f.username} 嗎？`)) {
+                    socket.emit('remove_friend', { targetUsername: f.username });
+                  }
+                }} style={{ background: 'rgba(255,65,108,0.2)', border: '1px solid var(--danger-color)', color: 'var(--danger-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>刪除</button>
+              </div>
+            ))
+          )}
+
+          {socialTab === 'requests' && (
+            socialData.friendRequests?.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>目前沒有邀請</div> :
+            socialData.friendRequests?.map(req => (
+              <div key={req} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '5px' }}>
+                <span>{req} 想要加您為好友</span>
+                <div style={{ display: 'flex', gap: '5px' }}>
+                  <button onClick={() => socket.emit('accept_friend_request', { targetUsername: req })} style={{ background: 'var(--accent-color)', color: '#000', border: 'none', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>接受</button>
+                  <button onClick={() => socket.emit('reject_friend_request', { targetUsername: req })} style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>拒絕</button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default App;

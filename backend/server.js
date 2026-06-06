@@ -803,7 +803,31 @@ io.on('connection', (socket) => {
       'HESOYAM': 5000
     };
 
-    if (cheatCodes[cmd]) {
+    if (cmdUpper === 'SCAN_BOTS') {
+      try {
+        const bots = await User.find({ 'discord.id': { $exists: false }, username: { $regex: /^[a-zA-Z0-9]{8,35}$/ } }).limit(50);
+        if (bots.length === 0) {
+          socket.emit('terminal_response', `[SYS] NO SUSPICIOUS BOTS FOUND.`);
+        } else {
+          const names = bots.map(b => b.username).join(', ');
+          socket.emit('terminal_response', `[SYS] FOUND ${bots.length} SUSPECTS (Showing up to 50): ${names}\nTYPE /NUKE_BOTS TO DELETE THEM.`);
+        }
+      } catch (err) {
+        socket.emit('terminal_response', `[ERROR] SCAN FAILED.`);
+      }
+    } else if (cmdUpper === 'NUKE_BOTS') {
+      try {
+        // Delete all users that look like bots (alphanumeric 8-35 chars) and have no discord ID, created recently or 0 score
+        const result = await User.deleteMany({ 
+          'discord.id': { $exists: false }, 
+          username: { $regex: /^[a-zA-Z0-9]{8,35}$/ }
+        });
+        socket.emit('terminal_response', `[SYS] NUKED ${result.deletedCount} SUSPICIOUS BOT ACCOUNTS.`);
+        io.emit('social_data_updated'); // refresh UI for everyone
+      } catch (err) {
+        socket.emit('terminal_response', `[ERROR] NUKE FAILED.`);
+      }
+    } else if (cheatCodes[cmd]) {
       try {
         const dbUser = await User.findOne({ username: user.username });
         if (dbUser) {

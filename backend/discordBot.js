@@ -129,8 +129,14 @@ client.login(TOKEN).catch(err => {
 });
 
 // Update Bot Status
+let lastPresenceUpdate = 0;
 async function updateBotPresence(onlineCount) {
   if (!isBotReady) return;
+  
+  const now = Date.now();
+  if (now - lastPresenceUpdate < 30000) return; // Only update every 30 seconds
+  lastPresenceUpdate = now;
+
   try {
     const result = await User.aggregate([
       { $group: { _id: null, totalTime: { $sum: "$accumulatedTime" } } }
@@ -139,7 +145,7 @@ async function updateBotPresence(onlineCount) {
     const totalHours = Math.floor(totalTimeMs / 3600000);
     
     client.user.setPresence({
-      activities: [{ name: `🌍 全球伺服器 | 📡 在線節點: ${onlineCount} | ⏱️ 總掛機時長: ${totalHours} 小時` }],
+      activities: [{ name: `🌍 地球在線 | 🧑‍💻 節點 ${onlineCount} | ⏳ 總時長 ${totalHours}h`, type: 0 }],
       status: 'online',
     });
   } catch (err) {

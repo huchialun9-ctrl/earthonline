@@ -12,7 +12,9 @@ const userSchema = new mongoose.Schema({
     id: String,
     username: String,
     avatar: String
-  }
+  },
+  recoveryKey: { type: String },
+  redeemedCodes: { type: [String], default: [] }
 });
 
 module.exports = mongoose.model('User', userSchema);

@@ -19,15 +19,39 @@ function getFlagEmoji(countryCode) {
 
 function LoginGateway({ onLogin }) {
   const [isRegister, setIsRegister] = useState(false);
+  const [isForgot, setIsForgot] = useState(false);
+  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [recoveryKey, setRecoveryKey] = useState('');
+  
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const endpoint = isRegister ? '/api/register' : '/api/login';
+    setSuccessMsg('');
     
+    if (isForgot) {
+      try {
+        const res = await fetch(`${API_URL}/api/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, recoveryKey, newPassword: password })
+        });
+        const data = await res.json();
+        if (!res.ok) return setError(data.error || '重置失敗');
+        setSuccessMsg('密碼重置成功，請使用新密碼登入');
+        setIsForgot(false);
+        setPassword('');
+      } catch (err) {
+        setError('伺服器連線失敗');
+      }
+      return;
+    }
+
+    const endpoint = isRegister ? '/api/register' : '/api/login';
     try {
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
@@ -42,8 +66,9 @@ function LoginGateway({ onLogin }) {
       }
       
       if (isRegister) {
-        alert('註冊成功，請登入');
+        alert(`註冊成功！\n【請務必保存您的恢復金鑰】\n${data.recoveryKey}\n\n如果您忘記密碼，這是唯一找回帳號的方式！`);
         setIsRegister(false);
+        setPassword('');
       } else {
         onLogin(data.token, data.user.username);
       }
@@ -69,6 +94,8 @@ function LoginGateway({ onLogin }) {
         
         <form onSubmit={handleSubmit} className="login-form">
           {error && <div className="error-message">{error}</div>}
+          {successMsg && <div style={{color: '#00ffaa', marginBottom: '10px', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold'}}>{successMsg}</div>}
+          
           <div className="form-group">
             <label>SUBJECT ID (帳號)</label>
             <input 
@@ -79,8 +106,23 @@ function LoginGateway({ onLogin }) {
               className="terminal-input"
             />
           </div>
+
+          {isForgot && (
+            <div className="form-group">
+              <label>RECOVERY KEY (恢復金鑰)</label>
+              <input 
+                type="text" 
+                value={recoveryKey} 
+                onChange={e => setRecoveryKey(e.target.value)} 
+                required 
+                className="terminal-input"
+                placeholder="EO-XXXX-XXXX"
+              />
+            </div>
+          )}
+
           <div className="form-group">
-            <label>ACCESS CODE (密碼)</label>
+            <label>{isForgot ? 'NEW ACCESS CODE (新密碼)' : 'ACCESS CODE (密碼)'}</label>
             <input 
               type="password" 
               value={password} 
@@ -89,17 +131,29 @@ function LoginGateway({ onLogin }) {
               className="terminal-input"
             />
           </div>
+
           <button type="submit" className="terminal-btn">
-            {isRegister ? '建立節點連線 (註冊)' : '驗證並接入 (登入)'}
+            {isForgot ? '重置安全授權 (RESET)' : isRegister ? '建立節點連線 (註冊)' : '驗證並接入 (登入)'}
           </button>
         </form>
         
-        <div style={{textAlign: 'center', marginTop: '15px'}}>
+        <div style={{textAlign: 'center', marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px'}}>
+          {!isForgot && (
+            <span className="toggle-link" onClick={() => setIsRegister(!isRegister)}>
+              {isRegister ? '>> 返回登入程序' : '>> 申請新節點授權'}
+            </span>
+          )}
           <span 
             className="toggle-link" 
-            onClick={() => setIsRegister(!isRegister)}
+            style={{color: 'var(--danger-color)'}} 
+            onClick={() => {
+              setIsForgot(!isForgot); 
+              if(!isForgot) setIsRegister(false); 
+              setError(''); 
+              setSuccessMsg('');
+            }}
           >
-            {isRegister ? '>> 返回登入程序' : '>> 申請新節點授權'}
+            {isForgot ? '>> 返回登入程序' : '>> 遺失安全授權 (忘記密碼)'}
           </span>
         </div>
       </div>
@@ -353,6 +407,7 @@ function Dashboard({ token, onLogout }) {
   const [mapTheme, setMapTheme] = useState('satellite');
   const [showManualBind, setShowManualBind] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showAccountInfo, setShowAccountInfo] = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
   const [sortMode, setSortMode] = useState('points');
   const [currentEvent, setCurrentEvent] = useState(null);
@@ -1104,6 +1159,94 @@ function Dashboard({ token, onLogout }) {
 
       {/* Full Page About Documentation */}
       {showAboutModal && <DocumentationOverlay onClose={() => setShowAboutModal(false)} />}
+      {showAccountInfo && <AccountInfoModal token={token} onClose={() => setShowAccountInfo(false)} />}
+    </div>
+  );
+}
+
+function AccountInfoModal({ token, onClose }) {
+  const [info, setInfo] = useState(null);
+  const [error, setError] = useState('');
+  const [showKey, setShowKey] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) setError(data.error);
+        else setInfo(data);
+      })
+      .catch(() => setError('伺服器連線失敗'));
+  }, [token]);
+
+  return (
+    <div className="modal-overlay" onClick={onClose} style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(5px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000
+    }}>
+      <div className="modal-content" onClick={e => e.stopPropagation()} style={{
+        width: '450px', background: '#0a0f19', borderRadius: '12px', padding: '30px',
+        border: '1px solid var(--accent-color)', boxShadow: '0 0 30px rgba(0, 210, 255, 0.2)',
+        fontFamily: 'var(--font-sans)', color: 'var(--text-main)', position: 'relative'
+      }}>
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px dashed var(--accent-color)', paddingBottom: '10px'}}>
+          <h2 style={{margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--accent-color)', fontSize: '1.5rem'}}>
+            <User size={24} /> 節點帳號中心
+          </h2>
+          <X size={24} style={{cursor: 'pointer', color: 'var(--text-secondary)'}} onClick={onClose} />
+        </div>
+        
+        {error ? <div style={{color: 'var(--danger-color)'}}>{error}</div> : !info ? <div style={{color: 'var(--text-secondary)'}}>資料同步中...</div> : (
+          <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <span style={{color: 'var(--text-secondary)'}}>代號 (SUBJECT ID)</span>
+              <strong style={{color: 'var(--text-main)'}}>{info.username}</strong>
+            </div>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <span style={{color: 'var(--text-secondary)'}}>連線建立日 (JOINED)</span>
+              <strong style={{color: 'var(--text-main)'}}>{new Date(info.createdAt).toLocaleDateString()}</strong>
+            </div>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <span style={{color: 'var(--text-secondary)'}}>累積生存時間</span>
+              <strong style={{color: 'var(--text-main)'}}>{(info.accumulatedTime / 3600).toFixed(1)} 小時</strong>
+            </div>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <span style={{color: 'var(--text-secondary)'}}>榮譽點數 (PT)</span>
+              <strong style={{color: 'var(--accent-color)'}}>{info.accumulatedBonusPoints.toLocaleString()}</strong>
+            </div>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <span style={{color: 'var(--text-secondary)'}}>Discord 通訊協定</span>
+              <strong style={{color: info.discord && info.discord.username ? '#5865F2' : 'var(--danger-color)'}}>
+                {info.discord && info.discord.username ? info.discord.username : '未綁定'}
+              </strong>
+            </div>
+            
+            <div style={{marginTop: '20px', padding: '15px', background: 'rgba(255, 59, 48, 0.1)', border: '1px solid var(--danger-color)', borderRadius: '8px'}}>
+              <div style={{color: 'var(--danger-color)', fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <ShieldCheck size={18} /> 專屬恢復金鑰 (Recovery Key)
+              </div>
+              <p style={{fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '10px'}}>
+                警告：如果您遺失密碼，這是【唯一】能找回帳號的憑證，請勿洩漏給任何人。
+              </p>
+              <div style={{display: 'flex', gap: '10px'}}>
+                <input 
+                  type={showKey ? "text" : "password"} 
+                  value={info.recoveryKey} 
+                  readOnly 
+                  className="terminal-input"
+                  style={{flex: 1, letterSpacing: showKey ? '1px' : '3px'}}
+                />
+                <button className="terminal-btn" style={{padding: '0 15px', background: 'rgba(255, 59, 48, 0.2)', color: 'var(--danger-color)', borderColor: 'var(--danger-color)'}} onClick={() => setShowKey(!showKey)}>
+                  {showKey ? '隱藏' : '顯示'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

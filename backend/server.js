@@ -95,15 +95,17 @@ app.post('/api/register', async (req, res) => {
   }
   
   const hashedPassword = await bcrypt.hash(password, 10);
+  const recoveryKey = 'EO-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
   const newUser = {
     id: 'EO-' + Date.now(),
     username,
     password: hashedPassword,
-    registeredAt: Date.now()
+    registeredAt: Date.now(),
+    recoveryKey
   };
   
   await db.createUser(newUser);
-  res.json({ success: true, message: 'Registration successful' });
+  res.json({ success: true, message: 'Registration successful', recoveryKey });
 });
 
 app.post('/api/login', async (req, res) => {
@@ -118,6 +120,43 @@ app.post('/api/login', async (req, res) => {
   
   const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET);
   res.json({ success: true, token, user: { id: user.id, username: user.username } });
+});
+
+app.get('/api/auth/me', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'No token' });
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await db.findUserByUsername(decoded.username);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({
+      username: user.username,
+      createdAt: user.createdAt,
+      accumulatedTime: user.accumulatedTime,
+      accumulatedBonusPoints: user.accumulatedBonusPoints,
+      discord: user.discord,
+      recoveryKey: user.recoveryKey || '未產生'
+    });
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+app.post('/api/reset-password', async (req, res) => {
+  const { username, recoveryKey, newPassword } = req.body;
+  if (!username || !recoveryKey || !newPassword) return res.status(400).json({ error: 'Missing fields' });
+  
+  const user = await db.findUserByUsername(username);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  
+  if (user.recoveryKey !== recoveryKey) {
+    return res.status(400).json({ error: 'Invalid recovery key' });
+  }
+  
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await User.updateOne({ username }, { password: hashedPassword });
+  res.json({ success: true, message: 'Password reset successful' });
 });
 
 app.post('/api/bind-discord-manual', async (req, res) => {
@@ -423,6 +462,46 @@ io.on('connection', (socket) => {
       socket.emit('all_nodes', allNodes);
     } catch (err) {
       socket.emit('auth_error', { message: 'Invalid token' });
+    }
+  });
+
+  // Handle Terminal Commands
+  socket.on('terminal_command', async (data) => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    
+    const cmd = data.command.trim().toUpperCase();
+    const cheatCodes = {
+      'IDDQD': 10000,
+      'HESOYAM': 5000
+    };
+
+    if (cheatCodes[cmd]) {
+      try {
+        const dbUser = await User.findOne({ username: user.username });
+        if (dbUser) {
+          if (dbUser.redeemedCodes && dbUser.redeemedCodes.includes(cmd)) {
+            socket.emit('terminal_response', `[ERROR] CODE '${cmd}' ALREADY REDEEMED.`);
+          } else {
+            const reward = cheatCodes[cmd];
+            await User.updateOne(
+              { username: user.username },
+              { 
+                $push: { redeemedCodes: cmd },
+                $inc: { accumulatedBonusPoints: reward }
+              }
+            );
+            user.accumulatedBonusPoints = (user.accumulatedBonusPoints || 0) + reward; // update cache locally if needed
+            socket.emit('terminal_response', `[SUCCESS] SECRET CODE ACCEPTED. ${reward} PT AWARDED.`);
+            console.log(`[SYS] User ${user.username} redeemed secret code: ${cmd}`);
+          }
+        }
+      } catch (err) {
+        console.error('[SYS] Terminal Command Error:', err);
+        socket.emit('terminal_response', `[ERROR] SYSTEM FAILURE DURING REDEMPTION.`);
+      }
+    } else {
+      socket.emit('terminal_response', `[ERROR] UNKNOWN OR INVALID COMMAND: ${data.command}`);
     }
   });
 

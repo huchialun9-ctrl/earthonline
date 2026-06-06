@@ -476,6 +476,7 @@ function Dashboard({ token, onLogout }) {
   const [myNode, setMyNode] = useState(null);
   const [globalStats, setGlobalStats] = useState({ activeUsers: 0, totalPopulation: 0, globalProduction: 0, socialCompression: '1.000' });
   const [lifespan, setLifespan] = useState(0);
+  const [show100Celebration, setShow100Celebration] = useState(false);
   const [logs, setLogs] = useState([
     { text: '[SYS] 地球在線連線建立中...', time: new Date().toISOString().substring(11, 19) },
     { text: '[SYS] 進入全球節點網路...', time: new Date().toISOString().substring(11, 19) }
@@ -852,6 +853,12 @@ function Dashboard({ token, onLogout }) {
 
   return (
     <div className="app-container" style={{ boxShadow: getEventGlow(), transition: 'box-shadow 1s ease-in-out' }}>
+      {show100Celebration && (
+        <div className="celebration-overlay">
+          <div className="celebration-emoji">🎉</div>
+          <div className="celebration-text">伺服器達成 100 人里程碑！</div>
+        </div>
+      )}
       {/* Terminal Overlay */}
       {isTerminalOpen && (
         <div style={{

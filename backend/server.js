@@ -23,6 +23,37 @@ app.get('/', (req, res) => {
   res.send('Earth Online Backend Core is running. WebSocket and API endpoints are active.');
 });
 
+// Global Event State
+let currentGlobalEvent = null; // { type: 'QUANTUM_BURST' | 'SOLAR_STORM', endTime: number }
+
+function triggerRandomEvent() {
+  if (currentGlobalEvent) return;
+  
+  const events = ['QUANTUM_BURST', 'SOLAR_STORM'];
+  const type = events[Math.floor(Math.random() * events.length)];
+  const duration = type === 'QUANTUM_BURST' ? 2 * 60 * 60 * 1000 : 60 * 60 * 1000;
+  
+  currentGlobalEvent = {
+    type,
+    endTime: Date.now() + duration
+  };
+  
+  const msg = type === 'QUANTUM_BURST' 
+    ? '🌟 **【全球事件：量子爆發】** 接下來 2 小時內，全伺服器點數累積速度提升至 **3.0 倍**！'
+    : '🌪️ **【全球事件：太陽風暴】** 接下來 1 小時內網路將劇烈波動，期間斷線將被扣除 100 點！撐過去的生存者可獲 200 點獎勵！';
+    
+  sendDiscordWebhook(msg);
+  io.emit('global_event_started', { type, endTime: currentGlobalEvent.endTime });
+  console.log(`[SYS] Global Event Triggered: ${type}`);
+}
+
+// Randomly trigger an event every 2 to 4 hours
+setInterval(() => {
+  if (!currentGlobalEvent && Math.random() < 0.5) {
+    triggerRandomEvent();
+  }
+}, 2 * 60 * 60 * 1000);
+
 const JWT_SECRET = process.env.JWT_SECRET || 'earth_online_secret_key_9988';
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || '';
@@ -252,7 +283,25 @@ setInterval(async () => {
   const pop = await db.getTotalPopulation();
 
   const isBoosted = connectedUsers.size >= 5;
-  const multiplier = isBoosted ? 1.2 : 1.0;
+  let multiplier = isBoosted ? 1.2 : 1.0;
+  
+  // Apply Global Event overrides
+  if (currentGlobalEvent) {
+    if (Date.now() >= currentGlobalEvent.endTime) {
+      // Event Ended
+      if (currentGlobalEvent.type === 'SOLAR_STORM' && connectedUsers.size > 0) {
+        // Reward survivors
+        const usernames = Array.from(connectedUsers.values()).map(u => u.username);
+        await User.updateMany({ username: { $in: usernames } }, { $inc: { accumulatedBonusPoints: 200 } }).catch(console.error);
+      }
+      io.emit('global_event_ended', { type: currentGlobalEvent.type });
+      sendDiscordWebhook(`✅ **【事件結束】** ${currentGlobalEvent.type === 'QUANTUM_BURST' ? '量子爆發' : '太陽風暴'} 已結束，系統恢復正常！`);
+      console.log(`[SYS] Global Event Ended: ${currentGlobalEvent.type}`);
+      currentGlobalEvent = null;
+    } else if (currentGlobalEvent.type === 'QUANTUM_BURST') {
+      multiplier = 3.0; // Override multiplier
+    }
+  }
 
   // Add base time (2 seconds) and bonus points to online users
   if (connectedUsers.size > 0) {
@@ -352,7 +401,8 @@ io.on('connection', (socket) => {
         createdAt: user.createdAt,
         connectedAt: user.connectedAt,
         activeUsers: connectedUsers.size,
-        totalPopulation: pop
+        totalPopulation: pop,
+        currentGlobalEvent: currentGlobalEvent // Send current event to newly connected users
       });
 
       if (connectedUsers.size % 10 === 0 && connectedUsers.size > 0) {
@@ -376,9 +426,15 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('disconnect', () => {
+  // Handle Disconnect
+  socket.on('disconnect', async () => {
     const disconnectedUser = connectedUsers.get(socket.id);
     if (disconnectedUser) {
+      if (currentGlobalEvent && currentGlobalEvent.type === 'SOLAR_STORM') {
+        // Penalty for disconnecting during solar storm
+        await User.updateOne({ username: disconnectedUser.username }, { $inc: { accumulatedBonusPoints: -100 } }).catch(console.error);
+        console.log(`[SYS] Penalty applied to ${disconnectedUser.username} for Solar Storm disconnect`);
+      }
       connectedUsers.delete(socket.id);
       console.log(`[SYS] Node Disconnected: ${socket.id}`);
       io.emit('node_disconnected', { id: socket.id });

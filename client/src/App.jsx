@@ -354,9 +354,9 @@ function Dashboard({ token, onLogout }) {
   const [showManualBind, setShowManualBind] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
-  const [sortMode, setSortMode] = useState('points'); // 'points' or 'time'
+  const [sortMode, setSortMode] = useState('points');
+  const [currentEvent, setCurrentEvent] = useState(null);
   
-  // Fetch leaderboard data
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
@@ -370,7 +370,6 @@ function Dashboard({ token, onLogout }) {
     return () => clearInterval(intv);
   }, []);
 
-  // Fake bound Discord data for UI demo (since backend DB isn't fully updated yet)
   const [boundDiscord, setBoundDiscord] = useState(null);
 
   const handleBindDiscord = (e) => {
@@ -412,7 +411,7 @@ function Dashboard({ token, onLogout }) {
   const addLog = (msg) => {
     setLogs(prev => {
       const time = new Date().toISOString().substring(11, 19);
-      return [...prev, `[${time}] ${msg}`].slice(-8); // Keep last 8 lines
+      return [...prev, `[${time}] ${msg}`].slice(-8);
     });
   };
 
@@ -436,13 +435,23 @@ function Dashboard({ token, onLogout }) {
       setMyNode(data);
       addLog(`身分確認：節點 [${data.username}] 成功接入全球網路`);
       
-      // Auto-load Discord avatar if it's bound in database
       if (data.discordProfile) {
         setBoundDiscord({
           username: data.discordProfile.username,
           avatar: data.discordProfile.avatar
         });
       }
+      if (data.currentGlobalEvent) {
+        setCurrentEvent(data.currentGlobalEvent);
+      }
+    });
+
+    s.on('global_event_started', (eventData) => {
+      setCurrentEvent(eventData);
+    });
+
+    s.on('global_event_ended', () => {
+      setCurrentEvent(null);
     });
 
     s.on('all_nodes', (data) => {
@@ -541,9 +550,50 @@ function Dashboard({ token, onLogout }) {
     gridBlocks[gridId].rawNodes.push(node);
   });
 
+  // Global Event Banner Component
+  const GlobalEventBanner = () => {
+    if (!currentEvent) return null;
+    
+    const isQuantum = currentEvent.type === 'QUANTUM_BURST';
+    const bgColor = isQuantum ? 'linear-gradient(90deg, #00d2ff, #3a7bd5)' : 'linear-gradient(90deg, #ff416c, #ff4b2b)';
+    const icon = isQuantum ? '🌟' : '🌪️';
+    const text = isQuantum 
+      ? '【量子爆發】全伺服器點數累積速度 x 3.0 倍！' 
+      : '【太陽風暴】網路劇烈波動！期間斷線將扣除 100 點，撐過去可獲 200 點！';
+      
+    return (
+      <div style={{
+        width: '100%',
+        background: bgColor,
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '10px 20px',
+        fontFamily: '"Inter", "Segoe UI", sans-serif',
+        boxSizing: 'border-box',
+        borderBottom: '1px solid rgba(255,255,255,0.2)',
+        fontWeight: 'bold',
+        fontSize: '1rem',
+        textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+        animation: 'pulse 2s infinite'
+      }}>
+        <span style={{ marginRight: '10px', fontSize: '1.2rem' }}>{icon}</span> {text}
+      </div>
+    );
+  };
+
+  const getEventGlow = () => {
+    if (!currentEvent) return 'none';
+    return currentEvent.type === 'QUANTUM_BURST' 
+      ? 'inset 0 0 80px rgba(0, 210, 255, 0.4)' 
+      : 'inset 0 0 80px rgba(255, 65, 108, 0.4)';
+  };
+
   return (
-    <div className="app-container">
+    <div className="app-container" style={{ boxShadow: getEventGlow(), transition: 'box-shadow 1s ease-in-out' }}>
       <CountdownBanner />
+      <GlobalEventBanner />
       {/* Header Panel */}
       <header className="system-header">
         <div className="system-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

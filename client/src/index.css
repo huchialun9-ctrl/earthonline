@@ -636,3 +636,113 @@ body {
   animation: celebrate-pop 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s forwards;
   opacity: 0;
 }
+
+/* =========================================
+   Mobile UI Responsive Layout
+   ========================================= */
+@media (max-width: 768px) {
+  /* Allow scrolling on mobile, map is fixed height at top, stats at bottom */
+  body {
+    overflow-y: auto;
+  }
+  .app-container {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  .main-content {
+    flex-direction: column-reverse;
+    height: auto;
+  }
+  
+  /* Map on top */
+  .geographic-matrix {
+    height: 50vh;
+    min-height: 400px;
+    flex: none;
+    width: 100vw;
+  }
+
+  /* Stats sidebar on bottom */
+  .metrics-terminal {
+    width: 100%;
+    margin: 0;
+    height: auto;
+    border-radius: 0;
+    box-shadow: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 20px 15px;
+  }
+
+  /* Login and Modals */
+  .login-box {
+    width: 90%;
+    padding: 25px 20px;
+  }
+  
+  .modal-box {
+    width: 95%;
+    padding: 20px 15px;
+  }
+  
+  /* Doc overlay */
+  .pro-doc-header {
+    padding: 0 15px;
+  }
+  .pro-doc-body {
+    flex-direction: column;
+    padding: 20px 15px;
+    gap: 30px;
+  }
+  .pro-doc-sidebar {
+    width: 100%;
+  }
+  .pro-doc-sidebar ul {
+    position: static;
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 10px;
+  }
+  .pro-doc-sidebar li {
+    white-space: nowrap;
+    margin-bottom: 0;
+  }
+  .doc-grid {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  /* Overlays */
+  .map-overlays {
+    top: 10px;
+    right: 10px;
+    gap: 5px;
+  }
+  .overlay-box {
+    padding: 10px 15px;
+    min-width: 100px;
+  }
+  .overlay-value {
+    font-size: 1.2rem;
+  }
+  
+  /* Terminal / Log console */
+  .bottom-log-console {
+    width: calc(100% - 20px);
+    left: 10px;
+    bottom: 10px;
+    max-height: 120px;
+  }
+
+  /* Hide header right section to save space on very small screens, or adjust */
+  .header-right {
+    gap: 5px;
+  }
+  .system-header {
+    padding: 0 10px;
+    font-size: 0.8rem;
+  }
+}

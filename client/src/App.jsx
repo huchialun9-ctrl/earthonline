@@ -28,6 +28,23 @@ function LoginGateway({ onLogin }) {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Check for discord token in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      // Remove token from url cleanly
+      window.history.replaceState({}, document.title, window.location.pathname);
+      // We don't have username easily available here but token is enough, App.jsx decodes it or dashboard does.
+      onLogin(token, 'Discord User'); 
+    }
+  }, [onLogin]);
+
+  const handleDiscordLogin = () => {
+    const state = btoa(JSON.stringify({ action: 'login', returnTo: window.location.href.split('?')[0] }));
+    window.location.href = `${API_URL}/api/auth/discord?state=${state}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -456,6 +473,8 @@ function Dashboard({ token, onLogout }) {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAccountInfo, setShowAccountInfo] = useState(false);
   const [showSocialModal, setShowSocialModal] = useState(false);
+  
+  const pingStartRef = useRef(0);
   const [socialTab, setSocialTab] = useState('friends'); // 'friends', 'all', 'requests'
   const [socialData, setSocialData] = useState({ allPlayers: [], friends: [], friendRequests: [] });
   const [leaderboard, setLeaderboard] = useState([]);
@@ -679,10 +698,21 @@ function Dashboard({ token, onLogout }) {
 
     s.on('global_stats', (stats) => {
       setGlobalStats(stats);
-      setPing(Math.floor(Math.random() * 15) + 10); // Fake small ping variation for immersion
     });
 
+    s.on('pong', () => {
+      setPing(Date.now() - pingStartRef.current);
+    });
+
+    const pingInterval = setInterval(() => {
+      if (s.connected) {
+        pingStartRef.current = Date.now();
+        s.emit('ping');
+      }
+    }, 2000);
+
     return () => {
+      clearInterval(pingInterval);
       s.disconnect();
     };
   }, [token, onLogout]);
@@ -935,7 +965,9 @@ function Dashboard({ token, onLogout }) {
             <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '8px'}}>
               NODE ID: {myNode?.userId}<br/>
               IP: {myNode?.ip}<br/>
-              REGION: {myNode?.country}
+              REGION: {myNode?.country}<br/>
+              延遲 (Ping): {ping} ms<br/>
+              伺服器狀態: {isConnected ? '連線穩定' : '中斷'}
             </div>
           </div>
           

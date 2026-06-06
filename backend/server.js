@@ -255,13 +255,17 @@ app.get('/api/auth/discord/callback', async (req, res) => {
     return res.status(400).send(`Discord Authentication Failed. <a href="/">Return to app</a>`);
   }
 
-  let decoded, returnTo;
+  let action = 'bind';
+  let decoded = null, returnTo = null;
   try {
     const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
-    decoded = jwt.verify(stateData.token, JWT_SECRET);
+    action = stateData.action || 'bind';
     returnTo = stateData.returnTo;
+    if (action === 'bind') {
+      decoded = jwt.verify(stateData.token, JWT_SECRET);
+    }
   } catch (err) {
-    return res.status(401).send('Invalid or expired application token. Please login again.');
+    return res.status(401).send('Invalid state payload or expired token.');
   }
 
   try {
@@ -303,13 +307,40 @@ app.get('/api/auth/discord/callback', async (req, res) => {
       avatar: avatarUrl
     };
 
-    const success = await db.updateUserDiscord(decoded.username, profile);
-    
-    if (success) {
-      // Redirect back to frontend dynamically based on where they came from
-      res.redirect(returnTo || '/');
+    if (action === 'login') {
+      let user = await User.findOne({ 'discord.id': profile.id });
+      if (!user) {
+        // Create new user using discord name
+        let baseName = profile.username.replace(/\s+/g, '_');
+        let finalName = baseName;
+        let counter = 1;
+        while (await User.findOne({ username: finalName })) {
+          finalName = `${baseName}_${counter++}`;
+        }
+        user = await db.registerUser(finalName, 'discord_oauth_no_password');
+        await db.updateUserDiscord(finalName, profile);
+      }
+      
+      const token = jwt.sign(
+        { id: user._id, username: user.username },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+      );
+      
+      // Redirect to frontend with token in query params
+      const separator = returnTo.includes('?') ? '&' : '?';
+      return res.redirect(`${returnTo}${separator}token=${token}`);
+      
     } else {
-      res.status(404).send('User not found in Earth Online database');
+      // Bind action
+      const success = await db.updateUserDiscord(decoded.username, profile);
+      
+      if (success) {
+        // Redirect back to frontend dynamically based on where they came from
+        res.redirect(returnTo || '/');
+      } else {
+        res.status(404).send('User not found in Earth Online database');
+      }
     }
   } catch (err) {
     console.error(err);
@@ -370,6 +401,8 @@ const io = new Server(server, {
     methods: ['GET', 'POST']
   }
 });
+
+discordBot.setIoInstance(io);
 
 // State
 const connectedUsers = new Map();
@@ -447,6 +480,11 @@ function getRealIP(socket) {
 
 io.on('connection', (socket) => {
   // Wait for client to authenticate via token
+  // Handle Ping
+  socket.on('ping', () => {
+    socket.emit('pong');
+  });
+
   socket.on('authenticate', async (data) => {
     try {
       const decoded = jwt.verify(data.token, JWT_SECRET);
@@ -549,6 +587,9 @@ io.on('connection', (socket) => {
     
     io.emit('chat_message', { username: user.username, message: message });
     console.log(`[CHAT] ${user.username}: ${message}`);
+    
+    // Sync to Discord
+    discordBot.sendChatMessageToDiscord(user.username, message);
   });
 
   // Friend System Handlers

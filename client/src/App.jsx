@@ -767,9 +767,8 @@ function Dashboard({ token, onLogout }) {
   };
 
   const calculateHealthPercentage = (seconds) => {
-    const totalLifespan = 36000; // 10 hours max
-    const remaining = Math.max(0, totalLifespan - seconds);
-    return (remaining / totalLifespan) * 100;
+    // Health is always 100% unless there is an active penalty
+    return 100;
   };
 
   // Render nodes directly as dots without clustering
@@ -963,7 +962,7 @@ function Dashboard({ token, onLogout }) {
                   style={{width: '48px', height: '48px', minWidth: '48px', minHeight: '48px', borderRadius: '50%', border: '2px solid var(--accent-color)', objectFit: 'cover'}} 
                 />
                 <div style={{overflow: 'hidden'}}>
-                  <div style={{color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{boundDiscord.username}</div>
+                  <div style={{color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{boundDiscord.username || myNode?.username}</div>
                   <div style={{color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
                     <LinkIcon size={14} color="var(--accent-color)" /> 已連結 Discord
                   </div>
@@ -996,7 +995,7 @@ function Dashboard({ token, onLogout }) {
           
           <div className="metric-group">
             <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-              <Activity size={16} /> 本次上線時間 (Online Time)
+              <Activity size={16} /> 總生存時間 (Total Lifespan)
             </div>
             <div style={{color: 'var(--accent-color)', fontSize: '1.5rem', fontWeight: 'bold'}}>
               {formatTime(lifespan)}

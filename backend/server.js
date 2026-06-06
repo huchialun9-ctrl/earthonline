@@ -102,6 +102,19 @@ app.post('/api/register', async (req, res) => {
   if (ipCount >= 3 && ip !== '::1' && ip !== '127.0.0.1') {
     return res.status(400).json({ error: '同一 IP 一天最多只能註冊 3 個帳號。' });
   }
+
+  // VPN/Proxy Check
+  if (ip !== '::1' && ip !== '127.0.0.1') {
+    try {
+      const fetch = (await import('node-fetch')).default;
+      const ipCheck = await fetch(`http://ip-api.com/json/${ip}?fields=proxy,hosting`).then(r => r.json());
+      if (ipCheck.proxy || ipCheck.hosting) {
+        return res.status(403).json({ error: '系統偵測到您正在使用 VPN 或代理伺服器，請關閉後再試。' });
+      }
+    } catch (err) {
+      console.error('[SYS] IP Check failed:', err);
+    }
+  }
   
   const hashedPassword = await bcrypt.hash(password, 10);
   const recoveryKey = 'EO-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();

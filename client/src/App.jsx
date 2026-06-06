@@ -1444,44 +1444,53 @@ function AccountInfoModal({ token, onClose, onLogout }) {
 function EulaScreen({ onAgree }) {
   return (
     <div style={{
-      height: '100vh', width: '100vw', background: '#050a15', color: '#00ff88',
+      height: '100vh', width: '100vw', background: '#f0f4f8', color: '#2d3748',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'monospace', padding: '20px', boxSizing: 'border-box'
+      fontFamily: '"Microsoft JhengHei", "Segoe UI", sans-serif', padding: '20px', boxSizing: 'border-box'
     }}>
       <div style={{
-        maxWidth: '800px', width: '100%', background: 'rgba(0,0,0,0.8)',
-        border: '1px solid #00ff88', boxShadow: '0 0 20px rgba(0, 255, 136, 0.2)',
-        padding: '30px', borderRadius: '4px', overflowY: 'auto', maxHeight: '80vh'
+        maxWidth: '800px', width: '100%', background: '#ffffff',
+        borderTop: '6px solid #4299e1', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+        padding: '40px', borderRadius: '12px', overflowY: 'auto', maxHeight: '85vh'
       }}>
-        <h1 style={{ color: '#ff416c', textAlign: 'center', textShadow: '0 0 10px #ff416c', marginBottom: '30px', letterSpacing: '2px' }}>
-          /// 終端存取協議 (Terminal Access Protocol) ///
+        <h1 style={{ color: '#2b6cb0', textAlign: 'center', marginBottom: '10px', fontSize: '2.2rem', fontWeight: 'bold' }}>
+          ✧ 歡迎來到「地球在線」大家庭 ✧
         </h1>
+        <p style={{ textAlign: 'center', color: '#718096', fontSize: '1.1rem', marginBottom: '30px' }}>
+          Welcome to Earth Online Official Server
+        </p>
         
-        <div style={{ lineHeight: '1.8', fontSize: '1.1rem', opacity: 0.9 }}>
-          <p>▶ 警告：您即將連線至<strong>「地球在線 (Earth Online)」</strong>全球伺服器節點網路。</p>
-          <p>▶ 這是一個高度匿名的觀測系統，您的真實地理位置與 IP 位址將被加密並轉換為座標映射至全球監控圖網中。</p>
+        <div style={{ lineHeight: '1.8', fontSize: '1.1rem', color: '#4a5568' }}>
+          <p>親愛的玩家您好：</p>
+          <p>非常高興能與您在這裡相遇！「地球在線」不只是一個普通的伺服器，更是一個讓全球玩家齊聚一堂、共享時光的溫馨避風港。在這裡，無論您來自哪裡，我們都是一家人。</p>
           
-          <div style={{ borderLeft: '3px solid #00ff88', paddingLeft: '15px', margin: '20px 0', background: 'rgba(0,255,136,0.05)' }}>
-            <span style={{ color: '#ffcc00' }}>[協議聲明 / PROTOCOL STATEMENT]</span><br/>
-            一、本系統提供實時跨節點通訊 (World Chat)，使用者須對自身言論負完全責任。<br/>
-            二、任何試圖破壞伺服器平衡、干涉系統隨機事件（如量子爆發）的惡意程式將遭到自動隔離。<br/>
-            三、您的「掛機算力」將直接影響全球節點的總通量，一旦同意登入，即代表自願貢獻運算時間。
+          <div style={{ background: '#ebf8ff', borderRadius: '8px', padding: '20px', margin: '25px 0', border: '1px solid #bee3f8' }}>
+            <h3 style={{ color: '#3182ce', marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              ✦ 伺服器公約 (Server Guidelines)
+            </h3>
+            <ul style={{ paddingLeft: '20px', margin: 0, color: '#2c5282' }}>
+              <li style={{ marginBottom: '10px' }}><strong>尊重與友善：</strong>請友善對待世界頻道上的每一位家人，共同維護這個溫暖的聊天環境。禁止任何形式的惡意人身攻擊與騷擾。</li>
+              <li style={{ marginBottom: '10px' }}><strong>隱私與安全：</strong>我們十分重視您的個人資訊。系統僅會匿名記錄您的連線時長與所在區域，確保您的隱私受到最嚴格的保護。</li>
+              <li><strong>享受過程：</strong>盡情享受掛機與聊天的樂趣吧！每一次的連線與每一句問候，都是我們共同創造美好回憶的證明。</li>
+            </ul>
           </div>
           
-          <p>▶ <span style={{ color: '#ff416c' }}>系統提示：</span>若您未滿 18 歲，或身處禁止駭客觀測站運作的司法管轄區，請立即切斷連線。</p>
+          <p style={{ textAlign: 'center', fontWeight: 'bold', color: '#2d3748', marginTop: '30px' }}>
+            準備好加入我們了嗎？期待在世界頻道看見您的身影！
+          </p>
         </div>
 
-        <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ marginTop: '35px', display: 'flex', justifyContent: 'center' }}>
           <button onClick={onAgree} style={{
-            background: 'rgba(0, 255, 136, 0.1)', border: '2px solid #00ff88', color: '#00ff88',
-            padding: '15px 40px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer',
-            textTransform: 'uppercase', letterSpacing: '2px', transition: 'all 0.3s',
-            boxShadow: 'inset 0 0 10px rgba(0,255,136,0.2)'
+            background: '#4299e1', color: '#ffffff', border: 'none',
+            padding: '16px 45px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer',
+            borderRadius: '50px', letterSpacing: '1px', transition: 'all 0.3s',
+            boxShadow: '0 4px 6px rgba(66, 153, 225, 0.3)'
           }}
-          onMouseOver={e => e.target.style.background = 'rgba(0, 255, 136, 0.3)'}
-          onMouseOut={e => e.target.style.background = 'rgba(0, 255, 136, 0.1)'}
+          onMouseOver={e => { e.target.style.background = '#3182ce'; e.target.style.transform = 'translateY(-2px)'; }}
+          onMouseOut={e => { e.target.style.background = '#4299e1'; e.target.style.transform = 'translateY(0)'; }}
           >
-            [ 我同意並建立連線 / ACCEPT & CONNECT ]
+            ♥ 我已閱讀並同意，加入大家庭
           </button>
         </div>
       </div>

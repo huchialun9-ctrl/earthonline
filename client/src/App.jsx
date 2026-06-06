@@ -1049,14 +1049,13 @@ function Dashboard({ token, onLogout }) {
                 const isWarning = log.includes('警告');
                 return (
                   <div key={i} style={{ 
-                    color: isChat ? '#FF1493' : isWarning ? 'var(--danger-color)' : 'inherit', 
+                    color: isChat ? '#FFF' : isWarning ? 'var(--danger-color)' : 'inherit', 
                     marginTop: '4px', 
                     display: 'flex', 
-                    gap: '8px',
-                    textShadow: isChat ? '0 0 5px rgba(255,20,147,0.5)' : 'none'
+                    gap: '8px'
                   }}>
-                    <span style={{color: isChat ? '#FF1493' : 'var(--accent-color)', opacity: 0.7}}>&gt;</span> 
-                    <span style={{wordBreak: 'break-all'}}>{log}</span>
+                    <span style={{color: 'var(--accent-color)', opacity: 0.7}}>&gt;</span> 
+                    <span style={{wordBreak: 'break-all', opacity: isChat ? 1 : 0.8}}>{log}</span>
                   </div>
                 );
               })}

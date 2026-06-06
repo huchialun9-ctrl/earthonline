@@ -9,12 +9,12 @@ const API_URL = 'https://earthonline.onrender.com';
 const SOCKET_URL = 'https://earthonline.onrender.com';
 
 function getFlagEmoji(countryCode) {
-  if (!countryCode || countryCode === 'UNKNOWN') return '🌐';
+  if (!countryCode || countryCode === 'UNKNOWN') return '🌐 未知伺服器';
   const codePoints = countryCode
     .toUpperCase()
     .split('')
     .map(char => 127397 + char.charCodeAt());
-  return String.fromCodePoint(...codePoints) + ' ' + countryCode;
+  return String.fromCodePoint(...codePoints) + ' ' + countryCode + ' 伺服器';
 }
 
 function LoginGateway({ onLogin }) {
@@ -473,13 +473,17 @@ function Dashboard({ token, onLogout }) {
 
   // Lifespan timer
   useEffect(() => {
-    if (!myNode || !myNode.createdAt) return;
+    if (!myNode || !myNode.createdAt || myNode.accumulatedTime === undefined) return;
     
     // Check if we are currently boosted
     const isBoosted = globalStats.multiplier && globalStats.multiplier > 1.0;
     const rate = isBoosted ? 1.2 : 1.0;
     
-    let currentLocalLifespan = Math.floor((Date.now() - myNode.createdAt) / 1000) + (myNode.accumulatedBonusPoints || 0);
+    // Accumulated time from backend + time since connection
+    const baseAccumulatedSeconds = (myNode.accumulatedTime || 0) / 1000;
+    const sessionSeconds = Math.floor((Date.now() - myNode.connectedAt) / 1000);
+    
+    let currentLocalLifespan = baseAccumulatedSeconds + sessionSeconds + (myNode.accumulatedBonusPoints || 0);
 
     const interval = setInterval(() => {
       currentLocalLifespan += rate;
@@ -573,9 +577,9 @@ function Dashboard({ token, onLogout }) {
                 <img src={boundDiscord.avatar} alt="discord-avatar" style={{width: '48px', height: '48px', borderRadius: '50%', border: '2px solid var(--accent-color)'}} />
                 <div>
                   <div style={{color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: 'bold'}}>{boundDiscord.username}</div>
-                  <div style={{color: 'var(--accent-color)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px'}}>
-                    <ShieldCheck size={14} /> 已認證節點
-                  </div>
+                  <div style={{color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <Activity size={16} /> 累計在線時間 (Total Online Time)
+              </div>
                 </div>
               </div>
             ) : (

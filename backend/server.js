@@ -143,6 +143,28 @@ app.get('/api/auth/me', async (req, res) => {
   }
 });
 
+app.post('/api/auth/generate-recovery-key', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'No token' });
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await db.findUserByUsername(decoded.username);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    if (user.recoveryKey) {
+      return res.status(400).json({ error: 'Recovery key already exists' });
+    }
+    
+    const recoveryKey = 'EO-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    await User.updateOne({ username: user.username }, { recoveryKey });
+    
+    res.json({ success: true, recoveryKey });
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
 app.post('/api/reset-password', async (req, res) => {
   const { username, recoveryKey, newPassword } = req.body;
   if (!username || !recoveryKey || !newPassword) return res.status(400).json({ error: 'Missing fields' });

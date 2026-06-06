@@ -1181,6 +1181,24 @@ function AccountInfoModal({ token, onClose }) {
       .catch(() => setError('伺服器連線失敗'));
   }, [token]);
 
+  const handleGenerateKey = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/generate-recovery-key`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setInfo(prev => ({ ...prev, recoveryKey: data.recoveryKey }));
+        setShowKey(true);
+      } else {
+        alert(data.error || '生成失敗');
+      }
+    } catch (err) {
+      alert('連線失敗');
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose} style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -1232,16 +1250,24 @@ function AccountInfoModal({ token, onClose }) {
                 警告：如果您遺失密碼，這是【唯一】能找回帳號的憑證，請勿洩漏給任何人。
               </p>
               <div style={{display: 'flex', gap: '10px'}}>
-                <input 
-                  type={showKey ? "text" : "password"} 
-                  value={info.recoveryKey} 
-                  readOnly 
-                  className="terminal-input"
-                  style={{flex: 1, letterSpacing: showKey ? '1px' : '3px'}}
-                />
-                <button className="terminal-btn" style={{padding: '0 15px', background: 'rgba(255, 59, 48, 0.2)', color: 'var(--danger-color)', borderColor: 'var(--danger-color)'}} onClick={() => setShowKey(!showKey)}>
-                  {showKey ? '隱藏' : '顯示'}
-                </button>
+                {info.recoveryKey === '未產生' ? (
+                  <button className="terminal-btn" style={{flex: 1, padding: '10px', background: 'rgba(255, 59, 48, 0.2)', color: 'var(--danger-color)', borderColor: 'var(--danger-color)'}} onClick={handleGenerateKey}>
+                    立即為老帳號生成專屬金鑰
+                  </button>
+                ) : (
+                  <>
+                    <input 
+                      type={showKey ? "text" : "password"} 
+                      value={info.recoveryKey} 
+                      readOnly 
+                      className="terminal-input"
+                      style={{flex: 1, letterSpacing: showKey ? '1px' : '3px'}}
+                    />
+                    <button className="terminal-btn" style={{padding: '0 15px', background: 'rgba(255, 59, 48, 0.2)', color: 'var(--danger-color)', borderColor: 'var(--danger-color)'}} onClick={() => setShowKey(!showKey)}>
+                      {showKey ? '隱藏' : '顯示'}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>

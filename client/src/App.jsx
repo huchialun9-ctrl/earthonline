@@ -1498,7 +1498,6 @@ function AccountInfoModal({ token, onClose, onLogout }) {
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('eo_token'));
-  const [hasAgreedEula, setHasAgreedEula] = useState(false);
   
   const handleLogin = (newToken, username) => {
     localStorage.setItem('eo_token', newToken);
@@ -1509,10 +1508,6 @@ function App() {
     localStorage.removeItem('eo_token');
     setToken(null);
   };
-
-  if (!hasAgreedEula) {
-    return <EulaScreen onAgree={() => setHasAgreedEula(true)} />;
-  }
 
   if (!token) {
     return <LoginGateway onLogin={handleLogin} />;

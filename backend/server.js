@@ -97,9 +97,10 @@ app.post('/api/register', async (req, res) => {
     return res.status(400).json({ error: 'Username already exists' });
   }
 
-  const existingIpUser = await User.findOne({ registerIp: ip });
-  if (existingIpUser && ip !== '::1' && ip !== '127.0.0.1') {
-    return res.status(400).json({ error: '該 IP 位址已經註冊過帳號 (IP 限註冊一次)' });
+  const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+  const ipCount = await User.countDocuments({ registerIp: ip, createdAt: { $gt: oneDayAgo } });
+  if (ipCount >= 3 && ip !== '::1' && ip !== '127.0.0.1') {
+    return res.status(400).json({ error: '同一 IP 一天最多只能註冊 3 個帳號。' });
   }
   
   const hashedPassword = await bcrypt.hash(password, 10);

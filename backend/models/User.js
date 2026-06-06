@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
     username: String,
     avatar: String
   },
+  registerIp: { type: String },
   recoveryKey: { type: String },
   redeemedCodes: { type: [String], default: [] },
   friends: { type: [String], default: [] },

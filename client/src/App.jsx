@@ -381,6 +381,8 @@ function Dashboard({ token, onLogout }) {
       terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [terminalHistory, isTerminalOpen]);
+
+  useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
         const baseUrl = API_URL.replace(/\/$/, '');
@@ -663,7 +665,7 @@ function Dashboard({ token, onLogout }) {
             <div ref={terminalEndRef} />
           </div>
           <form onSubmit={handleTerminalSubmit} style={{ display: 'flex', gap: '10px' }}>
-            <span>></span>
+            <span>&gt;</span>
             <input 
               type="text" 
               value={terminalInput}

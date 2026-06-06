@@ -1265,6 +1265,7 @@ function Dashboard({ token, onLogout }) {
 
       {/* Full Page About Documentation */}
       {showAboutModal && <DocumentationOverlay onClose={() => setShowAboutModal(false)} />}
+      {showSocialModal && <SocialModal onClose={() => setShowSocialModal(false)} socialTab={socialTab} setSocialTab={setSocialTab} socialData={socialData} socket={socket} />}
       {showAccountInfo && <AccountInfoModal token={token} onClose={() => setShowAccountInfo(false)} onLogout={onLogout} />}
       
       <audio ref={audioRef} src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Ambient_music_-_beautiful_piano.ogg" loop />

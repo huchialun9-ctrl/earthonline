@@ -546,6 +546,25 @@ regions.forEach(regionName => {
       triggerRandomEvent();
     }
   }, 2 * 60 * 60 * 1000);
+});
+
+let hardwareStats = { cpu: 0, uplink: 0, downlink: 0 };
+setInterval(async () => {
+  try {
+    const load = await si.currentLoad();
+    const network = await si.networkStats();
+    const defaultNet = network && network.length > 0 ? network[0] : { tx_sec: 0, rx_sec: 0 };
+    hardwareStats.cpu = load.currentLoad;
+    hardwareStats.uplink = Math.floor((defaultNet.tx_sec || 0) / 1024);
+    hardwareStats.downlink = Math.floor((defaultNet.rx_sec || 0) / 1024);
+  } catch (err) {
+    console.error('[SYS] Hardware stat error:', err);
+  }
+}, 10000);
+
+regions.forEach(regionName => {
+  const nsp = io.of(`/${regionName}`);
+  const state = regionStates[regionName];
 
   setInterval(async () => {
     try {
@@ -594,13 +613,7 @@ regions.forEach(regionName => {
     
     state.globalProduction = await db.getRegionProduction(regionName);
     
-    // Fetch real hardware metrics
-    const load = await si.currentLoad();
-    const network = await si.networkStats();
-    const defaultNet = network && network.length > 0 ? network[0] : { tx_sec: 0, rx_sec: 0 };
-    const uplinkKB = Math.floor((defaultNet.tx_sec || 0) / 1024);
-    const downlinkKB = Math.floor((defaultNet.rx_sec || 0) / 1024);
-
+    // Fetch real hardware metrics (cached from 10s interval)
     nsp.emit('global_stats', {
       activeUsers: state.activeUsers,
       totalPopulation: pop,
@@ -608,9 +621,9 @@ regions.forEach(regionName => {
       socialCompression: state.socialCompression,
       multiplier: state.multiplier,
       systemHardware: {
-        cpu: load.currentLoad,
-        uplink: uplinkKB,
-        downlink: downlinkKB,
+        cpu: hardwareStats.cpu,
+        uplink: hardwareStats.uplink,
+        downlink: hardwareStats.downlink,
         loss: 0
       }
     });

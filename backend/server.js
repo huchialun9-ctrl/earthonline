@@ -390,6 +390,11 @@ apiRouter.get('/leaderboard', async (req, res) => {
 
 app.use('/api/:region', apiRouter);
 
+app.use((err, req, res, next) => {
+  console.error('[SYS] Express Error:', err);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
 const server = http.createServer(app);
 
 const io = new Server(server, {

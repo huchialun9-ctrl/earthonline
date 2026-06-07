@@ -116,6 +116,18 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
               </a>
             </div>
           </div>
+
+          {/* GitHub Contribution Wall */}
+          <div className="dc-contribution-wall" style={{ marginTop: '10px', paddingTop: '15px', borderTop: '1px solid #2d313b' }}>
+            <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <GithubIcon size={14} /> <span>開發者貢獻紀錄</span>
+            </div>
+            <img 
+              src="https://ghchart.rshah.org/3b82f6/huchialun9-ctrl" 
+              alt="huchialun9-ctrl's Github Chart" 
+              style={{ width: '100%', opacity: 0.8, filter: 'hue-rotate(180deg) brightness(0.8) contrast(1.2)' }} 
+            />
+          </div>
         </div>
 
         {/* Right Side: Visual Area */}
@@ -123,7 +135,7 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
           <div className="data-flow-grid">
             {level === 1 && <LaptopSvg />}
             {level === 2 && <TowerSvg />}
-            {level >= 3 && <ServerRacksSvg level={level} />}
+            {level >= 3 && <ServerRacksSvg level={level} progress={progressToNext} />}
           </div>
         </div>
 
@@ -162,9 +174,11 @@ function TowerSvg() {
   );
 }
 
-function ServerRacksSvg({ level }) {
+function ServerRacksSvg({ level, progress }) {
   const rackCount = level === 3 ? 1 : level === 4 ? 3 : 5;
-  
+  const totalBlades = rackCount * 12;
+  const activeBladesCount = level === 5 ? totalBlades : Math.max(1, Math.floor((progress / 100) * totalBlades));
+
   return (
     <svg viewBox="0 0 400 200" className="svg-equipment-wide">
       {Array.from({ length: rackCount }).map((_, idx) => {
@@ -174,15 +188,25 @@ function ServerRacksSvg({ level }) {
             {/* Outer Rack */}
             <rect x="0" y="0" width="45" height="160" rx="1" fill="#111" stroke="#333" strokeWidth="2" />
             {/* Server Blades */}
-            {Array.from({ length: 12 }).map((_, bIdx) => (
-              <g key={bIdx} transform={`translate(4, ${10 + bIdx * 12})`}>
-                <rect x="0" y="0" width="37" height="9" fill="#1a1a1a" stroke="#262626" strokeWidth="1" />
-                <rect x="2" y="2" width="12" height="5" fill="#0a0a0a" />
-                <circle cx="22" cy="4.5" r="1.5" fill="#34c759" className={`led-blink-${(idx+bIdx)%3 === 0 ? 'fast' : 'slow'}`} />
-                <circle cx="27" cy="4.5" r="1.5" fill="#007aff" className={`led-blink-${(idx+bIdx)%2 === 0 ? 'fast' : 'slow'}`} />
-                <circle cx="32" cy="4.5" r="1.5" fill="#ffcc00" className={`led-blink-${(idx+bIdx)%4 === 0 ? 'fast' : 'slow'}`} />
-              </g>
-            ))}
+            {Array.from({ length: 12 }).map((_, bIdx) => {
+              // Fill from bottom to top for realism
+              const globalBladeIndex = idx * 12 + (11 - bIdx);
+              const isActive = globalBladeIndex < activeBladesCount;
+
+              return (
+                <g key={bIdx} transform={`translate(4, ${10 + bIdx * 12})`}>
+                  <rect x="0" y="0" width="37" height="9" fill={isActive ? "#1a1a1a" : "#0d0d0d"} stroke={isActive ? "#262626" : "#111"} strokeWidth="1" />
+                  <rect x="2" y="2" width="12" height="5" fill="#050505" />
+                  {isActive && (
+                    <>
+                      <circle cx="22" cy="4.5" r="1.5" fill="#34c759" className={`led-blink-${(idx+bIdx)%3 === 0 ? 'fast' : 'slow'}`} />
+                      <circle cx="27" cy="4.5" r="1.5" fill="#007aff" className={`led-blink-${(idx+bIdx)%2 === 0 ? 'fast' : 'slow'}`} />
+                      <circle cx="32" cy="4.5" r="1.5" fill="#ffcc00" className={`led-blink-${(idx+bIdx)%4 === 0 ? 'fast' : 'slow'}`} />
+                    </>
+                  )}
+                </g>
+              );
+            })}
           </g>
         );
       })}

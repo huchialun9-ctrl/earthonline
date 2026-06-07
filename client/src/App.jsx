@@ -895,7 +895,7 @@ function Dashboard({ token, onLogout }) {
         <div className="system-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Globe2 className="icon-spin" color="var(--accent-color)" size={24} /> 
           <span style={{fontWeight: 'bold', fontSize: '1.2rem'}}>地球在線</span> 
-          <span style={{color: 'var(--text-secondary)'}}>// 所在伺服器地區 [{myNode?.country || '連線中...'}]</span>
+          <span style={{color: 'var(--text-secondary)'}}>// 所在伺服器地區 [{myNode?.country || '連線中..'}]</span>
         </div>
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div className="system-stats" style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
@@ -903,7 +903,7 @@ function Dashboard({ token, onLogout }) {
               <span style={{color: 'var(--text-secondary)'}}>實時上線人數: <strong style={{color: 'var(--accent-color)'}}>{globalStats.activeUsers}</strong></span>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
-              <span style={{color: 'var(--text-secondary)'}}>全球總人口: <strong style={{color: 'var(--text-primary)'}}>{globalStats.totalPopulation}</strong></span>
+全球總人口: <strong style={{color: 'var(--text-primary)'}}>{globalStats.totalPopulation}</strong></span>
             </div>
             {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[已斷線]</span>}
           </div>

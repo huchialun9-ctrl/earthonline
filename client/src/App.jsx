@@ -10,6 +10,7 @@ const SOCKET_URL = 'https://earthonline.onrender.com';
 
 
 function LoginGateway({ onLogin }) {
+  const { t, language, setLanguage } = useLanguage();
   const [isRegister, setIsRegister] = useState(false);
   const [isForgot, setIsForgot] = useState(false);
   
@@ -199,6 +200,7 @@ function LoginGateway({ onLogin }) {
 }
 
 function MapResizeHandler() {
+  const { t, language, setLanguage } = useLanguage();
   const map = useMap();
   useEffect(() => {
     const handleResize = () => {
@@ -219,6 +221,7 @@ function MapResizeHandler() {
 }
 
 function MapController({ myNode, mapTheme, setMapTheme }) {
+  const { t, language, setLanguage } = useLanguage();
   const map = useMap();
   
   const handleLocate = () => {
@@ -241,6 +244,7 @@ function MapController({ myNode, mapTheme, setMapTheme }) {
 }
 
 function DocumentationOverlay({ onClose }) {
+  const { t, language, setLanguage } = useLanguage();
   const [activeSection, setActiveSection] = useState('overview');
 
   const scrollTo = (id) => {
@@ -439,6 +443,7 @@ function DocumentationOverlay({ onClose }) {
 }
 
 function CountdownBanner() {
+  const { t, language, setLanguage } = useLanguage();
   const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
 
   useEffect(() => {
@@ -540,6 +545,7 @@ const DonateBanner = () => {
 };
 
 function Dashboard({ token, onLogout, region }) {
+  const { t, language, setLanguage } = useLanguage();
   const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://earthonline.onrender.com';
   const API_URL = `${BASE_URL}/api/${region}`;
   const SOCKET_URL = BASE_URL;
@@ -1495,6 +1501,7 @@ function Dashboard({ token, onLogout, region }) {
 }
 
 function AccountInfoModal({ token, onClose, onLogout }) {
+  const { t, language, setLanguage } = useLanguage();
   const [info, setInfo] = useState(null);
   const [error, setError] = useState('');
   const [showKey, setShowKey] = useState(false);
@@ -1640,6 +1647,7 @@ function AccountInfoModal({ token, onClose, onLogout }) {
 }
 
 function App() {
+  const { t, language, setLanguage } = useLanguage();
   const [token, setToken] = useState(sessionStorage.getItem('eo_token'));
   const [region, setRegion] = useState(sessionStorage.getItem('eo_region') || 'asia');
   
@@ -1673,6 +1681,7 @@ function App() {
 }
 
 function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket }) {
+  const { t, language, setLanguage } = useLanguage();
   return (
     <div className="modal-overlay" onClick={onClose} style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,

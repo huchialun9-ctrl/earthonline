@@ -20,9 +20,7 @@ const apiRouter = express.Router();
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Earth Online Backend Core is running. WebSocket and API endpoints are active.');
-});
+
 
 const JWT_SECRET = process.env.JWT_SECRET || 'earth_online_secret_key_9988';
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -200,9 +198,9 @@ apiRouter.post('/auth/delete-account', async (req, res, next) => {
     const existingEntry = Array.from(connectedUsers.entries()).find(([_, u]) => u.username === user.username);
     if (existingEntry) {
       const [oldSocketId] = existingEntry;
-      const oldSocket = io.sockets.sockets.get(oldSocketId);
+      const oldSocket = io.of('/asia').sockets.get(oldSocketId) || io.of('/us').sockets.get(oldSocketId) || io.of('/eu').sockets.get(oldSocketId);
       if (oldSocket) {
-        oldSocket.emit('auth_error', { message: '帳號已被刪除' });
+        oldSocket.emit('auth_error', { message: '您的帳號已刪除' });
         oldSocket.disconnect(true);
       }
       connectedUsers.delete(oldSocketId);
@@ -594,9 +592,9 @@ regions.forEach(regionName => {
       if (existingEntry) {
         const [oldSocketId] = existingEntry;
         if (oldSocketId !== socket.id) {
-          const oldSocket = io.sockets.sockets.get(oldSocketId);
+          const oldSocket = nsp.sockets.get(oldSocketId);
           if (oldSocket) {
-            oldSocket.emit('auth_error', { message: '您的帳號已在其他地方登入，此連線已中斷。' });
+            oldSocket.emit('auth_error', { message: '本帳號已在其他地方登入，此連線被中斷' });
             oldSocket.disconnect(true);
           }
         }
@@ -642,6 +640,7 @@ regions.forEach(regionName => {
       }));
       socket.emit('all_nodes', allNodes);
     } catch (err) {
+      console.error('[SYS] Auth error details:', err);
       socket.emit('auth_error', { message: 'Invalid token' });
     }
   });

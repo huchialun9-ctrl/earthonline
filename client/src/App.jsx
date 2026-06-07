@@ -703,7 +703,7 @@ function Dashboard({ token, onLogout, region }) {
   };
 
   useEffect(() => {
-    const s = io(SOCKET_URL, { path: `/socket.io/${region}/` });
+    const s = io(`${SOCKET_URL}/${region}`);
     setSocket(s);
 
     s.on('connect', () => {

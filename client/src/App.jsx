@@ -31,7 +31,7 @@ function LoginGateway({ onLogin }) {
     }
   }, [onLogin, region]);
 
-  const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+  const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://earthonline.onrender.com';
   const API_URL = `${BASE_URL}/api/${region}`;
 
   const handleDiscordLogin = () => {
@@ -537,7 +537,7 @@ const DonateBanner = () => {
 };
 
 function Dashboard({ token, onLogout, region }) {
-  const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+  const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://earthonline.onrender.com';
   const API_URL = `${BASE_URL}/api/${region}`;
   const SOCKET_URL = BASE_URL;
   const [socket, setSocket] = useState(null);

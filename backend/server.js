@@ -557,7 +557,8 @@ regions.forEach(regionName => {
     try {
       const decoded = jwt.verify(data.token, JWT_SECRET);
       
-      const ip = getRealIP(socket);
+      let ip = socket.handshake.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
+      if (ip && ip.includes(',')) ip = ip.split(',')[0].trim();
       let geo = geoip.lookup(ip);
       
       // Fallback for local IPs or if geoip fails

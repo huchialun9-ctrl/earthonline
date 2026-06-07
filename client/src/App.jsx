@@ -226,7 +226,6 @@ function LoginGateway({ onLogin }) {
 }
 
 function MapResizeHandler() {
-  const { t, language, setLanguage } = useLanguage();
   const map = useMap();
   useEffect(() => {
     const handleResize = () => {
@@ -238,9 +237,15 @@ function MapResizeHandler() {
     };
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleOrientation);
+    
+    // Call invalidateSize immediately and after a short delay on mount
+    map.invalidateSize();
+    const timeout = setTimeout(() => map.invalidateSize(), 100);
+
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleOrientation);
+      clearTimeout(timeout);
     };
   }, [map]);
   return null;
@@ -333,14 +338,14 @@ function MapOverlay({ onClose, myNode, nodes, initialTheme, onThemeChange }) {
         </MapContainer>
 
         {/* Map Controls */}
-        <div style={{position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000, display: 'flex', gap: '10px'}}>
-          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(0,0,0,0.8)', border: '1px solid var(--accent-color)'}} onClick={() => setLocateTrigger(p => p + 1)}>
+        <div style={{position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000, display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: '10px'}}>
+          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(0,0,0,0.8)', border: '1px solid var(--accent-color)', whiteSpace: 'nowrap', flexShrink: 0}} onClick={() => setLocateTrigger(p => p + 1)}>
             <Navigation size={14} /> 定位我的節點
           </button>
           <div style={{width: '1px', background: 'rgba(255,255,255,0.2)', margin: '0 5px'}}></div>
-          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'satellite' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'satellite' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('satellite')}>{t('衛星')}</button>
-          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'dark' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'dark' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('dark')}>{t('暗黑')}</button>
-          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'street' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'street' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('street')}>{t('街道')}</button>
+          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'satellite' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'satellite' ? '#000' : 'var(--text-primary)', whiteSpace: 'nowrap', flexShrink: 0}} onClick={() => setMapTheme('satellite')}>{t('衛星')}</button>
+          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'dark' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'dark' ? '#000' : 'var(--text-primary)', whiteSpace: 'nowrap', flexShrink: 0}} onClick={() => setMapTheme('dark')}>{t('暗黑')}</button>
+          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'street' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'street' ? '#000' : 'var(--text-primary)', whiteSpace: 'nowrap', flexShrink: 0}} onClick={() => setMapTheme('street')}>{t('街道')}</button>
         </div>
       </div>
     </div>

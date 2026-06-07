@@ -1807,28 +1807,21 @@ function AccountInfoModal({ token, onClose, onLogout }) {
 
 function App() {
   const { t, language, setLanguage } = useLanguage();
-  const [token, setToken] = useState(sessionStorage.getItem('eo_token'));
-  const [region, setRegion] = useState(sessionStorage.getItem('eo_region') || 'asia');
-  
-  useEffect(() => {
-    // Cleanup legacy persistent tokens
-    if (localStorage.getItem('eo_token')) {
-      localStorage.removeItem('eo_token');
-    }
-  }, []);
+  const [token, setToken] = useState(localStorage.getItem('eo_token'));
+  const [region, setRegion] = useState(localStorage.getItem('eo_region') || 'asia');
 
   const handleLogin = (newToken, username, selectedRegion) => {
-    sessionStorage.setItem('eo_token', newToken);
+    localStorage.setItem('eo_token', newToken);
     if (selectedRegion) {
-      sessionStorage.setItem('eo_region', selectedRegion);
+      localStorage.setItem('eo_region', selectedRegion);
       setRegion(selectedRegion);
     }
     setToken(newToken);
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('eo_token');
-    sessionStorage.removeItem('eo_region');
+    localStorage.removeItem('eo_token');
+    localStorage.removeItem('eo_region');
     setToken(null);
   };
 

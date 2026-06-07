@@ -12,10 +12,7 @@ const db = require('./db');
 const User = require('./models/User'); // Required for updateMany
 const discordBot = require('./discordBot'); // Starts discord bot and cron jobs
 const crypto = require('crypto');
-const { Resend } = require('resend');
-
-const resendApiKey = process.env.RESEND_API_KEY || 're_Vz6is7Qe_M5TBjp9PRmmsdc1kw32gFGsK';
-const resend = new Resend(resendApiKey);
+const nodemailer = require('nodemailer');
 // Run offline time migration once on startup
 db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', err));
 
@@ -244,8 +241,16 @@ apiRouter.post('/auth/send-verification', async (req, res) => {
     const frontendUrl = process.env.FRONTEND_URL || 'https://earthonline1.pages.dev';
     const verifyLink = `${frontendUrl}?verifyToken=${verificationToken}`;
 
-    const { data, error } = await resend.emails.send({
-      from: 'Earth Online <onboarding@resend.dev>', // resend.dev allows sending to verified domains, for testing it only sends to the registered email address unless you have a verified domain.
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: `"Earth Online" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Verify your Earth Online account',
       html: `
@@ -256,10 +261,12 @@ apiRouter.post('/auth/send-verification', async (req, res) => {
           <p style="margin-top: 20px; font-size: 12px; color: #888;">Or copy this link: ${verifyLink}</p>
         </div>
       `
-    });
+    };
 
-    if (error) {
-      console.error('[SYS] Resend Error:', error);
+    try {
+      await transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.error('[SYS] Email Error:', error);
       return res.status(500).json({ error: 'Failed to send email', details: error.message });
     }
 

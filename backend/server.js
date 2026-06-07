@@ -414,20 +414,17 @@ apiRouter.get('/global/stats', async (req, res, next) => {
 
 app.use('/api/:region', apiRouter);
 
-const path = require('path');
-if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') {
-  app.use(express.static(path.join(__dirname, '../client/dist')));
-  app.use((req, res, next) => {
-    if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/socket.io')) {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-    } else {
-      next();
-    }
-  });
-}
+// Frontend is hosted on Cloudflare Pages — redirect non-API requests there
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://earth-online-wiki.pages.dev';
+app.get('*', (req, res, next) => {
+  if (!req.path.startsWith('/api') && !req.path.startsWith('/socket.io')) {
+    return res.redirect(301, FRONTEND_URL);
+  }
+  next();
+});
 
 app.use((err, req, res, next) => {
-  console.error('[SYS] Express Error:', err);
+  console.error('[SYS] Express Error:', err.message || err);
   res.status(500).json({ error: 'Internal Server Error' });
 });
 

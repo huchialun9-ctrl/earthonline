@@ -1057,7 +1057,7 @@ function Dashboard({ token, onLogout, region }) {
               <span style={{color: 'var(--text-secondary)'}}>實時上線人數: <strong style={{color: 'var(--accent-color)'}}>{globalStats.activeUsers}</strong></span>
             </div>
             <div style={{display: 'flex', alignItems: 'center'}}>
-<span style={{color: 'var(--text-secondary)'}}>全球總人口: <strong style={{color: 'var(--text-primary)'}}>{globalStats.totalPopulation}</strong></span>
+<span style={{color: 'var(--text-secondary)'}}>{t('本伺服器總人口')}: <strong style={{color: 'var(--text-primary)'}}>{globalStats.totalPopulation}</strong></span>
             </div>
             {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[已斷線]</span>}
           </div>

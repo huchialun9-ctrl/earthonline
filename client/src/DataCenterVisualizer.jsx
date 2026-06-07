@@ -50,15 +50,7 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
     return (hours % 10) * 10; // 10 hours per rack progress loop
   }, [level, lifespan, bonusPoints]);
 
-  // Simulated CPU load based on online count
-  const [simulatedCpu, setSimulatedCpu] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const baseLoad = Math.min(100, (onlineCount || 1) * 2.3);
-      setSimulatedCpu(Math.max(0.5, baseLoad + (Math.random() * 4 - 2)));
-    }, 2000);
-    return () => clearInterval(interval);
-  }, [onlineCount]);
+  // Using the real cpuUsage passed from props
 
   // Infinite Canvas Dragging Logic
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -122,8 +114,8 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
             </div>
             <div className="metric-row">
               <Cpu size={16} color="#64748b" />
-              <span>伺服器即時負載</span>
-              <strong className="data-value">{simulatedCpu.toFixed(1)}%</strong>
+              <span>伺服器負載</span>
+              <strong className="data-value">{(cpuUsage || 0).toFixed(1)}%</strong>
             </div>
             <div className="metric-row">
               <Network size={16} color="#64748b" />

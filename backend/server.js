@@ -13,6 +13,8 @@ const User = require('./models/User'); // Required for updateMany
 const discordBot = require('./discordBot'); // Starts discord bot and cron jobs
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const si = require('systeminformation');
+
 // Run offline time migration once on startup
 db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', err));
 
@@ -592,12 +594,25 @@ regions.forEach(regionName => {
     
     state.globalProduction = await db.getRegionProduction(regionName);
     
+    // Fetch real hardware metrics
+    const load = await si.currentLoad();
+    const network = await si.networkStats();
+    const defaultNet = network && network.length > 0 ? network[0] : { tx_sec: 0, rx_sec: 0 };
+    const uplinkKB = Math.floor((defaultNet.tx_sec || 0) / 1024);
+    const downlinkKB = Math.floor((defaultNet.rx_sec || 0) / 1024);
+
     nsp.emit('global_stats', {
       activeUsers: state.activeUsers,
       totalPopulation: pop,
       globalProduction: state.globalProduction,
       socialCompression: state.socialCompression,
-      multiplier: state.multiplier
+      multiplier: state.multiplier,
+      systemHardware: {
+        cpu: load.currentLoad,
+        uplink: uplinkKB,
+        downlink: downlinkKB,
+        loss: 0
+      }
     });
     } catch (err) {
       console.error('[SYS] Interval error:', err);

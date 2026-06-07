@@ -1217,9 +1217,9 @@ function Dashboard({ token, onLogout, region }) {
             </div>
             <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)'}}>
               連線延遲 (Ping): {ping} ms<br/>
-              上傳 (Uplink): {Math.floor(Math.random()*500 + 100)} KB/s<br/>
-              下載 (Downlink): {Math.floor(Math.random()*1500 + 500)} KB/s<br/>
-              封包遺失 (Loss): 0.00%
+              上傳 (Uplink): {globalStats.systemHardware?.uplink || 0} KB/s<br/>
+              下載 (Downlink): {globalStats.systemHardware?.downlink || 0} KB/s<br/>
+              封包遺失 (Loss): {(globalStats.systemHardware?.loss || 0).toFixed(2)}%
             </div>
           </div>
 
@@ -1286,7 +1286,7 @@ function Dashboard({ token, onLogout, region }) {
             bonusPoints={myNode?.accumulatedBonusPoints || 0} 
             ping={ping}
             onlineCount={globalStats.activeUsers || 0}
-            cpuUsage={globalStats.cpuUsage}
+            cpuUsage={globalStats.systemHardware?.cpu || 0}
             region={region}
             onOpenSocial={() => setShowSocialModal(true)}
           />

@@ -139,7 +139,7 @@ if (TOKEN) {
 
 // Update Bot Status
 let lastPresenceUpdate = 0;
-async function updateBotPresence(onlineCount) {
+async function updateBotPresence(onlineCount, totalPop) {
   if (!isBotReady) return;
   
   const now = Date.now();
@@ -152,10 +152,17 @@ async function updateBotPresence(onlineCount) {
     ]);
     const totalTimeMs = result.length > 0 ? result[0].totalTime : 0;
     const totalHours = Math.floor(totalTimeMs / 3600000);
+    const pop = totalPop || await User.countDocuments();
+    
+    // Rotate between two status messages
+    const isEven = Math.floor(now / 60000) % 2 === 0;
+    const statusText = isEven
+      ? `🌏 ${onlineCount} 人在線 | 👥 總人口 ${pop} 人`
+      : `⏳ 全服總挂機 ${totalHours} 小時 | 📊 地球在線`;
     
     client.user.setPresence({
-      activities: [{ name: `🌍 地球在線 | 🧑‍💻 節點 ${onlineCount} | ⏳ 總時長 ${totalHours}h`, type: 0 }],
-      status: 'online',
+      activities: [{ name: statusText, type: 3 }], // type 3 = Watching
+      status: onlineCount > 0 ? 'online' : 'idle',
     });
   } catch (err) {
     console.error('[SYS] Discord Presence Update Error:', err);

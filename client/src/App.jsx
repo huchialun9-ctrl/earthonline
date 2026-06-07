@@ -569,6 +569,8 @@ function Dashboard({ token, onLogout, region }) {
   }, [BASE_URL]);
 
   const [lifespan, setLifespan] = useState(0);
+  const [sessionTime, setSessionTime] = useState(0);
+  const sessionStartRef = useRef(null);
   const [show100Celebration, setShow100Celebration] = useState(false);
   const [logs, setLogs] = useState([
     { text: '[SYS] 地球在線連線建立中...', time: new Date().toISOString().substring(11, 19) },
@@ -864,6 +866,18 @@ function Dashboard({ token, onLogout, region }) {
     return () => clearInterval(interval);
   }, [myNode, globalStats.multiplier]);
 
+  // Session timer — counts from the moment user connects
+  useEffect(() => {
+    if (!myNode) return;
+    if (!sessionStartRef.current) {
+      sessionStartRef.current = Date.now();
+    }
+    const interval = setInterval(() => {
+      setSessionTime(Math.floor((Date.now() - sessionStartRef.current) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [myNode]);
+
   // Format time HH:MM:SS
   const formatTime = (seconds) => {
     const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
@@ -1153,12 +1167,22 @@ function Dashboard({ token, onLogout, region }) {
               </div>
             )}
             
-            <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '8px'}}>
-              NODE ID: {myNode?.userId}<br/>
-              IP: {myNode?.ip}<br/>
-              REGION: {myNode?.country}<br/>
-              延遲 (Ping): {ping} ms<br/>
-              伺服器狀態: {isConnected ? '連線穩定' : '中斷'}
+            <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '8px', lineHeight: '1.8'}}>
+              <div>node-id: {myNode?.userId}</div>
+              <div>ip: {myNode?.ip}</div>
+              <div>region: {myNode?.country?.toLowerCase()}</div>
+              <div>延遲 (ping): {ping} ms</div>
+              <div>伺服器狀態: {isConnected ? '連線穩定' : '中斷'}</div>
+              <div style={{marginTop: '6px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.08)'}}>
+                <span style={{color: 'var(--text-secondary)'}}>所在伺服器: </span>
+                <strong style={{color: 'var(--accent-color)'}}>
+                  {region === 'asia' ? '🌏 亞洲伺服器 (Asia)' : region === 'us' ? '🌎 美洲伺服器 (US)' : '🌍 歐洲伺服器 (EU)'}
+                </strong>
+              </div>
+              <div style={{marginTop: '4px'}}>
+                <span style={{color: 'var(--text-secondary)'}}>本次上線: </span>
+                <strong style={{color: '#00ffaa'}}>{formatTime(sessionTime)}</strong>
+              </div>
             </div>
           </div>
           

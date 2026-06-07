@@ -1,10 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, Rectangle, CircleMarker, Popup, useMap } from 'react-leaflet';
 import { io } from 'socket.io-client';
 import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Tornado, Coins, Satellite, AlertTriangle, CheckCircle, MapPin, Monitor } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import DataCenterVisualizer from './DataCenterVisualizer';
-import 'leaflet/dist/leaflet.css';
 import './index.css';
 
 const API_URL = 'https://earthonline.onrender.com';
@@ -219,133 +217,6 @@ function LoginGateway({ onLogin }) {
           >
             {isForgot ? '>> 返回登入程序' : '>> 遺失安全授權 (忘記密碼)'}
           </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MapResizeHandler() {
-  const map = useMap();
-  useEffect(() => {
-    const handleResize = () => {
-      map.invalidateSize();
-    };
-    const handleOrientation = () => {
-      setTimeout(() => map.invalidateSize(), 100);
-      setTimeout(() => map.invalidateSize(), 500);
-    };
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('orientationchange', handleOrientation);
-    
-    // Call invalidateSize immediately and after a short delay on mount
-    map.invalidateSize();
-    const timeout = setTimeout(() => map.invalidateSize(), 100);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('orientationchange', handleOrientation);
-      clearTimeout(timeout);
-    };
-  }, [map]);
-  return null;
-}
-
-function MapLocator({ myNode, locateTrigger }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (locateTrigger > 0 && myNode && myNode.lat && myNode.lon) {
-      map.flyTo([myNode.lat, myNode.lon], 5, { animate: true, duration: 1.5 });
-    }
-  }, [locateTrigger, myNode, map]);
-
-  return null;
-}
-
-function MapOverlay({ onClose, myNode, nodes, initialTheme, onThemeChange }) {
-  const { t } = useLanguage();
-  const [mapTheme, setMapTheme] = useState(initialTheme);
-  const [locateTrigger, setLocateTrigger] = useState(0);
-
-  useEffect(() => {
-    onThemeChange(mapTheme);
-  }, [mapTheme, onThemeChange]);
-
-  return (
-    <div className="modal-overlay" style={{position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex', flexDirection: 'column'}}>
-      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px', background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
-        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-          <Globe2 size={24} color="var(--accent-color)" />
-          <h2 style={{margin: 0, color: 'var(--text-primary)', fontSize: '1.2rem', letterSpacing: '1px'}}>全球伺服器節點地圖</h2>
-        </div>
-        <X size={24} style={{cursor: 'pointer', color: 'var(--text-secondary)'}} onClick={onClose} />
-      </div>
-      
-      <div style={{flex: 1, position: 'relative'}}>
-        <MapContainer 
-          center={[20, 0]} 
-          zoom={2.0} 
-          minZoom={2.0}
-          maxZoom={8.0}
-          maxBounds={[[-90, -180], [90, 180]]}
-          maxBoundsViscosity={1.0}
-          worldCopyJump={false}
-          style={{ height: '100%', width: '100%' }}
-          zoomControl={true}
-        >
-          <MapResizeHandler />
-          <MapLocator myNode={myNode} locateTrigger={locateTrigger} />
-
-          {mapTheme === 'satellite' && (
-            <TileLayer
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-              attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-            />
-          )}
-          {mapTheme === 'dark' && (
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            />
-          )}
-          {mapTheme === 'street' && (
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; OpenStreetMap contributors'
-            />
-          )}
-          
-          {nodes.filter(n => typeof n.lat === 'number' && typeof n.lon === 'number').map(node => (
-            <CircleMarker
-              key={`node-${node.id}`}
-              center={[node.lat, node.lon]}
-              radius={node.id === myNode?.id ? 10 : 8}
-              pathOptions={{ 
-                color: '#ffffff', 
-                fillColor: node.id === myNode?.id ? 'var(--accent-color)' : '#ff3b30', 
-                fillOpacity: 1.0,
-                weight: 2
-              }}
-            >
-              <Popup>
-                <div style={{ fontFamily: 'var(--font-sans)' }}>
-                  使用者: {node.username} {node.id === myNode?.id && '(您)'}
-                </div>
-              </Popup>
-            </CircleMarker>
-          ))}
-        </MapContainer>
-
-        {/* Map Controls */}
-        <div style={{position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000, display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: '10px'}}>
-          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(0,0,0,0.8)', border: '1px solid var(--accent-color)', whiteSpace: 'nowrap', flexShrink: 0}} onClick={() => setLocateTrigger(p => p + 1)}>
-            <Navigation size={14} /> 定位我的節點
-          </button>
-          <div style={{width: '1px', background: 'rgba(255,255,255,0.2)', margin: '0 5px'}}></div>
-          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'satellite' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'satellite' ? '#000' : 'var(--text-primary)', whiteSpace: 'nowrap', flexShrink: 0}} onClick={() => setMapTheme('satellite')}>{t('衛星')}</button>
-          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'dark' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'dark' ? '#000' : 'var(--text-primary)', whiteSpace: 'nowrap', flexShrink: 0}} onClick={() => setMapTheme('dark')}>{t('暗黑')}</button>
-          <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'street' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'street' ? '#000' : 'var(--text-primary)', whiteSpace: 'nowrap', flexShrink: 0}} onClick={() => setMapTheme('street')}>{t('街道')}</button>
         </div>
       </div>
     </div>
@@ -689,7 +560,7 @@ function Dashboard({ token, onLogout, region }) {
   const [showDiscordModal, setShowDiscordModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [mapTheme, setMapTheme] = useState('satellite');
-  const [showMapModal, setShowMapModal] = useState(false);
+  // Remove showMapModal
   const [showManualBind, setShowManualBind] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAccountInfo, setShowAccountInfo] = useState(false);
@@ -1226,9 +1097,7 @@ function Dashboard({ token, onLogout, region }) {
               選單 (Menu) <ChevronDown size={16} style={{ transition: 'transform 0.2s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
             </button>
             <div className="header-dropdown-content">
-              <button onClick={() => { setShowMapModal(true); setDropdownOpen(false); }} className="dropdown-item">
-                <Globe2 size={16} /> 開啟伺服器地圖
-              </button>
+
               <div style={{width: '100%', height: '1px', background: 'rgba(255,255,255,0.1)', margin: '5px 0'}}></div>
               <button onClick={() => { setShowSocialModal(true); setDropdownOpen(false); }} className="dropdown-item">
                 <Users size={16} /> 社交網路 (Social)
@@ -1409,7 +1278,13 @@ function Dashboard({ token, onLogout, region }) {
               </div>
             </div>
           </div>
-          <DataCenterVisualizer lifespan={lifespan} bonusPoints={myNode?.accumulatedBonusPoints || 0} />
+          <DataCenterVisualizer 
+            lifespan={lifespan} 
+            bonusPoints={myNode?.accumulatedBonusPoints || 0} 
+            ping={ping}
+            onlineCount={globalStats.onlineCount}
+            cpuUsage={globalStats.cpuUsage}
+          />
 
           {/* Bottom Console Log Module */}
           <div className="bottom-log-console" style={{display: 'flex', flexDirection: 'column', height: '250px'}}>
@@ -1615,7 +1490,7 @@ function Dashboard({ token, onLogout, region }) {
       {/* Full Page About Documentation */}
       {showAboutModal && <DocumentationOverlay onClose={() => setShowAboutModal(false)} />}
       {showSocialModal && <SocialModal onClose={() => setShowSocialModal(false)} socialTab={socialTab} setSocialTab={setSocialTab} socialData={socialData} socket={socket} />}
-      {showMapModal && <MapOverlay onClose={() => setShowMapModal(false)} myNode={myNode} nodes={nodes} initialTheme={mapTheme} onThemeChange={setMapTheme} />}
+
       {showAccountInfo && <AccountInfoModal token={token} apiUrl={API_URL} onClose={() => setShowAccountInfo(false)} onLogout={onLogout} />}
       
       <audio ref={audioRef} src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Ambient_music_-_beautiful_piano.ogg" loop />

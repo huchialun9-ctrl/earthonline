@@ -241,7 +241,7 @@ apiRouter.post('/auth/send-verification', async (req, res) => {
     user.isEmailVerified = false;
     await user.save();
 
-    const frontendUrl = process.env.FRONTEND_URL || 'https://earth-online-wiki.pages.dev';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://earthonline1.pages.dev';
     const verifyLink = `${frontendUrl}?verifyToken=${verificationToken}`;
 
     const { data, error } = await resend.emails.send({
@@ -495,7 +495,7 @@ apiRouter.get('/global/stats', async (req, res, next) => {
 app.use('/api/:region', apiRouter);
 
 // Frontend is hosted on Cloudflare Pages — redirect non-API requests there
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://earth-online-wiki.pages.dev';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://earthonline1.pages.dev';
 app.use((req, res, next) => {
   if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/socket.io') && !req.path.startsWith('/downloads')) {
     return res.redirect(301, FRONTEND_URL);

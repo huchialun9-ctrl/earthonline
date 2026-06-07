@@ -50,7 +50,7 @@ function createWindow() {
   });
 
   mainWindow.setMenuBarVisibility(false);
-  mainWindow.loadURL('https://earth-online-wiki.pages.dev'); // Automatically connect to the frontend
+  mainWindow.loadURL('https://earthonline1.pages.dev'); // Automatically connect to the frontend
 
   ipcMain.on('update-presence', (event, data) => {
     setActivity(data);

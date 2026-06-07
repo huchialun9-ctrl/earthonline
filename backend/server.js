@@ -56,7 +56,8 @@ setInterval(() => {
 }, 24 * 60 * 60 * 1000); // Once a day
 
 // Auth Endpoints
-apiRouter.post('/register', async (req, res) => {
+apiRouter.post('/register', async (req, res, next) => {
+  try {
   const { username, password } = req.body;
   let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   if (ip && ip.includes(',')) ip = ip.split(',')[0].trim();
@@ -100,9 +101,11 @@ apiRouter.post('/register', async (req, res) => {
   await db.createUser(newUser);
   const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '7d' });
   res.json({ success: true, message: 'Registration successful', recoveryKey, token, username });
+  } catch (err) { next(err); }
 });
 
-apiRouter.post('/login', async (req, res) => {
+apiRouter.post('/login', async (req, res, next) => {
+  try {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Missing credentials' });
   
@@ -114,9 +117,11 @@ apiRouter.post('/login', async (req, res) => {
   
   const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET);
   res.json({ success: true, token, user: { id: user.id, username: user.username } });
+  } catch (err) { next(err); }
 });
 
-apiRouter.get('/auth/me', async (req, res) => {
+apiRouter.get('/auth/me', async (req, res, next) => {
+  try {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: 'No token' });
   const token = authHeader.split(' ')[1];
@@ -135,9 +140,11 @@ apiRouter.get('/auth/me', async (req, res) => {
   } catch (err) {
     res.status(401).json({ error: 'Invalid token' });
   }
+  } catch (err) { next(err); }
 });
 
-apiRouter.post('/auth/generate-recovery-key', async (req, res) => {
+apiRouter.post('/auth/generate-recovery-key', async (req, res, next) => {
+  try {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: 'No token' });
   const token = authHeader.split(' ')[1];
@@ -157,9 +164,11 @@ apiRouter.post('/auth/generate-recovery-key', async (req, res) => {
   } catch (err) {
     res.status(401).json({ error: 'Invalid token' });
   }
+  } catch (err) { next(err); }
 });
 
-apiRouter.post('/reset-password', async (req, res) => {
+apiRouter.post('/reset-password', async (req, res, next) => {
+  try {
   const { username, recoveryKey, newPassword } = req.body;
   if (!username || !recoveryKey || !newPassword) return res.status(400).json({ error: 'Missing fields' });
   
@@ -173,9 +182,11 @@ apiRouter.post('/reset-password', async (req, res) => {
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   await User.updateOne({ username }, { password: hashedPassword });
   res.json({ success: true, message: 'Password reset successful' });
+  } catch (err) { next(err); }
 });
 
-apiRouter.post('/auth/delete-account', async (req, res) => {
+apiRouter.post('/auth/delete-account', async (req, res, next) => {
+  try {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: 'No token' });
   const token = authHeader.split(' ')[1];
@@ -201,6 +212,7 @@ apiRouter.post('/auth/delete-account', async (req, res) => {
   } catch (err) {
     res.status(401).json({ error: 'Invalid token' });
   }
+  } catch (err) { next(err); }
 });
 
 apiRouter.post('/bind-discord-manual', async (req, res) => {
@@ -418,7 +430,8 @@ const regionStates = {
   eu: { connectedUsers: new Map(), currentGlobalEvent: null, multiplier: 1.0, activeUsers: 0, globalProduction: 0, socialCompression: '1.000' }
 };
 
-apiRouter.get('/global/stats', async (req, res) => {
+apiRouter.get('/global/stats', async (req, res, next) => {
+  try {
   try {
     const pop = await db.getTotalPopulation();
     let globalStats = {
@@ -437,6 +450,7 @@ apiRouter.get('/global/stats', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch global stats' });
   }
+  } catch (err) { next(err); }
 });
 
 

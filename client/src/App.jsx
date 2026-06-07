@@ -877,10 +877,11 @@ function Dashboard({ token, onLogout, region }) {
 
   // Format time HH:MM:SS
   const formatTime = (seconds) => {
-    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+    const d = Math.floor(seconds / 86400);
+    const h = Math.floor((seconds % 86400) / 3600).toString().padStart(2, '0');
     const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
-    return `${h}:${m}:${s}`;
+    return d > 0 ? `${d}d ${h}:${m}:${s}` : `${h}:${m}:${s}`;
   };
 
   const calculateHealthPercentage = (seconds) => {

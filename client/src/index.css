@@ -37,17 +37,15 @@ body {
 
 /* Header */
 .system-header {
-  height: 50px;
+  min-height: 60px;
   background-color: var(--panel-bg);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
+  padding: 10px 20px;
   font-family: var(--font-sans);
-  text-transform: lowercase;
-  letter-spacing: 2px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .header-left, .header-right {

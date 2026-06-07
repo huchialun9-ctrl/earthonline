@@ -1107,24 +1107,24 @@ function Dashboard({ token, onLogout, region }) {
       {/* Header Panel */}
       <header className="system-header">
         <div className="system-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Globe2 className="icon-spin" color="var(--accent-color)" size={24} /> 
-          <span style={{fontWeight: 'bold', fontSize: '1.2rem'}}>{t('地球在線')}</span> 
-          <span style={{color: 'var(--text-secondary)'}}>// {region.toUpperCase()} ARRAY 區域 | 節點所在: [{myNode?.country || '連線中..'}]</span>
+          <Globe2 color="#3b82f6" size={24} /> 
+          <span style={{fontWeight: '900', fontSize: '1.3rem', letterSpacing: '0'}}>{t('地球在線')}</span> 
+          <span style={{color: '#64748b', fontSize: '0.9rem', marginLeft: '10px'}}>伺服器: {region.toUpperCase()} | 你的位置: {myNode?.country || '連線中..'}</span>
         </div>
-        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {!window.electronAPI && (
-            <a href="https://earthonline.onrender.com/downloads/EarthOnlineSetup.exe" className="terminal-btn pulse-border" style={{display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'rgba(0, 255, 170, 0.1)', color: '#00ffaa', border: '1px solid rgba(0, 255, 170, 0.5)', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold'}}>
+            <a href="https://earthonline.onrender.com/downloads/EarthOnlineSetup.exe" style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 16px', background: '#10b981', color: 'white', border: 'none', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)', fontSize: '0.9rem'}}>
               <Monitor size={16} /> 下載專屬電腦版
             </a>
           )}
-          <div className="system-stats" style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-              <span style={{color: 'var(--text-secondary)'}}>實時上線人數: <strong style={{color: 'var(--accent-color)'}}>{globalStats.activeUsers}</strong></span>
+          <div className="system-stats" style={{display: 'flex', alignItems: 'center', gap: '15px', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem'}}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+              <span style={{color: '#94a3b8'}}>上線人數:</span> <strong style={{color: '#10b981'}}>{globalStats.activeUsers}</strong>
             </div>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-<span style={{color: 'var(--text-secondary)'}}>{t('本伺服器總人口')}: <strong style={{color: 'var(--text-primary)'}}>{globalStats.totalPopulation}</strong></span>
+            <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+              <span style={{color: '#94a3b8'}}>{t('總人口')}:</span> <strong style={{color: '#e2e8f0'}}>{globalStats.totalPopulation}</strong>
             </div>
-            {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[已斷線]</span>}
+            {!isConnected && <span style={{color: '#ef4444', fontWeight: 'bold'}}>[已斷線]</span>}
           </div>
 
           <div className={`header-dropdown${dropdownOpen ? ' open' : ''}`} ref={dropdownRef}>

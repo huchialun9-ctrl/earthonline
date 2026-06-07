@@ -1681,7 +1681,7 @@ function AccountInfoModal({ token, onClose, onLogout }) {
           </h2>
           <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
             {!window.electronAPI && (
-              <a href="https://github.com/huchialun9-ctrl/earthonline/releases/latest" target="_blank" rel="noreferrer" style={{display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem', color: '#00ffaa', textDecoration: 'none', background: 'rgba(0, 255, 170, 0.1)', padding: '5px 10px', borderRadius: '6px', border: '1px solid rgba(0, 255, 170, 0.3)'}}>
+              <a href="https://earthonline.onrender.com/downloads/EarthOnlineSetup.exe" style={{display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem', color: '#00ffaa', textDecoration: 'none', background: 'rgba(0, 255, 170, 0.1)', padding: '5px 10px', borderRadius: '6px', border: '1px solid rgba(0, 255, 170, 0.3)'}}>
                 📥 下載專屬電腦版
               </a>
             )}

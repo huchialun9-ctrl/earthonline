@@ -23,6 +23,8 @@ const app = express();
 const apiRouter = express.Router();
 app.use(cors());
 app.use(express.json());
+const path = require('path');
+app.use('/downloads', express.static(path.join(__dirname, 'public/downloads')));
 
 
 
@@ -495,7 +497,7 @@ app.use('/api/:region', apiRouter);
 // Frontend is hosted on Cloudflare Pages — redirect non-API requests there
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://earth-online-wiki.pages.dev';
 app.use((req, res, next) => {
-  if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/socket.io')) {
+  if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/socket.io') && !req.path.startsWith('/downloads')) {
     return res.redirect(301, FRONTEND_URL);
   }
   next();

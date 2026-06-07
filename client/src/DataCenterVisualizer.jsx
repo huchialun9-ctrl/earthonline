@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import Draggable from 'react-draggable';
 import { Server, Activity, Cpu, Network, Clock, ShieldCheck, Users, MapPin } from 'lucide-react';
 import './datacenter.css';
 
@@ -87,11 +88,12 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
       <div className="dc-layout">
         
         {/* Left Side: Solid Status Panel */}
-        <div className="dc-status-card" style={{ zIndex: 100 }}>
-          <div className="dc-card-header">
-            <Server size={18} color="#3b82f6" />
-            <h2>我的雲端伺服器</h2>
-          </div>
+        <Draggable bounds="parent" handle=".drag-handle">
+          <div className="dc-status-card" style={{ zIndex: 100 }}>
+            <div className="dc-card-header drag-handle" style={{ cursor: 'move' }}>
+              <Server size={18} color="#3b82f6" />
+              <h2>我的雲端伺服器</h2>
+            </div>
           
           <div className="dc-level-badge">
             <div className="level-number">LV {level}</div>
@@ -166,6 +168,7 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
             />
           </div>
         </div>
+        </Draggable>
 
         {/* Right Side: Visual Area (Infinite Canvas) */}
         <div 
@@ -177,11 +180,13 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
           style={{ cursor: isDragging ? 'grabbing' : 'grab', overflow: 'hidden', position: 'relative' }}
         >
           {/* Server Location Badge Sticker */}
-          <div style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(20,20,20,0.85)', padding: '10px 18px', borderRadius: '12px', border: '1px solid #2d313b', color: '#f8fafc', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10, backdropFilter: 'blur(4px)', userSelect: 'none', pointerEvents: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
-            <MapPin size={18} color="#ef4444" />
-            <strong style={{ fontWeight: '600' }}>Node: {currentRegion.name} {currentRegion.flag}</strong>
-            <span style={{ color: '#64748b', fontSize: '0.85rem', marginLeft: '6px', borderLeft: '1px solid #333', paddingLeft: '12px' }}>Racks: <strong style={{ color: '#fff' }}>{level < 3 ? 1 : rackCount}</strong></span>
-          </div>
+          <Draggable bounds="parent">
+            <div style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(20,20,20,0.85)', padding: '10px 18px', borderRadius: '12px', border: '1px solid #2d313b', color: '#f8fafc', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10, backdropFilter: 'blur(4px)', userSelect: 'none', cursor: 'move', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+              <MapPin size={18} color="#ef4444" />
+              <strong style={{ fontWeight: '600' }}>Node: {currentRegion.name} {currentRegion.flag}</strong>
+              <span style={{ color: '#64748b', fontSize: '0.85rem', marginLeft: '6px', borderLeft: '1px solid #333', paddingLeft: '12px' }}>Racks: <strong style={{ color: '#fff' }}>{level < 3 ? 1 : rackCount}</strong></span>
+            </div>
+          </Draggable>
 
           <div className="canvas-content" style={{ transform: `translate(${offset.x}px, ${offset.y}px)`, transition: isDragging ? 'none' : 'transform 0.1s ease-out', position: 'absolute', top: '50%', left: '50%', width: 0, height: 0 }}>
             {level === 1 && <div style={{ position: 'absolute', transform: 'translate(-100px, -100px)' }}><LaptopSvg /></div>}

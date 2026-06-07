@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Tornado, Coins, Satellite, AlertTriangle, CheckCircle, MapPin, Monitor } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
+import Draggable from 'react-draggable';
 import DataCenterVisualizer from './DataCenterVisualizer';
 import './index.css';
 
@@ -1292,8 +1293,9 @@ function Dashboard({ token, onLogout, region }) {
           />
 
           {/* Bottom Console Log Module */}
-          <div className="bottom-log-console" style={{display: 'flex', flexDirection: 'column', height: '250px'}}>
-            <div className="log-header" style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-color)'}}>
+          <Draggable bounds="parent" handle=".log-header">
+            <div className="bottom-log-console" style={{display: 'flex', flexDirection: 'column', height: '250px'}}>
+              <div className="log-header" style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-color)', cursor: 'move'}}>
               <Activity size={16} /> 世界頻道 / 系統日誌 (World Chat)
             </div>
             <div className="log-content" style={{flex: 1, overflowY: 'auto'}}>
@@ -1338,6 +1340,7 @@ function Dashboard({ token, onLogout, region }) {
               </button>
             </form>
           </div>
+          </Draggable>
         </main>
       </div>
 

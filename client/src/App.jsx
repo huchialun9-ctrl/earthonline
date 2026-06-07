@@ -475,7 +475,8 @@ function CountdownBanner() {
       boxSizing: 'border-box',
       borderBottom: '1px solid rgba(255,255,255,0.1)',
       gap: '15px',
-      flexWrap: 'wrap'
+      flexWrap: 'wrap',
+      flexShrink: 0
     }}>
       <div style={{display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.95rem', fontWeight: '600'}}>
         <span style={{color: '#ffcc00'}}>✧</span> 
@@ -965,7 +966,8 @@ function Dashboard({ token, onLogout, region }) {
         fontWeight: 'bold',
         fontSize: '1rem',
         textShadow: currentEvent.type === 'SYSTEM_MAINTENANCE' || currentEvent.type === 'DATA_GOLD_RUSH' ? 'none' : '0 1px 2px rgba(0,0,0,0.5)',
-        animation: 'pulse 2s infinite'
+        animation: 'pulse 2s infinite',
+        flexShrink: 0
       }}>
         <span style={{ marginRight: '10px', fontSize: '1.2rem' }}>{icon}</span> {text} 
         <span style={{ marginLeft: '10px', background: 'rgba(0,0,0,0.2)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.9rem', color: currentEvent.type === 'SYSTEM_MAINTENANCE' || currentEvent.type === 'DATA_GOLD_RUSH' ? '#000' : '#fff' }}>{timeLeft}</span>

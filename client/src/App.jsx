@@ -1185,7 +1185,7 @@ function Dashboard({ token, onLogout, region }) {
                 </div>
               </div>
             ) : (
-              <div style={{display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px'}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px', cursor: 'pointer', padding: '5px', borderRadius: '8px', transition: 'background 0.2s'}} onClick={() => setShowAccountInfo(true)} className="hover-highlight">
                 <div style={{width: '48px', height: '48px', minWidth: '48px', minHeight: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--border-color)'}}>
                   <User size={24} color="var(--text-secondary)" />
                 </div>

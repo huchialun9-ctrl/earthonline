@@ -32,6 +32,30 @@ function LoginGateway({ onLogin }) {
       window.history.replaceState({}, document.title, window.location.pathname);
       onLogin(token, 'Discord User', region); 
     }
+    const verifyToken = params.get('verifyToken');
+    if (verifyToken) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://earthonline.onrender.com';
+      fetch(`${BASE_URL}/api/${region}/auth/verify-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: verifyToken })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setSuccessMsg('電子郵件驗證成功！');
+          setTimeout(() => setSuccessMsg(''), 5000);
+        } else {
+          setError(data.error || '驗證失敗');
+          setTimeout(() => setError(''), 5000);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        setError('連線失敗');
+      });
+    }
   }, [onLogin, region]);
 
   const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://earthonline.onrender.com';
@@ -1547,6 +1571,8 @@ function AccountInfoModal({ token, onClose, onLogout }) {
   const [info, setInfo] = useState(null);
   const [error, setError] = useState('');
   const [showKey, setShowKey] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [isSendingVerify, setIsSendingVerify] = useState(false);
 
   useEffect(() => {
     fetch(`${API_URL}/auth/me`, {
@@ -1598,6 +1624,35 @@ function AccountInfoModal({ token, onClose, onLogout }) {
     } catch (err) {
       alert('連線失敗');
     }
+  };
+
+  const handleSendVerify = async () => {
+    if (!info) return;
+    const targetEmail = info.email || emailInput;
+    if (!targetEmail) return alert('請輸入電子郵件');
+    
+    setIsSendingVerify(true);
+    try {
+      const res = await fetch(`${API_URL}/auth/send-verification`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ token, email: targetEmail })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('驗證信已送出，請檢查您的信箱（包含垃圾信件匣）。');
+        // Update local info state to reflect the email
+        setInfo(prev => ({ ...prev, email: targetEmail, isEmailVerified: false }));
+      } else {
+        alert(data.error || '發送失敗');
+      }
+    } catch (err) {
+      alert('連線失敗');
+    }
+    setIsSendingVerify(false);
   };
 
   return (
@@ -1670,6 +1725,42 @@ function AccountInfoModal({ token, onClose, onLogout }) {
                   </>
                 )}
               </div>
+            </div>
+
+            {/* Email Binding Section */}
+            <div style={{marginTop: '10px', padding: '15px', background: 'rgba(0, 255, 170, 0.1)', border: '1px solid rgba(0, 255, 170, 0.3)', borderRadius: '8px'}}>
+              <div style={{color: '#00ffaa', fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <ShieldCheck size={18} /> 安全信箱綁定
+              </div>
+              <p style={{fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '10px'}}>
+                綁定信箱可獲得額外的帳號保護，若遺失密碼可透過信箱找回。
+              </p>
+              {info.isEmailVerified ? (
+                <div style={{display: 'flex', alignItems: 'center', gap: '10px', color: '#00ffaa'}}>
+                  <span>✅ 已綁定：{info.email}</span>
+                </div>
+              ) : info.email ? (
+                <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
+                  <span style={{color: '#ffcc00', flex: 1}}>⏳ 等待驗證：{info.email}</span>
+                  <button className="terminal-btn" style={{padding: '5px 15px', background: 'rgba(0, 255, 170, 0.2)', color: '#00ffaa', borderColor: '#00ffaa'}} onClick={handleSendVerify} disabled={isSendingVerify}>
+                    {isSendingVerify ? '發送中...' : '重新發送驗證信'}
+                  </button>
+                </div>
+              ) : (
+                <div style={{display: 'flex', gap: '10px'}}>
+                  <input 
+                    type="email" 
+                    placeholder="輸入您的電子郵件..." 
+                    value={emailInput} 
+                    onChange={e => setEmailInput(e.target.value)} 
+                    className="terminal-input"
+                    style={{flex: 1}}
+                  />
+                  <button className="terminal-btn" style={{padding: '0 15px', background: 'rgba(0, 255, 170, 0.2)', color: '#00ffaa', borderColor: '#00ffaa'}} onClick={handleSendVerify} disabled={isSendingVerify}>
+                    {isSendingVerify ? '發送中...' : '發送驗證'}
+                  </button>
+                </div>
+              )}
             </div>
 
             <div style={{marginTop: '10px', padding: '15px', border: '1px dashed var(--danger-color)', borderRadius: '8px', textAlign: 'center'}}>

@@ -11,7 +11,11 @@ const jwt = require('jsonwebtoken');
 const db = require('./db');
 const User = require('./models/User'); // Required for updateMany
 const discordBot = require('./discordBot'); // Starts discord bot and cron jobs
+const crypto = require('crypto');
+const { Resend } = require('resend');
 
+const resendApiKey = process.env.RESEND_API_KEY || 're_Vz6is7Qe_M5TBjp9PRmmsdc1kw32gFGsK';
+const resend = new Resend(resendApiKey);
 // Run offline time migration once on startup
 db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', err));
 
@@ -129,7 +133,9 @@ apiRouter.get('/auth/me', async (req, res, next) => {
       accumulatedTime: user.accumulatedTime,
       accumulatedBonusPoints: user.accumulatedBonusPoints,
       discord: user.discord,
-      recoveryKey: user.recoveryKey || '未產生'
+      recoveryKey: user.recoveryKey || '未產生',
+      email: user.email,
+      isEmailVerified: user.isEmailVerified
     });
   } catch (err) {
     res.status(401).json({ error: 'Invalid token' });
@@ -207,6 +213,78 @@ apiRouter.post('/auth/delete-account', async (req, res, next) => {
     res.status(401).json({ error: 'Invalid token' });
   }
   } catch (err) { next(err); }
+});
+
+apiRouter.post('/auth/send-verification', async (req, res) => {
+  const { token, email } = req.body;
+  if (!token || !email) return res.status(400).json({ error: 'Missing token or email' });
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findOne({ username: decoded.username });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Ensure email is valid format
+    if (!/^\S+@\S+\.\S+$/.test(email)) return res.status(400).json({ error: 'Invalid email format' });
+
+    // Check if email already in use
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail && existingEmail.username !== user.username) {
+      return res.status(400).json({ error: 'Email already in use' });
+    }
+
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    user.email = email;
+    user.emailVerificationToken = verificationToken;
+    user.isEmailVerified = false;
+    await user.save();
+
+    const frontendUrl = process.env.FRONTEND_URL || 'https://earth-online-wiki.pages.dev';
+    const verifyLink = `${frontendUrl}?verifyToken=${verificationToken}`;
+
+    const { data, error } = await resend.emails.send({
+      from: 'Earth Online <onboarding@resend.dev>', // resend.dev allows sending to verified domains, for testing it only sends to the registered email address unless you have a verified domain.
+      to: email,
+      subject: 'Verify your Earth Online account',
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; text-align: center;">
+          <h2>Earth Online Verification</h2>
+          <p>Click the button below to verify your email address.</p>
+          <a href="${verifyLink}" style="display: inline-block; padding: 10px 20px; background: #00ffaa; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify Email</a>
+          <p style="margin-top: 20px; font-size: 12px; color: #888;">Or copy this link: ${verifyLink}</p>
+        </div>
+      `
+    });
+
+    if (error) {
+      console.error('[SYS] Resend Error:', error);
+      return res.status(500).json({ error: 'Failed to send email', details: error.message });
+    }
+
+    res.json({ success: true, message: 'Verification email sent' });
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ error: 'Invalid token or server error' });
+  }
+});
+
+apiRouter.post('/auth/verify-email', async (req, res) => {
+  const { token } = req.body; // This is the verificationToken, not the JWT
+  if (!token) return res.status(400).json({ error: 'Missing verification token' });
+
+  try {
+    const user = await User.findOne({ emailVerificationToken: token });
+    if (!user) return res.status(400).json({ error: 'Invalid or expired verification token' });
+
+    user.isEmailVerified = true;
+    user.emailVerificationToken = undefined; // Clear the token
+    await user.save();
+
+    res.json({ success: true, message: 'Email verified successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error during verification' });
+  }
 });
 
 apiRouter.post('/bind-discord-manual', async (req, res) => {

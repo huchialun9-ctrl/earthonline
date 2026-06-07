@@ -46,7 +46,7 @@ function LoginGateway({ onLogin }) {
     
     if (isForgot) {
       try {
-        const res = await fetch(`${API_URL}/api/reset-password`, {
+        const res = await fetch(`${API_URL}/reset-password`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, recoveryKey, newPassword: password })
@@ -62,7 +62,7 @@ function LoginGateway({ onLogin }) {
       return;
     }
 
-    const endpoint = isRegister ? '/api/register' : '/api/login';
+    const endpoint = isRegister ? '/register' : '/login';
     try {
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
@@ -1495,7 +1495,7 @@ function AccountInfoModal({ token, onClose, onLogout }) {
   const [showKey, setShowKey] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/auth/me`, {
+    fetch(`${API_URL}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -1508,7 +1508,7 @@ function AccountInfoModal({ token, onClose, onLogout }) {
 
   const handleGenerateKey = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/auth/generate-recovery-key`, {
+      const res = await fetch(`${API_URL}/auth/generate-recovery-key`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -1529,7 +1529,7 @@ function AccountInfoModal({ token, onClose, onLogout }) {
     if (confirmText !== 'DELETE') return;
 
     try {
-      const res = await fetch(`${API_URL}/api/auth/delete-account`, {
+      const res = await fetch(`${API_URL}/auth/delete-account`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });

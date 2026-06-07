@@ -452,7 +452,6 @@ apiRouter.get('/leaderboard', async (req, res) => {
         avatar: u.discord?.avatar || null,
         country: u.country || 'UNKNOWN',
         idleTime: idleTimeSeconds,
-        time: formatTime(idleTimeSeconds),
         points: points,
         role: realRole || ''
       };

@@ -1175,7 +1175,7 @@ function Dashboard({ token, onLogout, region }) {
             </div>
             
             {boundDiscord ? (
-              <div style={{display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px'}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px', cursor: 'pointer', padding: '5px', borderRadius: '8px', transition: 'background 0.2s'}} onClick={() => setShowAccountInfo(true)} className="hover-highlight">
                 <img 
                   src={boundDiscord.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'} 
                   alt="" 

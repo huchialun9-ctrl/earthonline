@@ -442,36 +442,23 @@ apiRouter.get('/leaderboard', async (req, res) => {
     let leaderboard = users.map(u => {
       const idleTimeSeconds = Math.floor((u.accumulatedTime || 0) / 1000);
       const points = idleTimeSeconds + (u.accumulatedBonusPoints || 0);
+      const discordId = u.discord?.id || '無';
+      const realRole = discordId !== '無' ? discordBot.getHighestRole(discordId) : '';
+
       return {
         username: u.username,
-        discordId: u.discord?.id || '無',
+        discordId: discordId,
         discordName: u.discord?.username || '未綁定',
         avatar: u.discord?.avatar || null,
         country: u.country || 'UNKNOWN',
         idleTime: idleTimeSeconds,
+        time: formatTime(idleTimeSeconds),
         points: points,
-        role: ''
+        role: realRole || ''
       };
     });
 
-    const boundUsers = leaderboard.filter(u => u.discordId !== '無');
-    if (boundUsers.length > 0) {
-      const sortedByTime = [...boundUsers].sort((a, b) => b.idleTime - a.idleTime);
-      const sortedByPoints = [...boundUsers].sort((a, b) => b.points - a.points);
-      
-      sortedByTime[0].role = '【24小時在線 the 無業遊民】';
-      if (sortedByTime.length > 1) {
-        sortedByTime[sortedByTime.length - 1].role = '【現充（有現實生活的人）】';
-      }
-      
-      const topPoints = sortedByPoints[0];
-      const bottomPoints = sortedByPoints[sortedByPoints.length - 1];
-      
-      topPoints.role += (topPoints.role ? ' / ' : '') + '【已實現財務自由的人】';
-      if (sortedByPoints.length > 1) {
-        bottomPoints.role += (bottomPoints.role ? ' / ' : '') + '【戶頭剩三位數的月光族】';
-      }
-    }
+    // Fake roles removed
 
     // Sort by points descending
     leaderboard.sort((a, b) => b.points - a.points);

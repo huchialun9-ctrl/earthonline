@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, REST, Routes, AttachmentBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, AttachmentBuilder, EmbedBuilder } = require('discord.js');
 const cron = require('node-cron');
 const User = require('./models/User');
 const { createCanvas, loadImage } = require('canvas');
@@ -286,9 +286,29 @@ async function sendChatMessageToDiscord(username, message) {
   }
 }
 
+const getHighestRole = (discordId) => {
+  if (!isBotReady || !discordId || discordId === '無') return null;
+  try {
+    const guild = client.guilds.cache.get(GUILD_ID);
+    if (!guild) return null;
+    const member = guild.members.cache.get(discordId);
+    if (!member) return null;
+    
+    // Get highest role excluding @everyone
+    const roles = member.roles.cache.filter(r => r.name !== '@everyone').sort((a, b) => b.position - a.position);
+    if (roles.size > 0) {
+      return `【${roles.first().name}】`;
+    }
+    return null;
+  } catch (err) {
+    return null;
+  }
+};
+
 module.exports = {
   updateBotPresence,
   updateChannelName,
   setIoInstance,
-  sendChatMessageToDiscord
+  sendChatMessageToDiscord,
+  getHighestRole
 };

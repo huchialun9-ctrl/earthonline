@@ -232,7 +232,7 @@ apiRouter.post('/bind-discord-manual', async (req, res) => {
   }
 });
 
-apiRouter.get('/auth/discord', (req, res) => {
+app.get('/api/auth/discord', (req, res) => {
   const state = req.query.state;
   if (!state) return res.status(400).send('Missing state');
   
@@ -242,7 +242,7 @@ apiRouter.get('/auth/discord', (req, res) => {
   res.redirect(discordAuthUrl);
 });
 
-apiRouter.get('/auth/discord/callback', async (req, res) => {
+app.get('/api/auth/discord/callback', async (req, res) => {
   const { code, state, error } = req.query;
   const redirectUri = `${BACKEND_URL}/api/auth/discord/callback`;
 

@@ -44,7 +44,8 @@ function LoginGateway({ onLogin }) {
 
   const handleDiscordLogin = () => {
     const state = btoa(JSON.stringify({ action: 'login', returnTo: window.location.href.split('?')[0] }));
-    window.location.href = `${API_URL}/auth/discord?state=${state}`;
+    const BACKEND_DOMAIN = import.meta.env.VITE_API_URL ? new URL(import.meta.env.VITE_API_URL).origin : 'https://earthonline.onrender.com';
+    window.location.href = `${BACKEND_DOMAIN}/api/auth/discord?state=${state}`;
   };
 
   const handleSubmit = async (e) => {
@@ -664,7 +665,8 @@ function Dashboard({ token, onLogout, region }) {
   const handleBindDiscord = (e) => {
     e.preventDefault();
     const statePayload = btoa(JSON.stringify({ token, returnTo: window.location.origin }));
-    const discordOAuthUrl = `${API_URL}/auth/discord?state=${statePayload}`;
+    const BACKEND_DOMAIN = import.meta.env.VITE_API_URL ? new URL(import.meta.env.VITE_API_URL).origin : 'https://earthonline.onrender.com';
+    const discordOAuthUrl = `${BACKEND_DOMAIN}/api/auth/discord?state=${statePayload}`;
     window.location.href = discordOAuthUrl;
   };
 

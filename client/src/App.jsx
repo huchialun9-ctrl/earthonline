@@ -576,6 +576,11 @@ function Dashboard({ token, onLogout, region }) {
   const [sortMode, setSortMode] = useState('points');
   const [currentEvent, setCurrentEvent] = useState(null);
 
+  const [logEndVisible, setLogEndVisible] = useState(true);
+
+  // Ref for react-draggable
+  const logRef = useRef(null);
+
   const [bgmEnabled, setBgmEnabled] = useState(true);
   const audioRef = useRef(null);
 
@@ -1293,8 +1298,8 @@ function Dashboard({ token, onLogout, region }) {
           />
 
           {/* Bottom Console Log Module */}
-          <Draggable handle=".log-header">
-            <div className="bottom-log-console" style={{display: 'flex', flexDirection: 'column', height: '250px'}}>
+          <Draggable nodeRef={logRef} handle=".log-header">
+            <div ref={logRef} className="bottom-log-console" style={{display: 'flex', flexDirection: 'column', height: '250px'}}>
               <div className="log-header" style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-color)', cursor: 'move'}}>
               <Activity size={16} /> 世界頻道 / 系統日誌 (World Chat)
             </div>

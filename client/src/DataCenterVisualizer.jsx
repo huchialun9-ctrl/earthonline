@@ -58,6 +58,10 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
+  // Refs for react-draggable
+  const cardRef = useRef(null);
+  const badgeRef = useRef(null);
+
   const handleMouseDown = (e) => {
     setIsDragging(true);
     setDragStart({ x: e.clientX - offset.x, y: e.clientY - offset.y });
@@ -88,8 +92,8 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
       <div className="dc-layout">
         
         {/* Left Side: Solid Status Panel */}
-        <Draggable handle=".drag-handle">
-          <div className="dc-status-card" style={{ zIndex: 100 }}>
+        <Draggable nodeRef={cardRef} handle=".drag-handle">
+          <div ref={cardRef} className="dc-status-card" style={{ zIndex: 100 }}>
             <div className="dc-card-header drag-handle" style={{ cursor: 'move' }}>
               <Server size={18} color="#3b82f6" />
               <h2>我的雲端伺服器</h2>
@@ -180,8 +184,8 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
           style={{ cursor: isDragging ? 'grabbing' : 'grab', overflow: 'hidden', position: 'relative' }}
         >
           {/* Server Location Badge Sticker */}
-          <Draggable>
-            <div style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(20,20,20,0.85)', padding: '10px 18px', borderRadius: '12px', border: '1px solid #2d313b', color: '#f8fafc', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10, backdropFilter: 'blur(4px)', userSelect: 'none', cursor: 'move', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+          <Draggable nodeRef={badgeRef}>
+            <div ref={badgeRef} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(20,20,20,0.85)', padding: '10px 18px', borderRadius: '12px', border: '1px solid #2d313b', color: '#f8fafc', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10, backdropFilter: 'blur(4px)', userSelect: 'none', cursor: 'move', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
               <MapPin size={18} color="#ef4444" />
               <strong style={{ fontWeight: '600' }}>Node: {currentRegion.name} {currentRegion.flag}</strong>
               <span style={{ color: '#64748b', fontSize: '0.85rem', marginLeft: '6px', borderLeft: '1px solid #333', paddingLeft: '12px' }}>Racks: <strong style={{ color: '#fff' }}>{level < 3 ? 1 : rackCount}</strong></span>

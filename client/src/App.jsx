@@ -882,6 +882,15 @@ function Dashboard({ token, onLogout, region }) {
     const interval = setInterval(() => {
       currentLocalLifespan += rate;
       setLifespan(Math.floor(currentLocalLifespan));
+      
+      // Update Electron Desktop App Presence if available
+      if (window.electronAPI) {
+        window.electronAPI.updatePresence({
+          details: `生存時間: ${formatTime(Math.floor(currentLocalLifespan))}`,
+          state: `區域: ${region === 'asia' ? 'Asia' : region === 'us' ? 'US' : 'EU'} | 積分: ${Math.floor(myNode.accumulatedBonusPoints || 0)} PT`,
+          username: myNode.username
+        });
+      }
     }, 1000);
 
     // Run once immediately
@@ -1670,7 +1679,14 @@ function AccountInfoModal({ token, onClose, onLogout }) {
           <h2 style={{margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--accent-color)', fontSize: '1.5rem'}}>
             <User size={24} /> 節點帳號中心
           </h2>
-          <X size={24} style={{cursor: 'pointer', color: 'var(--text-secondary)'}} onClick={onClose} />
+          <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
+            {!window.electronAPI && (
+              <a href="https://github.com/huchialun9-ctrl/earthonline/releases/latest" target="_blank" rel="noreferrer" style={{display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem', color: '#00ffaa', textDecoration: 'none', background: 'rgba(0, 255, 170, 0.1)', padding: '5px 10px', borderRadius: '6px', border: '1px solid rgba(0, 255, 170, 0.3)'}}>
+                📥 下載專屬電腦版
+              </a>
+            )}
+            <X size={24} style={{cursor: 'pointer', color: 'var(--text-secondary)'}} onClick={onClose} />
+          </div>
         </div>
         
         {error ? <div style={{color: 'var(--danger-color)'}}>{error}</div> : !info ? <div style={{color: 'var(--text-secondary)'}}>資料同步中...</div> : (

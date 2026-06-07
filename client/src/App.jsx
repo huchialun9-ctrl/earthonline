@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Rectangle, CircleMarker, Popup, useMap } from 'react-leaflet';
 import { io } from 'socket.io-client';
 import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Tornado, Coins, Satellite, AlertTriangle, CheckCircle, MapPin } from 'lucide-react';
+import { useLanguage } from './LanguageContext';
 import 'leaflet/dist/leaflet.css';
 import './index.css';
 

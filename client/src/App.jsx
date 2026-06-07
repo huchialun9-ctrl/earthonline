@@ -1086,6 +1086,8 @@ function Dashboard({ token, onLogout, region }) {
             <h3 style={{margin: '0', color: 'var(--text-primary)', letterSpacing: '2px'}}>EARTH ONLINE</h3>
           </div>
 
+          <DonateBanner />
+
           <div className="metric-group profile-card">
             <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
               <User size={16} /> 使用者帳號 (User ID)
@@ -1221,8 +1223,6 @@ function Dashboard({ token, onLogout, region }) {
               </div>
             </div>
           </div>
-
-          <DonateBanner />
           <MapContainer 
             center={[20, 0]} 
             zoom={2.0} 

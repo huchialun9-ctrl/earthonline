@@ -17,6 +17,14 @@ function LoginGateway({ onLogin }) {
   const [password, setPassword] = useState('');
   const [recoveryKey, setRecoveryKey] = useState('');
   const [region, setRegion] = useState('asia');
+  const [language, setLanguage] = useState('zh');
+
+  // Change language automatically based on region on first load
+  useEffect(() => {
+    setLanguage(region === 'asia' ? 'zh' : 'en');
+  }, [region]);
+
+  const t = (key) => getTranslation(language, key);
   
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -231,9 +239,9 @@ function MapController({ myNode, mapTheme, setMapTheme }) {
         <Navigation size={14} /> 定位我的節點
       </button>
       <div style={{width: '1px', background: 'rgba(255,255,255,0.2)', margin: '0 5px'}}></div>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'satellite' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'satellite' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('satellite')}>衛星</button>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'dark' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'dark' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('dark')}>暗黑</button>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'street' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'street' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('street')}>街道</button>
+      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'satellite' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'satellite' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('satellite')}>{t('衛星')}</button>
+      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'dark' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'dark' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('dark')}>{t('暗黑')}</button>
+      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'street' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'street' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('street')}>{t('街道')}</button>
     </div>
   );
 }
@@ -492,7 +500,7 @@ function CountdownBanner() {
     }}>
       <div style={{display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.95rem', fontWeight: '600'}}>
         <span style={{color: '#ffcc00'}}>✧</span> 
-        每週任務結算 — 獲取 <span style={{background: '#ed4245', padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'}}>專屬身分組</span> | 距離結算剩餘:
+        每週任務結算 — 獲取 <span style={{background: '#ed4245', padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'}}>{t('專屬身分組')}</span> | 距離結算剩餘:
       </div>
       <div style={{display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold', fontSize: '1rem'}}>
         <div style={{background: '#f2f3f5', color: '#23272a', padding: '4px 8px', borderRadius: '6px', minWidth: '28px', textAlign: 'center'}}>{format(timeLeft.d)}</div>
@@ -516,7 +524,7 @@ const DonateBanner = () => {
       </div>
       <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)', marginBottom: '15px', lineHeight: '1.6' }}>
         為了打造真正的全球無上限微服務架構，我們計畫在 Render 上建立硬體分流叢集（包含獨立的 Redis 與三大洲 Web Service）。<br/>
-        <span style={{color: '#38ef7d'}}>優點：</span>真實硬體分流，乘載量無上限。<br/>
+        <span style={{color: '#38ef7d'}}>優點：</span>{t('真實硬體分流，乘載量無上限。')}<br/>
         <span style={{color: '#ff416c'}}>缺點：</span>設定較複雜，且 Render 的 Redis 與多台伺服器將產生高昂月費。
       </div>
       <a 
@@ -1036,7 +1044,7 @@ function Dashboard({ token, onLogout, region }) {
       <header className="system-header">
         <div className="system-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Globe2 className="icon-spin" color="var(--accent-color)" size={24} /> 
-          <span style={{fontWeight: 'bold', fontSize: '1.2rem'}}>地球在線</span> 
+          <span style={{fontWeight: 'bold', fontSize: '1.2rem'}}>{t('地球在線')}</span> 
           <span style={{color: 'var(--text-secondary)'}}>// {region.toUpperCase()} ARRAY 區域 | 節點所在: [{myNode?.country || '連線中..'}]</span>
         </div>
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -1072,7 +1080,7 @@ function Dashboard({ token, onLogout, region }) {
             </div>
           </div>
 
-          <button onClick={onLogout} className="logout-btn" style={{padding: '5px 15px', borderRadius: '8px', background: 'rgba(255,50,50,0.1)', border: '1px solid rgba(255,50,50,0.3)', color: 'var(--danger-color)', cursor: 'pointer'}}>登出 / 切換帳號</button>
+          <button onClick={onLogout} className="logout-btn" style={{padding: '5px 15px', borderRadius: '8px', background: 'rgba(255,50,50,0.1)', border: '1px solid rgba(255,50,50,0.3)', color: 'var(--danger-color)', cursor: 'pointer'}}>{t('登出 / 切換帳號')}</button>
         </div>
       </header>
 
@@ -1316,7 +1324,7 @@ function Dashboard({ token, onLogout, region }) {
                 type="text" 
                 value={chatInput}
                 onChange={e => setChatInput(e.target.value)}
-                placeholder="輸入訊息，與全球節點交流..."
+                placeholder={t("輸入訊息，與全球節點交流...")}
                 maxLength={200}
                 style={{flex: 1, background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '4px', outline: 'none', fontSize: '0.9rem'}}
               />

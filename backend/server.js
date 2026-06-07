@@ -642,7 +642,7 @@ regions.forEach(regionName => {
       socket.emit('all_nodes', allNodes);
     } catch (err) {
       console.error('[SYS] Auth error details:', err);
-      socket.emit('auth_error', { message: 'Invalid token' });
+      socket.emit('auth_error', { message: `Backend Error: ${err.message}` });
     }
   });
 

@@ -16,10 +16,10 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
   const level = useMemo(() => {
     const hours = lifespan / 3600;
     const pt = bonusPoints || 0;
-    if (hours >= 100 || pt >= 5000) return 5;
-    if (hours >= 24 || pt >= 1000) return 4;
-    if (hours >= 5 || pt >= 200) return 3;
-    if (hours >= 1 || pt >= 50) return 2;
+    if (hours >= 720 || pt >= 50000) return 5;
+    if (hours >= 168 || pt >= 10000) return 4;
+    if (hours >= 24 || pt >= 2000) return 3;
+    if (hours >= 1 || pt >= 100) return 2;
     return 1;
   }, [lifespan, bonusPoints]);
 
@@ -44,10 +44,10 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
   const progressToNext = useMemo(() => {
     const hours = lifespan / 3600;
     const pt = bonusPoints || 0;
-    if (level === 1) return Math.min(100, Math.max((hours/1)*100, (pt/50)*100));
-    if (level === 2) return Math.min(100, Math.max((hours/5)*100, (pt/200)*100));
-    if (level === 3) return Math.min(100, Math.max((hours/24)*100, (pt/1000)*100));
-    if (level === 4) return Math.min(100, Math.max((hours/100)*100, (pt/5000)*100));
+    if (level === 1) return Math.min(100, Math.max((hours/1)*100, (pt/100)*100));
+    if (level === 2) return Math.min(100, Math.max((hours/24)*100, (pt/2000)*100));
+    if (level === 3) return Math.min(100, Math.max((hours/168)*100, (pt/10000)*100));
+    if (level === 4) return Math.min(100, Math.max((hours/720)*100, (pt/50000)*100));
     return (hours % 10) * 10; // 10 hours per rack progress loop
   }, [level, lifespan, bonusPoints]);
 

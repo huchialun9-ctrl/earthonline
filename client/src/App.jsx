@@ -245,27 +245,16 @@ function MapResizeHandler() {
   return null;
 }
 
-function MapController({ myNode, mapTheme, setMapTheme }) {
-  const { t, language, setLanguage } = useLanguage();
+function MapLocator({ myNode, locateTrigger }) {
   const map = useMap();
   
-  const handleLocate = () => {
-    if (myNode && myNode.lat && myNode.lon) {
+  useEffect(() => {
+    if (locateTrigger > 0 && myNode && myNode.lat && myNode.lon) {
       map.flyTo([myNode.lat, myNode.lon], 5, { animate: true, duration: 1.5 });
     }
-  };
+  }, [locateTrigger, myNode, map]);
 
-  return (
-    <div style={{position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000, display: 'flex', gap: '10px'}}>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(0,0,0,0.8)', border: '1px solid var(--accent-color)'}} onClick={handleLocate}>
-        <Navigation size={14} /> 定位我的節點
-      </button>
-      <div style={{width: '1px', background: 'rgba(255,255,255,0.2)', margin: '0 5px'}}></div>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'satellite' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'satellite' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('satellite')}>{t('衛星')}</button>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'dark' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'dark' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('dark')}>{t('暗黑')}</button>
-      <button className="terminal-btn" style={{padding: '8px 12px', fontSize: '0.8rem', background: mapTheme === 'street' ? 'var(--accent-color)' : 'rgba(0,0,0,0.6)', color: mapTheme === 'street' ? '#000' : 'var(--text-primary)'}} onClick={() => setMapTheme('street')}>{t('街道')}</button>
-    </div>
-  );
+  return null;
 }
 
 function DocumentationOverlay({ onClose }) {
@@ -608,6 +597,7 @@ function Dashboard({ token, onLogout, region }) {
   const [showManualBind, setShowManualBind] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAccountInfo, setShowAccountInfo] = useState(false);
+  const [locateTrigger, setLocateTrigger] = useState(0);
   const [showSocialModal, setShowSocialModal] = useState(false);
   
   const pingStartRef = useRef(0);
@@ -1137,9 +1127,23 @@ function Dashboard({ token, onLogout, region }) {
                 cursor: 'pointer', fontWeight: 'bold', transition: 'all 0.2s', fontFamily: 'var(--font-sans)'
               }}
             >
-              社群 (Community) <ChevronDown size={16} style={{ transition: 'transform 0.2s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+              選單 (Menu) <ChevronDown size={16} style={{ transition: 'transform 0.2s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
             </button>
             <div className="header-dropdown-content">
+              <button onClick={() => { setLocateTrigger(prev => prev + 1); setDropdownOpen(false); }} className="dropdown-item">
+                <Navigation size={16} /> 定位我的節點
+              </button>
+              <div style={{width: '100%', height: '1px', background: 'rgba(255,255,255,0.1)', margin: '5px 0'}}></div>
+              <button onClick={() => { setMapTheme('satellite'); setDropdownOpen(false); }} className="dropdown-item" style={{color: mapTheme === 'satellite' ? 'var(--accent-color)' : '#fff'}}>
+                <Satellite size={16} /> 地圖: 衛星
+              </button>
+              <button onClick={() => { setMapTheme('dark'); setDropdownOpen(false); }} className="dropdown-item" style={{color: mapTheme === 'dark' ? 'var(--accent-color)' : '#fff'}}>
+                <Globe2 size={16} /> 地圖: 暗黑
+              </button>
+              <button onClick={() => { setMapTheme('street'); setDropdownOpen(false); }} className="dropdown-item" style={{color: mapTheme === 'street' ? 'var(--accent-color)' : '#fff'}}>
+                <MapPin size={16} /> 地圖: 街道
+              </button>
+              <div style={{width: '100%', height: '1px', background: 'rgba(255,255,255,0.1)', margin: '5px 0'}}></div>
               <button onClick={() => { setShowSocialModal(true); setDropdownOpen(false); }} className="dropdown-item">
                 <Users size={16} /> 社交網路 (Social)
               </button>
@@ -1331,7 +1335,7 @@ function Dashboard({ token, onLogout, region }) {
             zoomControl={true}
           >
             <MapResizeHandler />
-            <MapController myNode={myNode} mapTheme={mapTheme} setMapTheme={setMapTheme} />
+            <MapLocator myNode={myNode} locateTrigger={locateTrigger} />
 
             {mapTheme === 'satellite' && (
               <TileLayer
@@ -1578,14 +1582,14 @@ function Dashboard({ token, onLogout, region }) {
       {/* Full Page About Documentation */}
       {showAboutModal && <DocumentationOverlay onClose={() => setShowAboutModal(false)} />}
       {showSocialModal && <SocialModal onClose={() => setShowSocialModal(false)} socialTab={socialTab} setSocialTab={setSocialTab} socialData={socialData} socket={socket} />}
-      {showAccountInfo && <AccountInfoModal token={token} onClose={() => setShowAccountInfo(false)} onLogout={onLogout} />}
+      {showAccountInfo && <AccountInfoModal token={token} apiUrl={API_URL} onClose={() => setShowAccountInfo(false)} onLogout={onLogout} />}
       
       <audio ref={audioRef} src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Ambient_music_-_beautiful_piano.ogg" loop />
     </div>
   );
 }
 
-function AccountInfoModal({ token, onClose, onLogout }) {
+function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
   const { t, language, setLanguage } = useLanguage();
   const [info, setInfo] = useState(null);
   const [error, setError] = useState('');
@@ -1594,7 +1598,7 @@ function AccountInfoModal({ token, onClose, onLogout }) {
   const [isSendingVerify, setIsSendingVerify] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_URL}/auth/me`, {
+    fetch(`${apiUrl}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -1607,7 +1611,7 @@ function AccountInfoModal({ token, onClose, onLogout }) {
 
   const handleGenerateKey = async () => {
     try {
-      const res = await fetch(`${API_URL}/auth/generate-recovery-key`, {
+      const res = await fetch(`${apiUrl}/auth/generate-recovery-key`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });

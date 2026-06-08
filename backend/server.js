@@ -475,26 +475,6 @@ apiRouter.get('/leaderboard', async (req, res) => {
   }
 });
 
-apiRouter.get('/global/stats', async (req, res, next) => {
-  try {
-    const region = req.params.region || 'asia';
-    const pop = await db.getRegionPopulation(region);
-    const state = regionStates[region] || regionStates['asia'];
-    res.json({
-      totalActiveUsers: state ? state.activeUsers : 0,
-      totalPopulation: pop,
-      globalProduction: state ? state.globalProduction : 0,
-      socialCompression: state ? state.socialCompression : '1.000',
-      multiplier: state ? state.multiplier : 1.0
-    });
-  } catch (err) {
-    console.error('[SYS] /global/stats error:', err);
-    res.status(500).json({ error: 'Failed to fetch global stats' });
-  }
-});
-
-});
-
 app.get('/api/global/stats', async (req, res, next) => {
   try {
     const region = 'asia';

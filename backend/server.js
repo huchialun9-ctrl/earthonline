@@ -198,15 +198,18 @@ apiRouter.post('/auth/delete-account', async (req, res, next) => {
     
     await User.deleteOne({ username: user.username });
     
-    const existingEntry = Array.from(connectedUsers.entries()).find(([_, u]) => u.username === user.username);
-    if (existingEntry) {
-      const [oldSocketId] = existingEntry;
-      const oldSocket = io.of('/asia').sockets.get(oldSocketId) || io.of('/us').sockets.get(oldSocketId) || io.of('/eu').sockets.get(oldSocketId);
-      if (oldSocket) {
-        oldSocket.emit('auth_error', { message: '您的帳號已刪除' });
-        oldSocket.disconnect(true);
+    const state = regionStates['asia'];
+    if (state && state.connectedUsers) {
+      const existingEntry = Array.from(state.connectedUsers.entries()).find(([_, u]) => u.username === user.username);
+      if (existingEntry) {
+        const [oldSocketId] = existingEntry;
+        const oldSocket = io.sockets.sockets.get(oldSocketId);
+        if (oldSocket) {
+          oldSocket.emit('auth_error', { message: '您的帳號已刪除' });
+          oldSocket.disconnect(true);
+        }
+        state.connectedUsers.delete(oldSocketId);
       }
-      connectedUsers.delete(oldSocketId);
     }
     
     res.json({ success: true, message: 'Account deleted' });
@@ -217,8 +220,10 @@ apiRouter.post('/auth/delete-account', async (req, res, next) => {
 });
 
 apiRouter.post('/auth/send-verification', async (req, res) => {
-  const { token, email } = req.body;
-  if (!token || !email) return res.status(400).json({ error: 'Missing token or email' });
+  const { email } = req.body;
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !email) return res.status(400).json({ error: 'Missing token or email' });
+  const token = authHeader.split(' ')[1];
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
@@ -458,13 +463,13 @@ apiRouter.get('/leaderboard', async (req, res) => {
         role: realRole || ''
       };
     });
-
     // Fake roles removed
 
     // Sort by points descending
     leaderboard.sort((a, b) => b.points - a.points);
     res.json(leaderboard);
   } catch (err) {
+    console.error('[SYS] /leaderboard error:', err);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
   }
 });
@@ -484,6 +489,26 @@ apiRouter.get('/global/stats', async (req, res, next) => {
   } catch (err) {
     console.error('[SYS] /global/stats error:', err);
     res.status(500).json({ error: 'Failed to fetch global stats' });
+  }
+});
+
+});
+
+app.get('/api/global/stats', async (req, res, next) => {
+  try {
+    const region = 'asia';
+    const pop = await db.getRegionPopulation(region);
+    const state = regionStates[region] || regionStates['asia'];
+    res.json({
+      totalActiveUsers: state ? state.activeUsers : 0,
+      totalPopulation: pop,
+      globalProduction: state ? state.globalProduction : 0,
+      socialCompression: state ? state.socialCompression : '1.000',
+      multiplier: state ? state.multiplier : 1.0
+    });
+  } catch (err) {
+    console.error('[SYS] /global/stats error:', err);
+    res.status(500).json({ error: 'Internal error' });
   }
 });
 
@@ -877,7 +902,12 @@ regions.forEach(regionName => {
       socket.emit('all_nodes', allNodes);
     } catch (err) {
       console.error('[SYS] Auth error details:', err);
-      socket.emit('auth_error', { message: `Backend Error: ${err.message}` });
+      if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+        socket.emit('auth_error', { message: '認證失敗或過期' });
+      } else {
+        socket.emit('terminal_response', '[SYS] 伺服器載入中，請稍後重試。');
+        socket.disconnect(true);
+      }
     }
   });
 

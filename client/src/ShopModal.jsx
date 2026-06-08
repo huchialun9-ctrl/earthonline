@@ -16,14 +16,21 @@ export default function ShopModal({ onClose, pts, onBuy }) {
 
   const handleBuy = async (item) => {
     setBuying(item.id);
-    await onBuy(item.id);
-    setTimeout(() => setBuying(null), 500); // UI feedback delay
+    onBuy(item.id);
+    setTimeout(() => {
+      setBuying(null);
+    }, 800); // Wait a bit for the socket roundtrip so user sees feedback
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal-content shop-modal" style={{ maxWidth: '600px', backgroundColor: '#0f172a', border: '1px solid #334155' }}>
-        <button className="modal-close" onClick={onClose}><X size={20} /></button>
+        <button 
+          onClick={onClose} 
+          style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', zIndex: 10 }}
+        >
+          <X size={24} />
+        </button>
         <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#38bdf8', marginBottom: '20px' }}>
           <ShoppingCart size={24} /> 黑市終端商城
         </h2>

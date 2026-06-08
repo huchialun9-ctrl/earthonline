@@ -7,8 +7,8 @@ import DataCenterVisualizer from './DataCenterVisualizer';
 import ShopModal from './ShopModal';
 import './index.css';
 
-const API_URL = 'https://earthonline.onrender.com';
-const SOCKET_URL = 'https://earthonline.onrender.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';
 
 
 function LoginGateway({ onLogin }) {

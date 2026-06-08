@@ -853,6 +853,7 @@ regions.forEach(regionName => {
         createdAt: dbUser?.createdAt || Date.now(),
         connectedAt: Date.now()
       };
+      socket.user = user;
 
       // Prevent multiple logins on the same account
       const existingEntry = Array.from(connectedUsers.entries()).find(([_, u]) => u.username === decoded.username);

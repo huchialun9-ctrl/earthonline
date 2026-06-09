@@ -15,6 +15,9 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const os = require('os');
 
+// Filtered words for chat moderation
+const FILTERED_WORDS = ['fuck', 'shit', 'asshole', 'bitch', 'damn', 'cao', '幹', '靠北', '操你媽', 'fucking', 'stupid', 'idiot', 'nigger', 'bastard', 'piss off', 'suck my', 'motherfucker'];
+
 // Run offline time migration once on startup
 db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', err));
 
@@ -25,7 +28,33 @@ app.use(express.json());
 const path = require('path');
 app.use('/downloads', express.static(path.join(__dirname, 'public/downloads')));
 
+// Global error/crash logging
+const fs = require('fs');
+const crashLogPath = path.join(__dirname, 'crash.log');
 
+function writeCrashLog(type, err) {
+  try {
+    const timestamp = new Date().toISOString();
+    const stack = err?.stack || err?.message || String(err);
+    const logEntry = `[${timestamp}] [${type}] ${stack}\n`;
+    fs.appendFileSync(crashLogPath, logEntry);
+  } catch (e) {
+    console.error('[SYS] Failed to write crash log:', e);
+  }
+}
+
+process.on('uncaughtException', (err) => {
+  writeCrashLog('UNCAUGHT_EXCEPTION', err);
+  console.error('[SYS] Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  writeCrashLog('UNHANDLED_REJECTION', reason);
+  console.error('[SYS] Unhandled Rejection:', reason);
+});
+
+// Heartbeat tracking for disconnect compensation
+const heartbeatTimestamps = new Map();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'earth_online_secret_key_9988';
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -48,6 +77,15 @@ async function sendDiscordWebhook(message) {
   } catch (err) {
     console.error('[SYS] Discord Webhook error:', err);
   }
+}
+
+function obfuscateIp(ip) {
+  if (!ip) return '0.0.0.0';
+  const ipv4Match = ip.match(/^(\d{1,3}\.\d{1,3})\.\d{1,3}\.\d{1,3}$/);
+  if (ipv4Match) return ipv4Match[1] + '.x.x';
+  const ipv6Match = ip.match(/^([0-9a-f:]+:[0-9a-f:]+):/i);
+  if (ipv6Match) return ipv6Match[1] + ':xxxx:xxxx';
+  return 'x.x.x.x';
 }
 
 // Daily world flux report (runs after regions are initialized)
@@ -860,6 +898,7 @@ regions.forEach(regionName => {
         username: decoded.username,
         discordProfile: dbUser?.discord || null,
         ip: ip,
+        ipObfuscated: obfuscateIp(ip),
         country: geo.country,
         lat: geo.ll[0] + (Math.random() - 0.5) * 0.1,
         lon: geo.ll[1] + (Math.random() - 0.5) * 0.1,
@@ -873,19 +912,29 @@ regions.forEach(regionName => {
       };
       socket.user = user;
 
-      // Prevent multiple logins on the same account
-      const existingEntry = Array.from(connectedUsers.entries()).find(([_, u]) => u.username === decoded.username);
-      if (existingEntry) {
-        const [oldSocketId] = existingEntry;
-        if (oldSocketId !== socket.id) {
-          const oldSocket = nsp.sockets.get(oldSocketId);
-          if (oldSocket) {
-            oldSocket.emit('auth_error', { message: '本帳號已在其他地方登入，此連線被中斷' });
-            oldSocket.disconnect(true);
-          }
+      // Anti multi-instance: prevent multiple active sessions per account
+      const existingUser = await User.findOne({ username: decoded.username }, 'activeSession');
+      if (existingUser && existingUser.activeSession && existingUser.activeSession !== socket.id) {
+        const oldSocketId = existingUser.activeSession;
+        const oldSocket = nsp.sockets.get(oldSocketId);
+        if (oldSocket && oldSocket.connected) {
+          oldSocket.emit('auth_error', { message: '您的帳號已在其他裝置登入，此連線已中斷。' });
+          setTimeout(() => { try { oldSocket.disconnect(true); } catch(e) {} }, 500);
         }
         connectedUsers.delete(oldSocketId);
+        // Also clear the stale session entry so the db reflects truth
+        await User.updateOne({ username: decoded.username }, { $set: { activeSession: null } });
       }
+
+      // Clean up any leftover connectedUsers entries for this user
+      for (const [sid, u] of connectedUsers.entries()) {
+        if (u.username === decoded.username && sid !== socket.id) {
+          connectedUsers.delete(sid);
+        }
+      }
+
+      // Persist new session
+      await User.updateOne({ username: decoded.username }, { $set: { activeSession: socket.id } });
 
       connectedUsers.set(socket.id, user);
 
@@ -893,11 +942,26 @@ regions.forEach(regionName => {
 
       const pop = await db.getRegionPopulation(regionName);
 
+      // Disconnect compensation: calculate missed time
+      const lastHeartbeat = heartbeatTimestamps.get(decoded.username);
+      if (lastHeartbeat) {
+        const offlineDuration = Date.now() - lastHeartbeat;
+        if (offlineDuration > 30000 && offlineDuration < 86400000) {
+          const compensatedTime = Math.min(offlineDuration, 4 * 60 * 60 * 1000);
+          await User.updateOne(
+            { username: decoded.username },
+            { $inc: { accumulatedTime: compensatedTime } }
+          );
+          console.log(`[SYS] Disconnect compensation for ${decoded.username}: ${Math.round(compensatedTime/60000)} minutes`);
+        }
+      }
+      heartbeatTimestamps.set(decoded.username, Date.now());
+
       socket.emit('init_data', {
         userId: user.id,
         username: user.username,
         discordProfile: user.discordProfile,
-        ip: user.ip,
+        ip: user.ipObfuscated,
         country: user.country,
         lat: user.lat,
         lon: user.lon,
@@ -941,8 +1005,7 @@ regions.forEach(regionName => {
   });
 
   // Handle World Chat
-  const chatCooldowns = new Map();
-  socket.on('send_chat', (data) => {
+  socket.on('send_chat', async (data) => {
     const user = connectedUsers.get(socket.id);
     if (!user) return;
     
@@ -1220,6 +1283,7 @@ regions.forEach(regionName => {
         console.log(`[SYS] Penalty applied to ${disconnectedUser.username} for Solar Storm disconnect`);
       }
       connectedUsers.delete(socket.id);
+      heartbeatTimestamps.delete(disconnectedUser.username);
       console.log(`[SYS] Node Disconnected: ${socket.id}`);
       io.emit('node_disconnected', { id: socket.id });
     }

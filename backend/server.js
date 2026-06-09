@@ -17,7 +17,7 @@ const os = require('os');
 const path = require('path');
 const fs = require('fs');
 
-// Filtered words for chat moderation
+// Filtered words for chat moderation [v2.0.0]
 const FILTERED_WORDS = ['fuck', 'shit', 'asshole', 'bitch', 'damn', 'cao', '幹', '靠北', '操你媽', 'fucking', 'stupid', 'idiot', 'nigger', 'bastard', 'piss off', 'suck my', 'motherfucker'];
 
 // Chat rate limiting
@@ -65,7 +65,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/downloads', express.static(path.join(__dirname, 'public/downloads')));
 
-// Global error/crash logging
+// Global error/crash logging [v2.0.0]
 const crashLogPath = path.join(__dirname, 'crash.log');
 
 function writeCrashLog(type, err) {
@@ -116,7 +116,7 @@ async function sendDiscordWebhook(message) {
   }
 }
 
-// IP 預設模糊安全防護機制
+// IP 預設模糊安全防護 [v2.0.0]
 function obfuscateIp(ip) {
   if (!ip) return '0.0.0.0';
   const ipv4Match = ip.match(/^(\d{1,3}\.\d{1,3})\.\d{1,3}\.\d{1,3}$/);
@@ -507,7 +507,6 @@ app.get('/api/auth/discord/callback', async (req, res) => {
       
     } else {
       const success = await db.updateUserDiscord(decoded.username, profile);
-      
       if (success) {
         res.redirect(returnTo || '/');
       } else {
@@ -520,7 +519,7 @@ app.get('/api/auth/discord/callback', async (req, res) => {
   }
 });
 
-// Leaderboard Endpoint (整合 Discord 伺服器加成 1.5 倍特權)
+// Leaderboard Endpoint (已加入 Discord 加成者 1.5 倍增長特權)
 apiRouter.get('/leaderboard', async (req, res) => {
   try {
     const users = await User.find({}, 'username accumulatedTime accumulatedBonusPoints discord country')
@@ -531,14 +530,14 @@ apiRouter.get('/leaderboard', async (req, res) => {
     const leaderboard = await Promise.all(users.map(async u => {
       const idleTimeSeconds = Math.floor((u.accumulatedTime || 0) / 1000);
       
-      // 偵測是否為 [@核心能源供應商]
+      // 獲取並檢查是否具備加成身分組
       const discordId = u.discord?.id || '無';
       const realRole = discordId !== '無' ? await getCachedRole(discordId) : '';
       const isBooster = realRole.includes('核心能源供應商');
       
-      // 加成供應商享有基礎掛機點數 1.5 倍速狂飆特權
-      const speedMultiplier = isBooster ? 1.5 : 1.0;
-      const points = Math.floor(idleTimeSeconds * speedMultiplier) + (u.accumulatedBonusPoints || 0);
+      // 加成供應商結算時享有 1.5 倍基礎掛機算力特權
+      const boostMultiplier = isBooster ? 1.5 : 1.0;
+      const points = Math.floor(idleTimeSeconds * boostMultiplier) + (u.accumulatedBonusPoints || 0);
 
       return {
         username: u.username,
@@ -781,7 +780,7 @@ regions.forEach(regionName => {
       }
     });
 
-    // ── 購買道具（整合 Discord 加成供應商黑市商城終身 8 折特權） ─────────────────
+    // ── 購買道具（整合 Discord 加成供應商黑市終身 8 折特權） ─────────────────
     socket.on('buy_item', async (itemId) => {
       if (!socket.user) return;
       try {
@@ -801,11 +800,11 @@ regions.forEach(regionName => {
           return;
         }
         
-        // 檢查是否擁有加成者身分組
+        // 讀取快取並驗證是否為加成者
         const userRole = await getCachedRole(socket.user.discordProfile?.id || '');
         const isBooster = userRole.includes('核心能源供應商');
         
-        // 加成者終身 8 折
+        // 加成者直接享有 8 折關稅減免
         const finalCost = isBooster ? Math.floor(item.cost * 0.8) : item.cost;
         
         const result = await User.findOneAndUpdate(
@@ -819,7 +818,7 @@ regions.forEach(regionName => {
           return;
         }
 
-        socket.emit('buy_result', { success: true, message: `✅ 已購買「${itemId}」並存入背包！${isBooster ? ' (已自動折抵加成商 20% 關稅)' : ''}` });
+        socket.emit('buy_result', { success: true, message: `✅ 已購買「${itemId}」並存入背包！${isBooster ? ' (已折抵加成商 20% 關稅)' : ''}` });
         socket.emit('user_state_update', {
           pts: result.accumulatedBonusPoints,
           inventory: result.inventory ? Object.fromEntries(result.inventory) : {}
@@ -830,6 +829,7 @@ regions.forEach(regionName => {
       }
     });
 
+    // ── 使用道具（乾淨且原生綁定 async） ──────────────────────────────────
     socket.on('use_item', async (itemId) => {
       if (!socket.user) return;
       try {
@@ -982,7 +982,7 @@ regions.forEach(regionName => {
           role: dbUser?.role || 'user',
           discordProfile: dbUser?.discord || null,
           ip: ip,
-          ipObfuscated: obfuscateIp(ip),
+          ipObfuscated: obfuscateIp(ip), // 自動注入隱私模糊安全模組
           country: geo.country,
           lat: geo.ll[0] + (Math.random() - 0.5) * 0.1,
           lon: geo.ll[1] + (Math.random() - 0.5) * 0.1,
@@ -996,6 +996,7 @@ regions.forEach(regionName => {
         };
         socket.user = user;
 
+        // 防多開沙盒安全模組 [v2.0.0]
         const existingUser = await User.findOne({ username: decoded.username }, 'activeSession');
         if (existingUser && existingUser.activeSession && existingUser.activeSession !== socket.id) {
           const oldSocketId = existingUser.activeSession;
@@ -1086,7 +1087,7 @@ regions.forEach(regionName => {
       }
     });
 
-    // Handle World Chat
+    // Handle World Chat (整合實名認證、髒話過濾與管理高亮稱號)
     socket.on('send_chat', async (data) => {
       const user = connectedUsers.get(socket.id);
       if (!user) return;
@@ -1102,6 +1103,7 @@ regions.forEach(regionName => {
         const dbUser = await User.findOne({ username: user.username }, 'discord isEmailVerified role mutedUntil bannedUntil');
         if (!dbUser) return;
         
+        // [v2.0.0 實名制攔截] 聊天必須綁定 Discord 或電子郵件驗證
         if (!dbUser.discord?.id && !dbUser.isEmailVerified) {
           socket.emit('chat_verification_required', { message: '請先綁定 Discord 或驗證電子郵件後才能使用世界聊天。' });
           return;
@@ -1118,6 +1120,7 @@ regions.forEach(regionName => {
           return;
         }
         
+        // [v2.0.0 惡意言論過濾系統]
         let filteredMessage = message;
         let hasFilteredContent = false;
         for (const word of FILTERED_WORDS) {
@@ -1128,6 +1131,7 @@ regions.forEach(regionName => {
           }
         }
         
+        // 管理員明確表示高亮狀態
         const isAdmin = dbUser.role === 'admin' || dbUser.role === 'moderator';
         nspIo.emit('chat_message', { username: user.username, message: filteredMessage, isAdmin, filtered: hasFilteredContent });
         
@@ -1137,7 +1141,7 @@ regions.forEach(regionName => {
       }
     });
 
-    // Moderation Handlers
+    // 執法管理模組（刪除、禁言、封鎖）
     socket.on('mod_delete_message', async (data) => {
       const user = connectedUsers.get(socket.id);
       if (!user) return;
@@ -1156,7 +1160,7 @@ regions.forEach(regionName => {
         if (!dbUser || dbUser.role === 'user') return;
         const duration = Math.min(data.duration || 60, 1440);
         await User.findOneAndUpdate({ username: data.targetUsername }, { $set: { mutedUntil: Date.now() + duration * 60000 } });
-        nspIo.emit('chat_system_message', { message: `[系統] 使用者 ${data.targetUsername} 已被管理員禁言 ${duration} 分鐘` });
+        nspIo.emit('chat_system_message', { message: `[執法終端] 使用者 ${data.targetUsername} 已被管理員禁言 ${duration} 分鐘` });
       } catch (err) { console.error(err); }
     });
 
@@ -1167,7 +1171,7 @@ regions.forEach(regionName => {
         const dbUser = await User.findOne({ username: user.username }, 'role');
         if (!dbUser || dbUser.role === 'user') return;
         await User.updateOne({ username: data.targetUsername }, { $set: { mutedUntil: null } });
-        nspIo.emit('chat_system_message', { message: `[系統] 使用者 ${data.targetUsername} 已被管理員解除禁言` });
+        nspIo.emit('chat_system_message', { message: `[執法終端] 使用者 ${data.targetUsername} 已被管理員解除禁言` });
       } catch (err) { console.error(err); }
     });
 
@@ -1179,7 +1183,7 @@ regions.forEach(regionName => {
         if (!dbUser || dbUser.role === 'user') return;
         const duration = Math.min(data.duration || 1440, 43200);
         await User.findOneAndUpdate({ username: data.targetUsername }, { $set: { bannedUntil: Date.now() + duration * 60000 } });
-        nspIo.emit('chat_system_message', { message: `[系統] 使用者 ${data.targetUsername} 已被管理員封鎖 ${duration} 分鐘` });
+        nspIo.emit('chat_system_message', { message: `[執法終端] 使用者 ${data.targetUsername} 已被管理員封鎖 ${duration} 分鐘` });
       } catch (err) { console.error(err); }
     });
 
@@ -1190,7 +1194,7 @@ regions.forEach(regionName => {
         const dbUser = await User.findOne({ username: user.username }, 'role');
         if (!dbUser || dbUser.role === 'user') return;
         await User.updateOne({ username: data.targetUsername }, { $set: { bannedUntil: null } });
-        nspIo.emit('chat_system_message', { message: `[系統] 使用者 ${data.targetUsername} 已被管理員解除封鎖` });
+        nspIo.emit('chat_system_message', { message: `[執法終端] 使用者 ${data.targetUsername} 已被管理員解除封鎖` });
       } catch (err) { console.error(err); }
     });
 
@@ -1203,7 +1207,7 @@ regions.forEach(regionName => {
         const amount = Math.min(Math.abs(parseInt(data.amount) || 0), 100000);
         const target = await User.findOneAndUpdate({ username: data.targetUsername }, { $inc: { accumulatedBonusPoints: amount } }, { new: true });
         if (target) {
-          nspIo.emit('chat_system_message', { message: `[系統] 管理員給予 ${data.targetUsername} ${amount} PT` });
+          nspIo.emit('chat_system_message', { message: `[母體注入] 管理員給予 ${data.targetUsername} ${amount} PT` });
         }
       } catch (err) { console.error(err); }
     });
@@ -1239,7 +1243,7 @@ regions.forEach(regionName => {
       } catch (err) { console.error(err); }
     });
 
-    // Friend System
+    // Friend System Handlers
     socket.on('get_social_data', async () => {
       const user = connectedUsers.get(socket.id);
       if (!user) return;
@@ -1317,11 +1321,9 @@ regions.forEach(regionName => {
         try {
           const dbUser = await User.findOne({ username: user.username });
           if (!dbUser) return;
-          
           if ((dbUser.accumulatedBonusPoints || 0) < BROADCAST_COST) {
             return socket.emit('terminal_response', `[ERROR] INSUFFICIENT BONUS POINTS.`);
           }
-          
           await User.updateOne({ username: user.username }, { $inc: { accumulatedBonusPoints: -BROADCAST_COST } });
           nspIo.emit('global_broadcast', { username: user.username, message: message });
           socket.emit('terminal_response', `[SUCCESS] BROADCAST TRANSMITTED GLOBALLY.`);
@@ -1346,7 +1348,7 @@ regions.forEach(regionName => {
         try {
           const bots = await User.find({ 'discord.id': { $exists: false }, username: { $regex: /^[a-zA-Z0-9]{8,35}$/ } }).limit(50);
           if (bots.length === 0) socket.emit('terminal_response', `[SYS] NO SUSPICIOUS BOTS FOUND.`);
-          else socket.emit('terminal_response', `[SYS] FOUND ${bots.length} SUSPECTS. TYPE /NUKE_BOTS TO DELETE.`);
+          else socket.emit('terminal_response', `[SYS] FOUND ${bots.length} SUSPECTS. TYPE /NUKE_BOTS TO PURGE.`);
         } catch (err) { socket.emit('terminal_response', `[ERROR] SCAN FAILED.`); }
       } else if (cmdUpper === 'NUKE_BOTS') {
         if (user.username !== '大拇哥科技' && user.username !== 'admin') {
@@ -1368,16 +1370,15 @@ regions.forEach(regionName => {
       if (disconnectedUser) {
         if (state.currentGlobalEvent && state.currentGlobalEvent.type === 'SOLAR_STORM') {
           
-          // 讀取該島民是否具備 [核心能源供應商] 特權稱號
           const realRole = disconnectedUser.discordProfile?.id ? await getCachedRole(disconnectedUser.discordProfile.id) : '';
           
           if (!realRole.includes('核心能源供應商')) {
-            // 普通島民：扣除 100 PT
+            // 普通玩家斷線扣除 100 PT
             await User.updateOne({ username: disconnectedUser.username }, { $inc: { accumulatedBonusPoints: -100 } }).catch(console.error);
             console.log(`[SYS] Penalty -100 PT applied to non-booster: ${disconnectedUser.username}`);
           } else {
-            // 能源供應商：防火牆豁免，不扣分
-            console.log(`[SYS] Booster ${disconnectedUser.username} bypassed Solar Storm disconnect penalty successfully.`);
+            // 加成者免受天災斷線扣分之連帶處罰
+            console.log(`[SYS] Booster ${disconnectedUser.username} bypassed Solar Storm penalty successfully.`);
           }
         }
         connectedUsers.delete(socket.id);
@@ -1392,5 +1393,5 @@ regions.forEach(regionName => {
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
-  console.log(`[SYS] Earth Online Backend Core v2.0.0 successfully operating on port ${PORT}`);
+  console.log(`[SYS] Earth Online Backend Core v2.0.0 operating flawlessly on port ${PORT}`);
 });

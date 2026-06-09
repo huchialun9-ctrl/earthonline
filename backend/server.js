@@ -68,7 +68,7 @@ db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', er
 const app = express();
 const apiRouter = express.Router({ mergeParams: true });
 app.use(helmet());
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000,https://earthonline1.pages.dev,https://earthonline.onrender.com').split(',').map(s => s.trim());
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000,https://earthonline1.pages.dev,https://earthonline-2m7.pages.dev,https://earthonline.onrender.com').split(',').map(s => s.trim());
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
@@ -471,8 +471,8 @@ app.get('/api/auth/discord/callback', async (req, res) => {
       try {
         const returnUrl = new URL(returnTo);
         const allowedHosts = process.env.NODE_ENV === 'development'
-          ? ['localhost', 'earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline.qzz.io']
-          : ['earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline.qzz.io'];
+          ? ['localhost', 'earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline-2m7.pages.dev', 'earthonline.qzz.io']
+          : ['earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline-2m7.pages.dev', 'earthonline.qzz.io'];
         if (!allowedHosts.includes(returnUrl.hostname)) {
           returnTo = null;
         }

@@ -1729,7 +1729,7 @@ function Dashboard({ token, onLogout, region }) {
 
       {/* Full Page About Documentation */}
       {showAboutModal && <DocumentationOverlay onClose={() => setShowAboutModal(false)} />}
-      {showSocialModal && <SocialModal onClose={() => setShowSocialModal(false)} socialTab={socialTab} setSocialTab={setSocialTab} socialData={socialData} socket={socket} />}
+      {showSocialModal && <SocialModal onClose={() => setShowSocialModal(false)} socialTab={socialTab} setSocialTab={setSocialTab} socialData={socialData} socket={socket} myNode={myNode} />}
       {showShopModal && <ShopModal onClose={() => setShowShopModal(false)} pts={myNode?.accumulatedBonusPoints} onBuy={(id) => { if (socket?.connected) { socket.emit('buy_item', id); } else { alert('連線未就緒，無法購買'); } }} onAdRevive={() => setShowAdRevive(true)} adReviveRemaining={adReviveRemaining} />}
 
       {showAccountInfo && <AccountInfoModal token={token} apiUrl={API_URL} onClose={() => setShowAccountInfo(false)} onLogout={onLogout} />}
@@ -1743,7 +1743,7 @@ function Dashboard({ token, onLogout, region }) {
           if (adminPlayerFilter === 'muted')  return p.isMuted;
           if (adminPlayerFilter === 'banned') return p.isBanned;
           return true;
-        });
+        }).sort((a, b) => (b.online ? 1 : 0) - (a.online ? 1 : 0));
         const selected = allPlayersList.find(p => p.username === adminTarget);
 
         return (
@@ -2327,8 +2327,9 @@ function App() {
   return <Dashboard token={token} onLogout={handleLogout} region={region} />;
 }
 
-function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket }) {
+function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myNode }) {
   const { t, language, setLanguage } = useLanguage();
+  const sortedPlayers = [...(socialData.allPlayers || [])].sort((a, b) => (b.online ? 1 : 0) - (a.online ? 1 : 0));
   return (
     <div className="modal-overlay" onClick={onClose} style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -2359,14 +2360,14 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket }) {
 
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {socialTab === 'all' && (
-            socialData.allPlayers?.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>查無資料</div> :
-            socialData.allPlayers?.map(p => (
+            sortedPlayers.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>查無資料</div> :
+            sortedPlayers.map(p => (
               <div key={p.username} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '5px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{ color: p.online ? '#0f0' : '#888', fontWeight: 'bold' }}>●</span>
                   <span>{p.username} [{p.country}]</span>
                 </div>
-                {!socialData.friends?.find(f => f.username === p.username) && (
+                {p.username !== myNode?.username && !socialData.friends?.find(f => f.username === p.username) && (
                   <button 
                     onClick={(e) => {
                       socket.emit('send_friend_request', { targetUsername: p.username });

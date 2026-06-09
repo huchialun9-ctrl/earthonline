@@ -608,6 +608,7 @@ function Dashboard({ token, onLogout, region }) {
 
   // Ref for react-draggable
   const logRef = useRef(null);
+  const adminModalRef = useRef(null);
 
   const [bgmEnabled, setBgmEnabled] = useState(true);
   const audioRef = useRef(null);
@@ -1726,8 +1727,8 @@ function Dashboard({ token, onLogout, region }) {
       {/* Admin Panel Modal */}
       {showAdminPanel && (
         <div style={{position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)'}} onClick={() => setShowAdminPanel(false)}>
-          <Draggable handle=".admin-header">
-            <div onClick={e => e.stopPropagation()} style={{width: '450px', maxWidth: '90vw', background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '8px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', overflow: 'hidden'}}>
+          <Draggable nodeRef={adminModalRef} handle=".admin-header">
+            <div ref={adminModalRef} onClick={e => e.stopPropagation()} style={{width: '450px', maxWidth: '90vw', background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '8px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', overflow: 'hidden'}}>
             <div className="admin-header" style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-light)', borderBottom: '1px solid var(--border-color)', cursor: 'move'}}>
               <span style={{color: 'var(--danger-color)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px'}}><Shield size={18} /> 管理員功能 (Admin Panel)</span>
               <button onClick={() => setShowAdminPanel(false)} style={{background: 'transparent', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', padding: '4px', fontSize: '1.2rem'}}><X size={18} /></button>

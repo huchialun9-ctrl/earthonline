@@ -832,6 +832,24 @@ function Dashboard({ token, onLogout, region }) {
       }
     });
 
+    s.on('chat_muted', (data) => {
+      addLog(`[SYSTEM] ${data.message}`);
+      alert(data.message);
+    });
+
+    s.on('chat_banned', (data) => {
+      addLog(`[SYSTEM] ${data.message}`);
+      alert(data.message);
+    });
+
+    s.on('chat_message_deleted', (data) => {
+      addLog(`[MOD] 管理員 ${data.modUsername} 刪除了一則訊息`);
+    });
+
+    s.on('chat_system_message', (data) => {
+      addLog(data.message);
+    });
+
     s.on('pong', () => {
       setPing(Date.now() - pingStartRef.current);
     });

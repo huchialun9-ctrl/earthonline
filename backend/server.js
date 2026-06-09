@@ -58,6 +58,7 @@ process.on('unhandledRejection', (reason) => {
 
 // Heartbeat tracking for disconnect compensation
 const heartbeatTimestamps = new Map();
+const reviveCounts = new Map();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'earth_online_secret_key_9988';
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -395,7 +396,7 @@ app.get('/api/auth/discord/callback', async (req, res) => {
     if (returnTo) {
       try {
         const returnUrl = new URL(returnTo);
-        const allowedHosts = ['localhost', 'earthonline.onrender.com', 'earthonline1.pages.dev'];
+        const allowedHosts = ['localhost', 'earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline.qzz.io'];
         if (!allowedHosts.includes(returnUrl.hostname)) {
           returnTo = null;
         }
@@ -403,6 +404,7 @@ app.get('/api/auth/discord/callback', async (req, res) => {
         returnTo = null;
       }
     }
+    if (!returnTo) returnTo = '/';
     if (action === 'bind') {
       decoded = jwt.verify(stateData.token, JWT_SECRET);
     }
@@ -480,8 +482,8 @@ app.get('/api/auth/discord/callback', async (req, res) => {
       );
       
       // Redirect to frontend with token in query params
-      const separator = returnTo.includes('?') ? '&' : '?';
-      return res.redirect(`${returnTo}${separator}token=${token}`);
+      const separator = returnTo && returnTo.includes('?') ? '&' : '?';
+      return res.redirect(`${returnTo || '/'}${separator}token=${token}`);
       
     } else {
       // Bind action
@@ -720,7 +722,8 @@ regions.forEach(regionName => {
               filter: { username: user.username },
               update: { $inc: incFields }
             }
-          });
+  });
+
         }
       }
       
@@ -873,6 +876,31 @@ regions.forEach(regionName => {
     }
   });
 
+  // Ad revive: restore health after watching an ad
+  socket.on('ad_revive', async () => {
+    if (!socket.user) return;
+    const now = Date.now();
+    const today = new Date().toISOString().substring(0, 10);
+    const adCountKey = `adRevive_${socket.user.username}_${today}`;
+    const count = reviveCounts?.get(adCountKey) || 0;
+    if (count >= 3) {
+      socket.emit('ad_revive_result', { success: false, message: '今日廣告次數已用完（上限 3 次）' });
+      return;
+    }
+    const user = await User.findOne({ username: socket.user.username });
+    if (!user) return;
+    if (user.health > 0) {
+      socket.emit('ad_revive_result', { success: false, message: '伺服器仍在運作，無需復活' });
+      return;
+    }
+    const newHealth = Math.min(100, (user.health || 0) + 50);
+    await User.updateOne({ username: socket.user.username }, { $set: { health: newHealth } });
+    if (!reviveCounts) reviveCounts = new Map();
+    reviveCounts.set(adCountKey, count + 1);
+    socket.emit('ad_revive_result', { success: true, health: newHealth, remaining: 2 - count });
+    socket.emit('user_state_update', { health: newHealth });
+  });
+
   socket.on('authenticate', async (data) => {
     try {
       const decoded = jwt.verify(data.token, JWT_SECRET);
@@ -981,6 +1009,18 @@ regions.forEach(regionName => {
         totalPopulation: pop,
         currentGlobalEvent: currentGlobalEvent // Send current event to newly connected users
       });
+
+      // Sync Discord role to in-app role
+      if (dbUser?.discord?.id) {
+        discordBot.getHighestRole(dbUser.discord.id).then(discordRole => {
+          if (!discordRole) return;
+          if (discordRole.includes('地球管理團隊')) {
+            User.updateOne({ username: decoded.username }, { $set: { role: 'admin' } }).catch(console.error);
+          } else if (user.role === 'admin' && !discordRole.includes('地球管理團隊')) {
+            User.updateOne({ username: decoded.username }, { $set: { role: 'user' } }).catch(console.error);
+          }
+        }).catch(() => {});
+      }
 
       if (connectedUsers.size % 10 === 0 && connectedUsers.size > 0) {
         sendDiscordWebhook(`🌐 **【地理節點高載通報】**\n偵測到大量節點湧入，目前全服掛機人數已達 **${connectedUsers.size}** 人！\n來自 \`${user.country}\` 的節點點亮了板塊。`);

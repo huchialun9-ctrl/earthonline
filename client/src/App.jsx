@@ -539,6 +539,22 @@ function Dashboard({ token, onLogout, region }) {
   const [myRole, setMyRole] = useState('user');
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [adminTarget, setAdminTarget] = useState('');
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [showAdRevive, setShowAdRevive] = useState(false);
+  const [adCountdown, setAdCountdown] = useState(0);
+  const [adReviveRemaining, setAdReviveRemaining] = useState(3);
+  const [currentAd, setCurrentAd] = useState('');
+  const [adPlaying, setAdPlaying] = useState(false);
+  const [adSlogan, setAdSlogan] = useState('');
+  const AD_SLOGANS = [
+    { title: '子熙生態・無限可能', lines: ['玩遊戲・賺代幣・擁抱區塊鏈', 'Play. Earn. Own.'] },
+    { title: '12 款經典博弈遊戲', lines: ['硬幣翻轉・輪盤・21點・賽馬・骰寶', '老虎機・賓果・爆擊 Crash・德州撲克'] },
+    { title: '雙代幣經濟', lines: ['子熙幣 (ZXC) — 遊戲流通代幣', '佑戩幣 (YJC) — 稀缺保值（1 YJC = 1 億 ZXC）'] },
+    { title: '你的裝置・就是你的冷錢包', lines: ['Device-Linker App 私鑰存於本地', 'PIN 碼簽署・安全又方便'] },
+    { title: '10 大寶箱系統', lines: ['從普通到超越・保證掉落機制', '你敢挑戰超越寶箱嗎？'] },
+    { title: '完整虛擬經濟', lines: ['股票市場・期貨交易・銀行・公司經營', '當舖・玩家交易市場・貸款系統'] },
+    { title: '最強鏈上賭場・盡在子熙', lines: ['https://zixi-casino.vercel.app', '可驗證公平・鏈上結算・雙語界面'] },
+  ];
   const [globalStats, setGlobalStats] = useState({ activeUsers: 0, totalPopulation: 0, globalProduction: 0, socialCompression: '1.000' });
   const [hubStats, setHubStats] = useState(null);
 
@@ -557,6 +573,7 @@ function Dashboard({ token, onLogout, region }) {
   const [lifespan, setLifespan] = useState(0);
   const [sessionTime, setSessionTime] = useState(0);
   const sessionStartRef = useRef(null);
+  const lifespanBaseRef = useRef(null);
   const [show100Celebration, setShow100Celebration] = useState(false);
   const [logs, setLogs] = useState([
     { text: '[SYS] 地球在線連線建立中...', time: new Date().toISOString().substring(11, 19) },
@@ -663,6 +680,13 @@ function Dashboard({ token, onLogout, region }) {
       logEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [logs]);
+
+  // Fetch online users when admin panel opens
+  useEffect(() => {
+    if (showAdminPanel && socket) {
+      socket.emit('get_online_users');
+    }
+  }, [showAdminPanel, socket]);
 
   // Fetch social data when modal opens
   useEffect(() => {
@@ -874,6 +898,21 @@ function Dashboard({ token, onLogout, region }) {
       addLog(data.message);
     });
 
+    s.on('online_users', (users) => {
+      setOnlineUsers(users);
+    });
+
+    s.on('ad_revive_result', (data) => {
+      setAdPlaying(false);
+      if (data.success) {
+        addLog(`[SYSTEM] 廣告復活成功！伺服器健康度恢復至 ${data.health}%（今日剩餘 ${data.remaining} 次）`);
+        setAdReviveRemaining(data.remaining);
+        setShowAdRevive(false);
+      } else {
+        addLog(`[SYSTEM] 廣告復活失敗：${data.message}`);
+      }
+    });
+
     s.on('chat_verification_required', (data) => {
       addLog(`[SYSTEM] ⚠️ ${data.message}`);
       alert('⚠️ ' + data.message);
@@ -906,24 +945,16 @@ function Dashboard({ token, onLogout, region }) {
     };
   }, [token, onLogout]);
 
-  // Lifespan timer
+  // Lifespan timer — set base once, never reset
   useEffect(() => {
     if (!myNode || myNode.accumulatedTime === undefined) return;
-    
-    // Check if we are currently boosted
-    const isBoosted = globalStats.multiplier && globalStats.multiplier > 1.0;
-    const rate = isBoosted ? 1.2 : 1.0;
-    
-    // Avoid using Date.now() - connectedAt because server time might be different from client time, causing negative values.
-    const baseAccumulatedSeconds = (myNode.accumulatedTime || 0) / 1000;
-    
-    let currentLocalLifespan = baseAccumulatedSeconds;
+    if (lifespanBaseRef.current !== null) return;
+    lifespanBaseRef.current = (myNode.accumulatedTime || 0) / 1000;
 
+    let currentLocalLifespan = lifespanBaseRef.current;
     const interval = setInterval(() => {
-      currentLocalLifespan += rate;
+      currentLocalLifespan += 1;
       setLifespan(Math.floor(currentLocalLifespan));
-      
-      // Update Electron Desktop App Presence if available
       if (window.electronAPI) {
         window.electronAPI.updatePresence({
           details: `生存時間: ${formatTime(Math.floor(currentLocalLifespan))}`,
@@ -932,12 +963,10 @@ function Dashboard({ token, onLogout, region }) {
         });
       }
     }, 1000);
-
-    // Run once immediately
     setLifespan(Math.floor(currentLocalLifespan));
 
     return () => clearInterval(interval);
-  }, [myNode, globalStats.multiplier]);
+  }, [myNode]);
 
   // Session timer — counts from the moment user connects
   useEffect(() => {
@@ -1666,9 +1695,124 @@ function Dashboard({ token, onLogout, region }) {
       {/* Full Page About Documentation */}
       {showAboutModal && <DocumentationOverlay onClose={() => setShowAboutModal(false)} />}
       {showSocialModal && <SocialModal onClose={() => setShowSocialModal(false)} socialTab={socialTab} setSocialTab={setSocialTab} socialData={socialData} socket={socket} />}
-      {showShopModal && <ShopModal onClose={() => setShowShopModal(false)} pts={myNode?.accumulatedBonusPoints} onBuy={(id) => { if (socket?.connected) { socket.emit('buy_item', id); } else { alert('連線未就緒，無法購買'); } }} />}
+      {showShopModal && <ShopModal onClose={() => setShowShopModal(false)} pts={myNode?.accumulatedBonusPoints} onBuy={(id) => { if (socket?.connected) { socket.emit('buy_item', id); } else { alert('連線未就緒，無法購買'); } }} onAdRevive={() => setShowAdRevive(true)} adReviveRemaining={adReviveRemaining} />}
 
       {showAccountInfo && <AccountInfoModal token={token} apiUrl={API_URL} onClose={() => setShowAccountInfo(false)} onLogout={onLogout} />}
+
+      {/* Admin Panel Modal */}
+      {showAdminPanel && (
+        <div style={{position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)'}} onClick={() => setShowAdminPanel(false)}>
+          <Draggable handle=".admin-header">
+            <div onClick={e => e.stopPropagation()} style={{width: '450px', maxWidth: '90vw', background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: '8px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', overflow: 'hidden'}}>
+            <div className="admin-header" style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-light)', borderBottom: '1px solid var(--border-color)', cursor: 'move'}}>
+              <span style={{color: 'var(--danger-color)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px'}}><Shield size={18} /> 管理員功能 (Admin Panel)</span>
+              <button onClick={() => setShowAdminPanel(false)} style={{background: 'transparent', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', padding: '4px', fontSize: '1.2rem'}}><X size={18} /></button>
+            </div>
+            <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
+              <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                <span style={{color: 'var(--text-color)', fontSize: '0.9rem', whiteSpace: 'nowrap'}}>目標使用者:</span>
+                <select value={adminTarget} onChange={e => setAdminTarget(e.target.value)} style={{flex: 1, background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '6px 8px', borderRadius: '4px', outline: 'none', fontSize: '0.9rem'}}>
+                  <option value="">-- 選擇使用者 --</option>
+                  {onlineUsers.map(u => <option key={u} value={u}>{u}</option>)}
+                </select>
+                <button onClick={() => { if (socket) socket.emit('get_online_users'); }} style={{background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-dim)', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem'}}>重新整理</button>
+              </div>
+
+              <div style={{display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap'}}>
+                <span style={{color: 'var(--text-color)', fontSize: '0.9rem'}}>禁言:</span>
+                <select id="muteDuration" defaultValue="5" style={{background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '4px', borderRadius: '4px', fontSize: '0.8rem'}}>
+                  <option value="1">1 分鐘</option>
+                  <option value="5">5 分鐘</option>
+                  <option value="10">10 分鐘</option>
+                  <option value="30">30 分鐘</option>
+                  <option value="60">1 小時</option>
+                  <option value="360">6 小時</option>
+                  <option value="1440">24 小時</option>
+                </select>
+                <button onClick={handleAdminMute} style={{background: 'var(--danger-color)', border: 'none', color: '#fff', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem'}}>禁言</button>
+                <button onClick={handleAdminUnmute} style={{background: 'var(--success-color)', border: 'none', color: '#fff', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem'}}>解禁</button>
+              </div>
+
+              <div style={{display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap'}}>
+                <span style={{color: 'var(--text-color)', fontSize: '0.9rem'}}>封鎖:</span>
+                <select id="banDuration" defaultValue="1440" style={{background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '4px', borderRadius: '4px', fontSize: '0.8rem'}}>
+                  <option value="60">1 小時</option>
+                  <option value="360">6 小時</option>
+                  <option value="1440">24 小時</option>
+                  <option value="4320">3 天</option>
+                  <option value="10080">7 天</option>
+                  <option value="43200">30 天</option>
+                </select>
+                <button onClick={handleAdminBan} style={{background: '#000', border: '1px solid var(--danger-color)', color: 'var(--danger-color)', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem'}}>封鎖</button>
+                <button onClick={handleAdminUnban} style={{background: 'var(--success-color)', border: 'none', color: '#fff', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem'}}>解封</button>
+              </div>
+
+              <div style={{display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap'}}>
+                <button onClick={handleAdminDelete} style={{background: 'var(--warning-color)', border: 'none', color: '#000', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem'}}>刪除該使用者所有訊息</button>
+              </div>
+            </div>
+          </div>
+        </Draggable>
+      </div>
+      )}
+
+      {/* Ad Revive Modal */}
+      {showAdRevive && (
+        <div className="modal-overlay" onClick={() => { if (adCountdown === 0) setShowAdRevive(false); }} style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10001
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: 'var(--surface-color)', border: '1px solid var(--accent-color)',
+            borderRadius: '12px', padding: '24px', maxWidth: '640px', width: '95%',
+            textAlign: 'center'
+          }}>
+            {adCountdown > 0 ? (
+              <>
+                <div style={{marginBottom: '12px', borderRadius: '8px', overflow: 'hidden', maxHeight: '360px'}}>
+                  <img src={currentAd} alt="ad" style={{width: '100%', height: 'auto', display: 'block', borderRadius: '8px'}} />
+                </div>
+                <div style={{color: 'var(--accent-color)', fontSize: '1.3rem', fontWeight: 'bold', marginBottom: '4px', minHeight: '1.8em', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  {adSlogan?.title || ''}
+                </div>
+                <div style={{color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '10px', minHeight: '2.4em', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px'}}>
+                  {adSlogan?.lines?.map((line, i) => <span key={i}>{line}</span>)}
+                </div>
+                <div style={{color: 'var(--accent-color)', fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '15px'}}>{adCountdown}s</div>
+                <div style={{color: 'var(--text-dim)', fontSize: '0.75rem', marginBottom: '10px'}}>贊助商：子熙生態系</div>
+                <div style={{width: '100%', height: '4px', background: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden'}}>
+                  <div style={{width: `${((15 - adCountdown) / 15) * 100}%`, height: '100%', background: 'var(--accent-color)', transition: 'width 1s linear'}} />
+                </div>
+                <div style={{color: 'var(--text-dim)', fontSize: '0.8rem', marginTop: '15px'}}>觀看完整廣告即可免費復活伺服器</div>
+              </>
+            ) : (
+              <>
+                <div style={{fontSize: '3rem', marginBottom: '15px'}}>⚡</div>
+                <div style={{color: 'var(--text-color)', fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '8px'}}>伺服器已死機！</div>
+                <div style={{color: 'var(--text-dim)', fontSize: '0.9rem', marginBottom: '20px'}}>觀看廣告即可免費復活（恢復 50% 健康度）</div>
+                <div style={{color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '20px'}}>今日剩餘次數：{adReviveRemaining} / 3</div>
+                <div style={{display: 'flex', gap: '10px', justifyContent: 'center'}}>
+                  <button onClick={handleStartAdRevive} disabled={adReviveRemaining <= 0} style={{
+                    background: adReviveRemaining > 0 ? 'var(--accent-color)' : 'var(--border-color)',
+                    color: adReviveRemaining > 0 ? '#000' : 'var(--text-dim)',
+                    border: 'none', padding: '12px 30px', borderRadius: '8px',
+                    fontWeight: 'bold', cursor: adReviveRemaining > 0 ? 'pointer' : 'not-allowed',
+                    fontSize: '1rem'
+                  }}>
+                    {adReviveRemaining > 0 ? '▶ 觀看廣告復活' : '今日次數已用完'}
+                  </button>
+                  <button onClick={() => setShowAdRevive(false)} style={{
+                    background: 'transparent', border: '1px solid var(--border-color)',
+                    color: 'var(--text-dim)', padding: '12px 20px', borderRadius: '8px',
+                    cursor: 'pointer', fontSize: '0.9rem'
+                  }}>關閉</button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {showThemeMenu && (
         <div className="modal-overlay" onClick={() => setShowThemeMenu(false)} style={{

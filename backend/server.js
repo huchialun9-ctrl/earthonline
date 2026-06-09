@@ -876,19 +876,29 @@ regions.forEach(regionName => {
         connectedAt: Date.now()
       };
 
-      // Prevent multiple logins on the same account
-      const existingEntry = Array.from(connectedUsers.entries()).find(([_, u]) => u.username === decoded.username);
-      if (existingEntry) {
-        const [oldSocketId] = existingEntry;
-        if (oldSocketId !== socket.id) {
-          const oldSocket = nsp.sockets.get(oldSocketId);
-          if (oldSocket) {
-            oldSocket.emit('auth_error', { message: '本帳號已在其他地方登入，此連線被中斷' });
-            oldSocket.disconnect(true);
-          }
+      // Anti multi-instance: prevent multiple active sessions per account
+      const existingUser = await User.findOne({ username: decoded.username }, 'activeSession');
+      if (existingUser && existingUser.activeSession && existingUser.activeSession !== socket.id) {
+        const oldSocketId = existingUser.activeSession;
+        const oldSocket = nsp.sockets.get(oldSocketId);
+        if (oldSocket && oldSocket.connected) {
+          oldSocket.emit('auth_error', { message: '您的帳號已在其他裝置登入，此連線已中斷。' });
+          setTimeout(() => { try { oldSocket.disconnect(true); } catch(e) {} }, 500);
         }
         connectedUsers.delete(oldSocketId);
+        // Also clear the stale session entry so the db reflects truth
+        await User.updateOne({ username: decoded.username }, { $set: { activeSession: null } });
       }
+
+      // Clean up any leftover connectedUsers entries for this user
+      for (const [sid, u] of connectedUsers.entries()) {
+        if (u.username === decoded.username && sid !== socket.id) {
+          connectedUsers.delete(sid);
+        }
+      }
+
+      // Persist new session
+      await User.updateOne({ username: decoded.username }, { $set: { activeSession: socket.id } });
 
       connectedUsers.set(socket.id, user);
 

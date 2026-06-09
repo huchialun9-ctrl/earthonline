@@ -132,151 +132,39 @@ function LoginGateway({ onLogin }) {
 
   return (
     <div className="login-gateway">
-      <div className="login-box">
-        {/* Snoopy Animations */}
-        <div className={`snoopy-container ${isDaytime ? 'snoopy-day' : 'snoopy-night'}`}>
-          <div className="snoopy-bg-deco">
-            {isDaytime ? (
-              <>
-                <div className="snoopy-sun"></div>
-                <div className="snoopy-clouds">
-                  <div className="scloud scloud-1"></div>
-                  <div className="scloud scloud-2"></div>
-                  <div className="scloud scloud-3"></div>
-                </div>
-                <div className="snoopy-grass"></div>
-              </>
-            ) : (
-              <>
-                <div className="snoopy-moon-bg"></div>
-                <div className="snoopy-stars">
-                  {Array.from({ length: 30 }, (_, i) => (
-                    <div key={i} className="sstar" style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 40}%`,
-                      animationDelay: `${Math.random() * 3}s`,
-                      width: `${1 + Math.random() * 3}px`,
-                      height: `${1 + Math.random() * 3}px`,
-                    }} />
-                  ))}
-                </div>
-                <div className="snoopy-ground"></div>
-              </>
-            )}
-          </div>
-
-          {/* Helper: renderSnoopy creates a Snoopy character */}
-          {[
-            { cls: 'sdance1', anim: 'snDance', delay: '0s', top: '30%', left: '8%', scale: 1 },
-            { cls: 'sdance2', anim: 'snDance', delay: '1s', top: '50%', left: '5%', scale: 0.85 },
-            { cls: 'sdance3', anim: 'snDance', delay: '2s', top: '65%', left: '12%', scale: 0.7 },
-            { cls: 'sfly1', anim: 'snFly', delay: '0s', top: '8%', left: '55%', scale: 1.1 },
-            { cls: 'sfly2', anim: 'snFly', delay: '2s', top: '5%', left: '75%', scale: 0.85 },
-            { cls: 'ssleep1', anim: 'snSleep', delay: '0s', top: '72%', left: '35%', scale: 0.9 },
-            { cls: 'ssleep2', anim: 'snSleep', delay: '3s', top: '75%', left: '50%', scale: 0.7 },
-            { cls: 'swalk1', anim: 'snWalk', delay: '0s', top: '82%', left: '60%', scale: 0.95 },
-            { cls: 'swalk2', anim: 'snWalk', delay: '4s', top: '85%', left: '70%', scale: 0.8 },
-            { cls: 'sjump1', anim: 'snJump', delay: '0s', top: '45%', left: '78%', scale: 0.9 },
-            { cls: 'sjump2', anim: 'snJump', delay: '0.8s', top: '55%', left: '72%', scale: 0.75 },
-            { cls: 'sjump3', anim: 'snJump', delay: '1.6s', top: '40%', left: '85%', scale: 0.65 },
-            { cls: 'sjump4', anim: 'snJump', delay: '2.4s', top: '60%', left: '82%', scale: 0.7 },
-            { cls: 'sspin1', anim: 'snSpin', delay: '0s', top: '25%', left: '82%', scale: 0.8 },
-            { cls: 'sspin2', anim: 'snSpin', delay: '1.5s', top: '20%', left: '90%', scale: 0.65 },
-            { cls: 'sfloat1', anim: 'snFloat', delay: '0s', top: '15%', left: '30%', scale: 0.6 },
-            { cls: 'sfloat2', anim: 'snFloat', delay: '2s', top: '60%', left: '20%', scale: 0.55 },
-            { cls: 'sfloat3', anim: 'snFloat', delay: '4s', top: '35%', left: '40%', scale: 0.5 },
-            { cls: 'sfloat4', anim: 'snFloat', delay: '1s', top: '22%', left: '50%', scale: 0.5 },
-            { cls: 'sfloat5', anim: 'snFloat', delay: '3s', top: '68%', left: '30%', scale: 0.55 },
-          ].map((s, i) => (
-            <div key={i} className={`snoopy ${s.cls}`} style={{
-              top: s.top, left: s.left,
-              animation: `${s.anim} ${3 + (i % 3) * 0.5}s ease-in-out infinite`,
-              animationDelay: s.delay,
-              transform: `scale(${s.scale})`,
-            }}>
-              <div className="snoopy-body">
-                <div className="snoopy-ear-l"></div>
-                <div className="snoopy-ear-r"></div>
-                <div className="snoopy-head">
-                  <div className="snoopy-eye-l"></div>
-                  <div className="snoopy-eye-r"></div>
-                  <div className="snoopy-nose"></div>
-                  <div className="snoopy-smile"></div>
-                </div>
-                <div className="snoopy-tail"></div>
-                <div className="snoopy-leg-fl"></div>
-                <div className="snoopy-leg-fr"></div>
-                <div className="snoopy-leg-bl"></div>
-                <div className="snoopy-leg-br"></div>
+      <div className={`login-bg ${isDaytime ? 'bg-day' : 'bg-night'}`}>
+        <div className="login-bg-deco">
+          {isDaytime ? (
+            <>
+              <div className="bg-sun"></div>
+              <div className="bg-clouds">
+                <div className="bcloud bcloud-1"></div>
+                <div className="bcloud bcloud-2"></div>
+                <div className="bcloud bcloud-3"></div>
               </div>
-              {i < 2 && <div className="snoopy-scarf"></div>}
-              {(i >= 4 && i <= 5) && <div className="snoopy-z">💤</div>}
-            </div>
-          ))}
-
-          {/* Woodstock birds */}
-          {[
-            { top: '18%', left: '35%', delay: '0s', dur: '3s' },
-            { top: '28%', left: '68%', delay: '1s', dur: '4s' },
-            { top: '55%', left: '15%', delay: '2s', dur: '3.5s' },
-            { top: '70%', left: '22%', delay: '0.5s', dur: '4.5s' },
-            { top: '12%', left: '42%', delay: '1.5s', dur: '3s' },
-          ].map((b, i) => (
-            <div key={`b${i}`} className="woodstock" style={{
-              top: b.top, left: b.left,
-              animation: `woodFly ${b.dur}s ease-in-out infinite`,
-              animationDelay: b.delay,
-            }}>
-              <div className="woodstock-body">
-                <div className="woodstock-wing"></div>
-                <div className="woodstock-eye"></div>
-                <div className="woodstock-beak"></div>
-                <div className="woodstock-tail"></div>
+              <div className="bg-grass"></div>
+            </>
+          ) : (
+            <>
+              <div className="bg-moon"></div>
+              <div className="bg-stars">
+                {Array.from({ length: 30 }, (_, i) => (
+                  <div key={i} className="bstar" style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 40}%`,
+                    animationDelay: `${Math.random() * 3}s`,
+                    width: `${1 + Math.random() * 3}px`,
+                    height: `${1 + Math.random() * 3}px`,
+                  }} />
+                ))}
               </div>
-            </div>
-          ))}
-
-          {/* Doghouse */}
-          <div className="doghouse" style={{ bottom: '12%', right: '15%' }}>
-            <div className="doghouse-roof"></div>
-            <div className="doghouse-body">
-              <div className="doghouse-hole"></div>
-              <div className="doghouse-text">SNOOPY</div>
-            </div>
-          </div>
-
-          {/* Snoopy on doghouse */}
-          <div className="snoopy snoopy-onhouse" style={{ bottom: '25%', right: '18%', animation: 'snFloat 4s ease-in-out infinite' }}>
-            <div className="snoopy-body">
-              <div className="snoopy-ear-l"></div>
-              <div className="snoopy-ear-r"></div>
-              <div className="snoopy-head">
-                <div className="snoopy-eye-l"></div>
-                <div className="snoopy-eye-r"></div>
-                <div className="snoopy-nose"></div>
-                <div className="snoopy-smile"></div>
-              </div>
-              <div className="snoopy-tail"></div>
-              <div className="snoopy-leg-fl"></div>
-              <div className="snoopy-leg-fr"></div>
-            </div>
-          </div>
-
-          {/* Floating notes & stars */}
-          <div className="snoopy-floaties">
-            <div className="sfloat sfloat-note1">♪</div>
-            <div className="sfloat sfloat-note2">♫</div>
-            <div className="sfloat sfloat-note3">♪</div>
-            <div className="sfloat sfloat-note4">♩</div>
-            <div className="sfloat sfloat-note5">♬</div>
-            <div className="sfloat sfloat-star1">⭐</div>
-            <div className="sfloat sfloat-star2">✨</div>
-            <div className="sfloat sfloat-heart">💕</div>
-            <div className="sfloat sfloat-heart2">❤️</div>
-            <div className="sfloat sfloat-joy">💛</div>
-          </div>
+              <div className="bg-ground"></div>
+            </>
+          )}
         </div>
+      </div>
 
+      <div className="login-box">
         <div style={{textAlign: 'center', marginBottom: '25px', zIndex: 10, position: 'relative'}}>
           <div className="login-earth"></div>
           <h2 style={{fontFamily: 'var(--font-sans)', color: 'var(--text-main)', fontSize: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}}>
@@ -1327,12 +1215,25 @@ function Dashboard({ token, onLogout, region }) {
   };
 
   const [adminPtsAmount, setAdminPtsAmount] = useState(0);
+  const [selectedPlayers, setSelectedPlayers] = useState(new Set());
 
   const handleAdminAddPts = () => {
     if (!socket || !adminTarget.trim() || adminPtsAmount <= 0) return;
     socket.emit('mod_add_pts', { targetUsername: adminTarget.trim(), amount: adminPtsAmount });
     addLog(`[MOD] 給予 ${adminTarget.trim()} ${adminPtsAmount} PT`);
     setTimeout(() => socket.emit('get_all_players'), 300);
+    setAdminPtsAmount(0);
+  };
+
+  const handleAdminMassAddPts = () => {
+    if (!socket || selectedPlayers.size === 0 || adminPtsAmount <= 0) return;
+    const targets = [...selectedPlayers];
+    targets.forEach(username => {
+      socket.emit('mod_add_pts', { targetUsername: username, amount: adminPtsAmount });
+    });
+    addLog(`[MOD] 批量給予 ${targets.length} 位成員各 ${adminPtsAmount} PT (${targets.join(', ')})`);
+    setTimeout(() => socket.emit('get_all_players'), 500);
+    setSelectedPlayers(new Set());
     setAdminPtsAmount(0);
   };
 
@@ -1512,135 +1413,88 @@ function Dashboard({ token, onLogout, region }) {
       <div className="main-content">
         {/* Left Metrics Terminal */}
         <aside className="metrics-terminal floating-panel">
-          <div className="brand-banner" style={{ textAlign: 'center', paddingBottom: '15px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '15px' }}>
-            <div style={{display: 'flex', justifyContent: 'center', marginBottom: '10px'}}>
-              <Globe2 size={56} color="var(--accent-color)" className="icon-glow icon-spin" />
+          <div className="brand-banner" style={{ textAlign: 'center', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: '12px' }}>
+            <div style={{display: 'flex', justifyContent: 'center', marginBottom: '6px'}}>
+              <Globe2 size={40} color="var(--accent-color)" className="icon-glow icon-spin" />
             </div>
-            <h3 style={{margin: '0', color: 'var(--text-primary)', letterSpacing: '2px'}}>EARTH ONLINE</h3>
+            <h3 style={{margin: '0', color: 'var(--text-primary)', letterSpacing: '2px', fontSize: '1.1rem'}}>EARTH ONLINE</h3>
           </div>
 
-          <DonateBanner />
-
-          <div className="metric-group profile-card">
-            <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-              <User size={16} /> 使用者帳號 (User ID)
-            </div>
-            
-            {boundDiscord ? (
-              <div style={{display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px', cursor: 'pointer', padding: '5px', borderRadius: '8px', transition: 'background 0.2s'}} onClick={() => setShowAccountInfo(true)} className="hover-highlight">
+          <div className="metric-group" style={{padding: '10px 12px', marginBottom: '8px'}}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer'}} onClick={() => setShowAccountInfo(true)}>
+              {boundDiscord ? (
                 <img 
                   src={boundDiscord.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'} 
                   alt="" 
                   onError={(e) => { e.target.onerror = null; e.target.src = "https://cdn.discordapp.com/embed/avatars/0.png"; }}
-                  style={{width: '48px', height: '48px', minWidth: '48px', minHeight: '48px', borderRadius: '50%', border: '2px solid var(--accent-color)', objectFit: 'cover'}} 
+                  style={{width: '40px', height: '40px', borderRadius: '50%', border: '2px solid var(--accent-color)', objectFit: 'cover'}} 
                 />
-                <div style={{overflow: 'hidden'}}>
-                  <div style={{color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{boundDiscord.username || myNode?.username}</div>
-                  <div style={{color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
-                    <LinkIcon size={14} color="var(--accent-color)" /> 已連結 Discord
+              ) : (
+                <div style={{width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--border-color)'}}>
+                  <User size={20} color="var(--text-secondary)" />
+                </div>
+              )}
+              <div style={{flex: 1, overflow: 'hidden'}}>
+                <div style={{color: 'var(--text-main)', fontWeight: 'bold', fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{myNode?.username}</div>
+                {boundDiscord ? (
+                  <div style={{color: 'var(--text-secondary)', fontSize: '0.8rem'}}>
+                    <LinkIcon size={12} color="var(--accent-color)" style={{marginRight: '4px'}}/>
+                    已連結 Discord
                   </div>
-                </div>
+                ) : (
+                  <a href="#" onClick={(e) => { e.preventDefault(); setShowDiscordModal(true); }} style={{fontSize: '0.8rem', color: 'var(--info-color)'}}>
+                    連結 Discord
+                  </a>
+                )}
               </div>
-            ) : (
-              <div style={{display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px', cursor: 'pointer', padding: '5px', borderRadius: '8px', transition: 'background 0.2s'}} onClick={() => setShowAccountInfo(true)} className="hover-highlight">
-                <div style={{width: '48px', height: '48px', minWidth: '48px', minHeight: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--border-color)'}}>
-                  <User size={24} color="var(--text-secondary)" />
-                </div>
-                <div style={{overflow: 'hidden'}}>
-                  <div style={{color: 'var(--text-main)', fontSize: '1.2rem', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{myNode?.username}</div>
-                  <div style={{marginTop: '5px'}}>
-                    <a href="#" onClick={(e) => { e.preventDefault(); setShowDiscordModal(true); }} className="discord-link" style={{fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 8px', background: 'rgba(88, 101, 242, 0.2)', color: 'var(--info-color)', borderRadius: '4px', textDecoration: 'none', whiteSpace: 'nowrap'}}>
-                      <LinkIcon size={14} /> 立即連結 Discord
-                    </a>
-                  </div>
-                </div>
-              </div>
+            </div>
+            <div style={{display: 'flex', gap: '12px', marginTop: '10px', fontSize: '0.8rem', color: 'var(--text-secondary)'}}>
+              <div><span style={{color: '#888'}}>ping </span><strong style={{color: 'var(--text-main)'}}>{ping}ms</strong></div>
+              <div><span style={{color: '#888'}}>session </span><strong style={{color: '#00ffaa'}}>{formatTime(sessionTime)}</strong></div>
+              <div><span style={{color: '#888'}}>status </span><strong style={{color: isConnected ? 'var(--success-color)' : 'var(--danger-color)'}}>{isConnected ? 'on' : 'off'}</strong></div>
+            </div>
+          </div>
+
+          <div style={{display: 'flex', gap: '10px', marginBottom: '8px'}}>
+            <div className="metric-group" style={{flex: 1, padding: '10px 12px'}}>
+              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>上線人數</div>
+              <div style={{fontSize: '1.3rem', fontWeight: 'bold', color: 'var(--success-color)'}}>{globalStats.activeUsers}</div>
+            </div>
+            <div className="metric-group" style={{flex: 1, padding: '10px 12px'}}>
+              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>倍率</div>
+              <div style={{fontSize: '1.3rem', fontWeight: 'bold', color: globalStats.multiplier > 1.0 ? 'var(--accent-color)' : 'var(--text-main)'}}>{globalStats.multiplier?.toFixed(1) || '1.0'}x</div>
+            </div>
+            <div className="metric-group" style={{flex: 1, padding: '10px 12px'}}>
+              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>生命</div>
+              <div style={{fontSize: '1.3rem', fontWeight: 'bold', color: calculateHealthPercentage(lifespan) > 30 ? 'var(--accent-color)' : 'var(--danger-color)'}}>{Math.floor(calculateHealthPercentage(lifespan))}%</div>
+            </div>
+          </div>
+
+          <div className="metric-group" style={{padding: '10px 12px', marginBottom: '8px'}}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px'}}>
+              <span style={{fontSize: '0.8rem', color: '#888'}}>總生存時間</span>
+              <span style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--accent-color)'}}>{formatTime(lifespan)}</span>
+            </div>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+              <span style={{fontSize: '0.8rem', color: '#888'}}>累積點數</span>
+              <span style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--text-main)'}}>{(myNode?.accumulatedBonusPoints || 0).toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div style={{display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '8px'}}>
+            <div style={{fontSize: '0.8rem', color: '#888', marginBottom: '4px'}}>伺服器：{region === 'asia' ? '亞洲' : region === 'us' ? '美洲' : '歐洲'} | node: {myNode?.userId} | {myNode?.country || '--'}</div>
+            {globalStats.multiplier > 1.0 && (
+              <div style={{fontSize: '0.8rem', color: 'var(--accent-color)'}}>🔥 超載中：{globalStats.activeUsers} / 5 人</div>
             )}
-            
-            <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '15px', background: 'var(--bg-light)', padding: '10px', borderRadius: '8px', lineHeight: '1.8'}}>
-              <div>node-id: {myNode?.userId}</div>
-              <div>ip: {myNode?.ip}</div>
-              <div>region: {myNode?.country?.toLowerCase()}</div>
-              <div>延遲 (ping): {ping} ms</div>
-              <div>伺服器狀態: {isConnected ? '連線穩定' : '中斷'}</div>
-              <div style={{marginTop: '6px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.08)'}}>
-                <span style={{color: 'var(--text-secondary)'}}>所在伺服器: </span>
-                <strong style={{color: 'var(--accent-color)'}}>
-                  {region === 'asia' ? '🌏 亞洲伺服器 (Asia)' : region === 'us' ? '🌎 美洲伺服器 (US)' : '🌍 歐洲伺服器 (EU)'}
-                </strong>
-              </div>
-              <div style={{marginTop: '4px'}}>
-                <span style={{color: 'var(--text-secondary)'}}>本次上線: </span>
-                <strong style={{color: '#00ffaa'}}>{formatTime(sessionTime)}</strong>
-              </div>
-            </div>
-          </div>
-          
-          <div className="metric-group">
-            <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-              <Activity size={16} /> 總生存時間 (Total Lifespan)
-            </div>
-            <div style={{color: 'var(--accent-color)', fontSize: '1.5rem', fontWeight: 'bold'}}>
-              {formatTime(lifespan)}
-            </div>
           </div>
 
-          <div className="metric-group" style={{ marginBottom: '20px' }}>
-            <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px'}}>
-              <Activity size={16} /> 健康狀態 (Health Status)
-            </div>
-            <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
-              <div style={{ 
-                width: `${calculateHealthPercentage(lifespan)}%`, 
-                height: '100%', 
-                background: calculateHealthPercentage(lifespan) > 30 ? 'var(--accent-color)' : 'var(--danger-color)',
-                transition: 'width 1s linear'
-              }}></div>
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '5px', textAlign: 'right' }}>
-              {Math.floor(calculateHealthPercentage(lifespan))}%
-            </div>
-          </div>
-
-          <div className="metric-group">
-            <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-              <Server size={16} /> 網路連線狀態 (Network)
-            </div>
-            <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)'}}>
-              連線延遲 (Ping): {ping} ms<br/>
-              上傳 (Uplink): {globalStats.systemHardware?.uplink || 0} KB/s<br/>
-              下載 (Downlink): {globalStats.systemHardware?.downlink || 0} KB/s<br/>
-              封包遺失 (Loss): {(globalStats.systemHardware?.loss || 0).toFixed(2)}%
-            </div>
-          </div>
-
-          <div className="metric-group" style={{ 
-            border: globalStats.multiplier > 1.0 ? '1px solid var(--accent-color)' : '1px solid rgba(255,255,255,0.1)',
-            transition: 'border 0.3s'
-          }}>
-            <div className="metric-title" style={{display: 'flex', alignItems: 'center', gap: '8px', color: globalStats.multiplier > 1.0 ? 'var(--accent-color)' : 'var(--text-primary)'}}>
-              🔥 區間群聚超載系統
-            </div>
-            <div style={{fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '8px'}}>
-              當前伺服器共同在線掛機人數：<strong style={{color: globalStats.activeUsers >= 5 ? 'var(--accent-color)' : 'inherit'}}>{globalStats.activeUsers} / 5 人</strong>
-            </div>
-            <div style={{fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '4px'}}>
-              後台點數產出倍率：<strong style={{color: globalStats.multiplier > 1.0 ? 'var(--accent-color)' : 'inherit'}}>{globalStats.multiplier?.toFixed(1) || '1.0'}x</strong>
-            </div>
-          </div>
-
-          <div style={{ marginTop: 'auto', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <button className="terminal-btn" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'rgba(255,215,0,0.1)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.3)'}} onClick={() => setShowLeaderboard(true)}>
-              <Activity size={16} /> 全球節點排行榜 (Leaderboard)
+          <div style={{ marginTop: 'auto', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(255,215,0,0.1)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.3)'}} onClick={() => setShowLeaderboard(true)}>
+              <Activity size={14} /> 排行榜
             </button>
-            <button className="terminal-btn" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}} onClick={() => setShowAboutModal(true)}>
-              <Info size={16} /> 檔案說明與系統資訊
+            <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'}} onClick={() => setShowAboutModal(true)}>
+              <Info size={14} /> 系統資訊
             </button>
-            {!window.electronAPI && (
-              <a href="https://drive.google.com/uc?export=download&id=1Xji_z7dB5Q16FfSyRvnm2mXqn3n0cAQ2" target="_blank" rel="noopener noreferrer" className="terminal-btn" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: 'rgba(0, 255, 170, 0.1)', color: '#00ffaa', border: '1px solid rgba(0, 255, 170, 0.3)', textDecoration: 'none'}}>
-                <Monitor size={16} /> 下載專屬電腦版 (Discord 連動)
-              </a>
-            )}
           </div>
         </aside>
 
@@ -1963,7 +1817,11 @@ function Dashboard({ token, onLogout, region }) {
                         fontSize: '0.82rem', outline: 'none', marginBottom: '8px',
                       }}
                     />
-                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#94a3b8', fontSize: '0.72rem', cursor: 'pointer', marginRight: '4px' }}>
+                        <input type="checkbox" checked={filtered.length > 0 && selectedPlayers.size === filtered.length} onChange={e => { if (e.target.checked) { setSelectedPlayers(new Set(filtered.map(p => p.username))); } else { setSelectedPlayers(new Set()); } }} style={{ accentColor: '#ef4444' }} />
+                        全選
+                      </label>
                       {[['all','全部'],['online','在線'],['muted','禁言'],['banned','封鎖']].map(([val, label]) => (
                         <button key={val} onClick={() => setAdminPlayerFilter(val)} style={{
                           padding: '3px 9px', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer',
@@ -1991,31 +1849,33 @@ function Dashboard({ token, onLogout, region }) {
                     {filtered.map(p => (
                       <div
                         key={p.username}
-                        onClick={() => setAdminTarget(p.username)}
                         style={{
-                          padding: '9px 12px', cursor: 'pointer',
+                          padding: '6px 12px',
                           borderBottom: '1px solid rgba(255,255,255,0.04)',
-                          background: adminTarget === p.username ? 'rgba(239,68,68,0.12)' : 'transparent',
+                          background: selectedPlayers.has(p.username) ? 'rgba(34,197,94,0.08)' : adminTarget === p.username ? 'rgba(239,68,68,0.12)' : 'transparent',
                           borderLeft: adminTarget === p.username ? '3px solid #ef4444' : '3px solid transparent',
                           transition: 'all 0.15s',
                           display: 'flex', alignItems: 'center', gap: '8px',
                         }}
                       >
-                        {/* Online dot */}
-                        <span style={{
-                          width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
-                          background: p.online ? '#22c55e' : '#334155',
-                          boxShadow: p.online ? '0 0 6px #22c55e' : 'none',
-                        }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{
-                            color: adminTarget === p.username ? '#f87171' : '#e2e8f0',
-                            fontWeight: '600', fontSize: '0.85rem',
-                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                          }}>
-                            {p.username}
-                            {p.role === 'admin' && <span style={{ marginLeft: '5px', color: '#ef4444', fontSize: '0.65rem' }}>[ADMIN]</span>}
-                            {p.role === 'moderator' && <span style={{ marginLeft: '5px', color: '#f59e0b', fontSize: '0.65rem' }}>[MOD]</span>}
+                        <input type="checkbox" checked={selectedPlayers.has(p.username)} onChange={e => { const next = new Set(selectedPlayers); if (e.target.checked) { next.add(p.username); } else { next.delete(p.username); } setSelectedPlayers(next); }} onClick={e => e.stopPropagation()} style={{ accentColor: '#22c55e', flexShrink: 0 }} />
+                        <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => setAdminTarget(p.username)}>
+                          {/* Online dot + name row */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{
+                              width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
+                              background: p.online ? '#22c55e' : '#334155',
+                              boxShadow: p.online ? '0 0 6px #22c55e' : 'none',
+                            }} />
+                            <span style={{
+                              color: selectedPlayers.has(p.username) ? '#4ade80' : adminTarget === p.username ? '#f87171' : '#e2e8f0',
+                              fontWeight: '600', fontSize: '0.85rem',
+                              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                            }}>
+                              {p.username}
+                              {p.role === 'admin' && <span style={{ marginLeft: '5px', color: '#ef4444', fontSize: '0.65rem' }}>[ADMIN]</span>}
+                              {p.role === 'moderator' && <span style={{ marginLeft: '5px', color: '#f59e0b', fontSize: '0.65rem' }}>[MOD]</span>}
+                            </span>
                           </div>
                           <div style={{ display: 'flex', gap: '6px', marginTop: '2px', alignItems: 'center' }}>
                             <span style={{ color: '#475569', fontSize: '0.68rem' }}>{p.country}</span>
@@ -2033,10 +1893,50 @@ function Dashboard({ token, onLogout, region }) {
 
                 {/* Right: Action Panel */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                  {!adminTarget ? (
+                  {!adminTarget && selectedPlayers.size === 0 ? (
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#334155', gap: '8px' }}>
                       <Shield size={40} color="#1e293b" />
-                      <span style={{ fontSize: '0.9rem' }}>← 從左側選取一位玩家</span>
+                      <span style={{ fontSize: '0.9rem' }}>← 從左側選取玩家</span>
+                    </div>
+                  ) : selectedPlayers.size > 0 ? (
+                    <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '12px',
+                        marginBottom: '20px', padding: '14px',
+                        background: 'rgba(34,197,94,0.07)', borderRadius: '10px',
+                        border: '1px solid rgba(34,197,94,0.3)',
+                      }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ color: '#4ade80', fontWeight: '700', fontSize: '1.1rem' }}>
+                            已選取 {selectedPlayers.size} 位成員
+                          </div>
+                          <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '4px' }}>
+                            {[...selectedPlayers].join(', ')}
+                          </div>
+                        </div>
+                        <button onClick={() => setSelectedPlayers(new Set())} style={{
+                          background: 'transparent', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.8rem',
+                        }}>清除選取</button>
+                      </div>
+
+                      {/* Mass Give PT */}
+                      <div style={{ marginBottom: '14px' }}>
+                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>批量發布點數 MASS GIVE PT</div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                          <input type="number" value={adminPtsAmount} onChange={e => setAdminPtsAmount(Math.max(0, parseInt(e.target.value) || 0))} min="1" max="100000" placeholder="數量" style={{ width: '100px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', padding: '6px 8px', borderRadius: '6px', outline: 'none', fontSize: '0.82rem' }} />
+                          <span style={{ color: '#64748b', fontSize: '0.78rem' }}>× {selectedPlayers.size} 人 = {(adminPtsAmount * selectedPlayers.size).toLocaleString()} PT</span>
+                          <button onClick={handleAdminMassAddPts} disabled={adminPtsAmount <= 0} style={{
+                            background: adminPtsAmount > 0 ? '#22c55e' : '#334155',
+                            color: adminPtsAmount > 0 ? '#000' : '#64748b',
+                            border: 'none', padding: '6px 20px', borderRadius: '6px', cursor: adminPtsAmount > 0 ? 'pointer' : 'not-allowed',
+                            fontSize: '0.82rem', fontWeight: '600', marginLeft: 'auto',
+                          }}>批量發送</button>
+                        </div>
+                      </div>
+
+                      <div style={{ marginTop: '24px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)', color: '#475569', fontSize: '0.75rem', lineHeight: 1.6 }}>
+                        ⚠ 將對全部 {selectedPlayers.size} 位已選取成員各發送 {adminPtsAmount} PT，請確認後再操作。
+                      </div>
                     </div>
                   ) : (
                     <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>

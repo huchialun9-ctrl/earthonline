@@ -1131,6 +1131,49 @@ regions.forEach(regionName => {
     }
   });
 
+  // Moderation: Ban user (moderator+ only)
+  socket.on('mod_ban_user', async (data) => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    try {
+      const dbUser = await User.findOne({ username: user.username }, 'role');
+      if (!dbUser || dbUser.role === 'user') return;
+      const duration = Math.min(data.duration || 1440, 43200);
+      const targetUser = await User.findOneAndUpdate(
+        { username: data.targetUsername },
+        { $set: { bannedUntil: Date.now() + duration * 60000 } },
+        { new: true }
+      );
+      if (!targetUser) {
+        socket.emit('terminal_response', `[MOD] 找不到使用者 ${data.targetUsername}`);
+        return;
+      }
+      nspIo.emit('chat_system_message', { message: `[系統] 使用者 ${data.targetUsername} 已被管理員封鎖 ${duration} 分鐘` });
+      for (const [sid, u] of connectedUsers.entries()) {
+        if (u.username === data.targetUsername) {
+          nspIo.to(sid).emit('chat_banned', { message: `您已被管理員封鎖 ${duration} 分鐘。` });
+          break;
+        }
+      }
+    } catch (err) {
+      console.error('[MOD] ban_user error:', err);
+    }
+  });
+
+  // Moderation: Unban user (moderator+ only)
+  socket.on('mod_unban_user', async (data) => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    try {
+      const dbUser = await User.findOne({ username: user.username }, 'role');
+      if (!dbUser || dbUser.role === 'user') return;
+      await User.updateOne({ username: data.targetUsername }, { $set: { bannedUntil: null } });
+      nspIo.emit('chat_system_message', { message: `[系統] 使用者 ${data.targetUsername} 已被管理員解除封鎖` });
+    } catch (err) {
+      console.error('[MOD] unban_user error:', err);
+    }
+  });
+
   // Friend System Handlers
   const isUserOnline = (username) => {
     for (const [id, user] of connectedUsers.entries()) {

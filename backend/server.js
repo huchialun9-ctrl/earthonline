@@ -475,26 +475,6 @@ apiRouter.get('/leaderboard', async (req, res) => {
   }
 });
 
-apiRouter.get('/global/stats', async (req, res, next) => {
-  try {
-    const region = req.params.region || 'asia';
-    const pop = await db.getRegionPopulation(region);
-    const state = regionStates[region] || regionStates['asia'];
-    res.json({
-      totalActiveUsers: state ? state.activeUsers : 0,
-      totalPopulation: pop,
-      globalProduction: state ? state.globalProduction : 0,
-      socialCompression: state ? state.socialCompression : '1.000',
-      multiplier: state ? state.multiplier : 1.0
-    });
-  } catch (err) {
-    console.error('[SYS] /global/stats error:', err);
-    res.status(500).json({ error: 'Failed to fetch global stats' });
-  }
-});
-
-});
-
 app.get('/api/global/stats', async (req, res, next) => {
   try {
     const region = 'asia';
@@ -922,12 +902,30 @@ regions.forEach(regionName => {
   });
 
   // Handle World Chat
-  socket.on('send_chat', (data) => {
+  socket.on('send_chat', async (data) => {
     const user = connectedUsers.get(socket.id);
     if (!user) return;
     
-    const message = (data.message || '').trim().substring(0, 200); // Max length 200
+    // Rate limit: 1 message per 2 seconds
+    const now = Date.now();
+    if (user._lastChat && now - user._lastChat < 2000) return;
+    user._lastChat = now;
+    
+    const message = (data.message || '').trim().substring(0, 200);
     if (!message) return;
+    
+    // Require Discord binding or email verification to chat
+    try {
+      const dbUser = await User.findOne({ username: user.username }, 'discord isEmailVerified');
+      if (!dbUser) return;
+      if (!dbUser.discord?.id && !dbUser.isEmailVerified) {
+        socket.emit('chat_verification_required', { message: '請先綁定 Discord 或驗證電子郵件後才能使用世界聊天。' });
+        return;
+      }
+    } catch (err) {
+      console.error('[CHAT] Verification check error:', err);
+      return;
+    }
     
     io.emit('chat_message', { username: user.username, message: message });
     console.log(`[CHAT] ${user.username}: ${message}`);

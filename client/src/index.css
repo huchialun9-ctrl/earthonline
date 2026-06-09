@@ -278,141 +278,246 @@ body {
   background-image: radial-gradient(circle at center, var(--surface-color) 0%, var(--bg-color) 100%);
 }
 
-/* Advanced Login Animation */
-.anim-container {
+/* Cartoon Screen-Off Style Animations */
+.cartoon-container {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: radial-gradient(ellipse at center, rgba(0,40,80,0.3) 0%, transparent 70%);
-}
-
-.anim-core {
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #00ffcc, #0066ff, #003366);
-  box-shadow: 0 0 60px rgba(0,255,204,0.4), 0 0 120px rgba(0,102,255,0.2), 0 0 200px rgba(0,255,204,0.1);
-  animation: corePulse 3s ease-in-out infinite;
-}
-
-@keyframes corePulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
-  50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-}
-
-.anim-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  border-radius: 50%;
-  border: 1px solid rgba(0,255,204,0.3);
-  animation: ringExpand 4s ease-out infinite;
+  background: radial-gradient(ellipse at center, rgba(255,200,230,0.15) 0%, rgba(200,230,255,0.08) 50%, transparent 80%);
   pointer-events: none;
 }
 
-.anim-ring-1 { width: 160px; height: 160px; margin: -80px; animation-delay: 0s; }
-.anim-ring-2 { width: 240px; height: 240px; margin: -120px; animation-delay: 1.3s; border-color: rgba(0,102,255,0.2); }
-.anim-ring-3 { width: 320px; height: 320px; margin: -160px; animation-delay: 2.6s; border-color: rgba(0,255,204,0.15); }
-
-@keyframes ringExpand {
-  0% { transform: scale(0.5); opacity: 0; }
-  50% { opacity: 0.6; }
-  100% { transform: scale(1.5); opacity: 0; }
-}
-
-.anim-particle-field {
+.cartoon-bg-shapes {
   position: absolute;
   inset: 0;
-  pointer-events: none;
 }
 
-.anim-particle {
+.cshape {
   position: absolute;
-  border-radius: 50%;
-  background: #00ffcc;
-  box-shadow: 0 0 6px #00ffcc;
-  animation: particleFloat 5s ease-in-out infinite alternate;
+  font-size: 28px;
+  animation: cfloat 8s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  user-select: none;
 }
 
-@keyframes particleFloat {
-  0% { transform: translateY(0) translateX(0); opacity: 0.2; }
-  50% { transform: translateY(-30px) translateX(10px); opacity: 0.8; }
-  100% { transform: translateY(0) translateX(-10px); opacity: 0.2; }
+.cshape-cloud1 {
+  top: 5%;
+  left: 10%;
+  font-size: 48px;
+  animation: cdrift 12s ease-in-out infinite, cpulse 4s ease-in-out infinite;
+  opacity: 0.6;
 }
 
-.anim-scanline {
-  position: absolute;
-  width: 200%;
-  height: 2px;
-  top: -2px;
-  left: -50%;
-  background: linear-gradient(90deg, transparent, rgba(0,255,204,0.6), transparent);
-  animation: scanMove 4s linear infinite;
-  pointer-events: none;
+.cshape-cloud2 {
+  top: 15%;
+  right: 15%;
+  font-size: 36px;
+  animation: cdrift2 15s ease-in-out infinite, cpulse 5s ease-in-out infinite;
+  opacity: 0.4;
+  animation-delay: 2s;
 }
 
-@keyframes scanMove {
-  0% { top: -2px; }
-  100% { top: 102%; }
+.cshape-star1 {
+  top: 20%;
+  left: 60%;
+  font-size: 22px;
+  animation: cspin 6s linear infinite, cbright 2s ease-in-out infinite;
 }
 
-.anim-pulse-ring {
-  position: absolute;
+.cshape-star2 {
+  top: 60%;
+  left: 15%;
+  font-size: 18px;
+  animation: cspin 8s linear infinite reverse, cbright 3s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.cshape-moon {
+  top: 8%;
+  right: 20%;
+  font-size: 40px;
+  animation: cmoon 10s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+.cshape-heart1 {
+  bottom: 30%;
+  left: 20%;
+  animation: cheart 6s ease-in-out infinite;
+  font-size: 24px;
+}
+
+.cshape-heart2 {
+  bottom: 20%;
+  right: 25%;
+  animation: cheart 7s ease-in-out infinite;
+  font-size: 20px;
+  animation-delay: 1.5s;
+}
+
+.cshape-smile1 {
+  top: 40%;
+  left: 8%;
+  font-size: 26px;
+  animation: cbounce 5s ease-in-out infinite;
+}
+
+.cshape-smile2 {
+  top: 35%;
+  right: 10%;
+  font-size: 22px;
+  animation: cbounce 6s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.cshape-rainbow {
+  bottom: 15%;
+  left: 40%;
+  font-size: 32px;
+  animation: crainbow 9s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+.cshape-cat {
   top: 50%;
+  left: 70%;
+  font-size: 30px;
+  animation: cwalk 10s ease-in-out infinite;
+}
+
+.cshape-dog {
+  top: 45%;
+  left: 75%;
+  font-size: 28px;
+  animation: cwalk 11s ease-in-out infinite;
+  animation-delay: 3s;
+}
+
+.cshape-butterfly1 {
+  top: 25%;
+  left: 30%;
+  font-size: 20px;
+  animation: cfly 7s ease-in-out infinite;
+}
+
+.cshape-butterfly2 {
+  top: 55%;
   left: 50%;
-  width: 200px;
-  height: 200px;
-  margin: -100px;
-  border-radius: 50%;
-  border: 2px solid rgba(0,255,204,0.15);
-  animation: pulseRingBig 2s ease-out infinite;
-  pointer-events: none;
+  font-size: 18px;
+  animation: cfly 8s ease-in-out infinite;
+  animation-delay: 2s;
 }
 
-@keyframes pulseRingBig {
-  0% { transform: scale(0.3); opacity: 0; }
-  50% { opacity: 0.5; }
-  100% { transform: scale(2.5); opacity: 0; }
-}
+.cshape-bounce1 { bottom: 10%; left: 5%; font-size: 14px; animation: cball 3s ease-in-out infinite; }
+.cshape-bounce2 { bottom: 15%; left: 15%; font-size: 14px; animation: cball 3.5s ease-in-out infinite; animation-delay: 0.5s; }
+.cshape-bounce3 { bottom: 8%; left: 30%; font-size: 14px; animation: cball 4s ease-in-out infinite; animation-delay: 1s; }
+.cshape-bounce4 { bottom: 12%; left: 55%; font-size: 14px; animation: cball 3.2s ease-in-out infinite; animation-delay: 0.3s; }
+.cshape-bounce5 { bottom: 18%; left: 70%; font-size: 14px; animation: cball 3.8s ease-in-out infinite; animation-delay: 1.5s; }
+.cshape-bounce6 { bottom: 10%; left: 85%; font-size: 14px; animation: cball 3.3s ease-in-out infinite; animation-delay: 0.8s; }
 
-.anim-grid {
+.cartoon-dots {
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(0,255,204,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,204,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  animation: gridShift 10s linear infinite;
-  pointer-events: none;
 }
 
-@keyframes gridShift {
-  0% { transform: translate(0, 0); }
-  50% { transform: translate(20px, 20px); }
-  100% { transform: translate(0, 0); }
-}
-
-.anim-glowing-orb {
+.cdot {
   position: absolute;
-  width: 300px;
-  height: 300px;
-  top: 50%;
-  left: 50%;
-  margin: -150px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(0,255,204,0.06) 0%, transparent 70%);
-  animation: orbRotate 20s linear infinite;
-  pointer-events: none;
+  animation: cdotAnim 8s ease-in-out infinite alternate;
+  opacity: 0;
+  box-shadow: 0 0 6px rgba(255,255,255,0.3);
 }
 
-@keyframes orbRotate {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.2); }
-  100% { transform: rotate(360deg) scale(1); }
+@keyframes cfloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-15px) rotate(5deg); }
+  50% { transform: translateY(-8px) rotate(-3deg); }
+  75% { transform: translateY(-20px) rotate(4deg); }
+}
+
+@keyframes cdrift {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  25% { transform: translateX(30px) translateY(-10px); }
+  50% { transform: translateX(15px) translateY(-20px); }
+  75% { transform: translateX(40px) translateY(-5px); }
+}
+
+@keyframes cdrift2 {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  25% { transform: translateX(-25px) translateY(-10px); }
+  50% { transform: translateX(-10px) translateY(-15px); }
+  75% { transform: translateX(-30px) translateY(-8px); }
+}
+
+@keyframes cpulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes cspin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes cbright {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes cmoon {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(5deg); }
+  66% { transform: translateY(5px) rotate(-3deg); }
+}
+
+@keyframes cheart {
+  0%, 100% { transform: scale(1) translateY(0); }
+  30% { transform: scale(1.15) translateY(-8px); }
+  60% { transform: scale(1) translateY(-3px); }
+}
+
+@keyframes cbounce {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-18px); }
+  60% { transform: translateY(-5px); }
+}
+
+@keyframes crainbow {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.5; }
+  25% { transform: translateY(-12px) rotate(5deg); opacity: 0.8; }
+  50% { transform: translateY(-5px) rotate(-5deg); opacity: 0.6; }
+  75% { transform: translateY(-18px) rotate(3deg); opacity: 0.9; }
+}
+
+@keyframes cwalk {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  20% { transform: translateX(20px) translateY(-5px); }
+  40% { transform: translateX(40px) translateY(0); }
+  60% { transform: translateX(60px) translateY(-3px); }
+  80% { transform: translateX(80px) translateY(0); }
+}
+
+@keyframes cfly {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(30px, -20px) rotate(10deg); }
+  50% { transform: translate(60px, -5px) rotate(-5deg); }
+  75% { transform: translate(30px, -25px) rotate(8deg); }
+}
+
+@keyframes cball {
+  0%, 100% { transform: translateY(0) scale(1); }
+  20% { transform: translateY(-40px) scale(0.95); }
+  40% { transform: translateY(-10px) scale(1); }
+  60% { transform: translateY(-30px) scale(0.95); }
+  80% { transform: translateY(-5px) scale(1); }
+}
+
+@keyframes cdotAnim {
+  0% { transform: translateY(20px) scale(0); opacity: 0; }
+  20% { opacity: 0.6; }
+  50% { transform: translateY(-20px) scale(1); opacity: 0.8; }
+  80% { opacity: 0.4; }
+  100% { transform: translateY(-40px) scale(0.5); opacity: 0; }
 }
 
 .icon-spin {

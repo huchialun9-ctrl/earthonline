@@ -15,6 +15,9 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const os = require('os');
 
+// Filtered words for chat moderation
+const FILTERED_WORDS = ['fuck', 'shit', 'asshole', 'bitch', 'damn', 'cao', '幹', '靠北', '操你媽', 'fucking', 'stupid', 'idiot', 'nigger', 'bastard', 'piss off', 'suck my', 'motherfucker'];
+
 // Run offline time migration once on startup
 db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', err));
 
@@ -48,6 +51,15 @@ async function sendDiscordWebhook(message) {
   } catch (err) {
     console.error('[SYS] Discord Webhook error:', err);
   }
+}
+
+function obfuscateIp(ip) {
+  if (!ip) return '0.0.0.0';
+  const ipv4Match = ip.match(/^(\d{1,3}\.\d{1,3})\.\d{1,3}\.\d{1,3}$/);
+  if (ipv4Match) return ipv4Match[1] + '.x.x';
+  const ipv6Match = ip.match(/^([0-9a-f:]+:[0-9a-f:]+):/i);
+  if (ipv6Match) return ipv6Match[1] + ':xxxx:xxxx';
+  return 'x.x.x.x';
 }
 
 // Daily world flux report (runs after regions are initialized)
@@ -475,26 +487,6 @@ apiRouter.get('/leaderboard', async (req, res) => {
   }
 });
 
-apiRouter.get('/global/stats', async (req, res, next) => {
-  try {
-    const region = req.params.region || 'asia';
-    const pop = await db.getRegionPopulation(region);
-    const state = regionStates[region] || regionStates['asia'];
-    res.json({
-      totalActiveUsers: state ? state.activeUsers : 0,
-      totalPopulation: pop,
-      globalProduction: state ? state.globalProduction : 0,
-      socialCompression: state ? state.socialCompression : '1.000',
-      multiplier: state ? state.multiplier : 1.0
-    });
-  } catch (err) {
-    console.error('[SYS] /global/stats error:', err);
-    res.status(500).json({ error: 'Failed to fetch global stats' });
-  }
-});
-
-});
-
 app.get('/api/global/stats', async (req, res, next) => {
   try {
     const region = 'asia';
@@ -842,6 +834,7 @@ regions.forEach(regionName => {
         username: decoded.username,
         discordProfile: dbUser?.discord || null,
         ip: ip,
+        ipObfuscated: obfuscateIp(ip),
         country: geo.country,
         lat: geo.ll[0] + (Math.random() - 0.5) * 0.1,
         lon: geo.ll[1] + (Math.random() - 0.5) * 0.1,
@@ -878,7 +871,7 @@ regions.forEach(regionName => {
         userId: user.id,
         username: user.username,
         discordProfile: user.discordProfile,
-        ip: user.ip,
+        ip: user.ipObfuscated,
         country: user.country,
         lat: user.lat,
         lon: user.lon,

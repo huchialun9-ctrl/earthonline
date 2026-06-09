@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema({
     username: String,
     avatar: String
   },
+  role: { type: String, enum: ['user', 'moderator', 'admin'], default: 'user' },
+  mutedUntil: { type: Number, default: null },
+  bannedUntil: { type: Number, default: null },
   registerIp: { type: String },
   recoveryKey: { type: String },
   email: { type: String, sparse: true, unique: true },

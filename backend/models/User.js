@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema({
     username: String,
     avatar: String
   },
+  role: { type: String, enum: ['user', 'moderator', 'admin'], default: 'user' },
+  mutedUntil: { type: Number, default: null },
+  bannedUntil: { type: Number, default: null },
   registerIp: { type: String },
   recoveryKey: { type: String },
   email: { type: String, sparse: true, unique: true },
@@ -24,7 +27,8 @@ const userSchema = new mongoose.Schema({
   homeRegion: { type: String, default: 'asia' },
   health: { type: Number, default: 100 },
   inventory: { type: Map, of: Number, default: {} },
-  activeBuffs: { type: Map, of: Number, default: {} }
+  activeBuffs: { type: Map, of: Number, default: {} },
+  activeSession: { type: String, default: null }
 });
 
 userSchema.index({ 'discord.id': 1 });

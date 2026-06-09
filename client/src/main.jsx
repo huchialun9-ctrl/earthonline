@@ -35,6 +35,7 @@ class ErrorBoundary extends React.Component {
 }
 
 import { LanguageProvider } from './LanguageContext';
+import { ThemeProvider } from './ThemeContext';
 
 let savedRegion;
 try { savedRegion = sessionStorage.getItem('eo_region'); } catch(e) { savedRegion = null; }
@@ -43,9 +44,11 @@ const initialRegion = savedRegion || 'asia';
 ReactDOM.createRoot(document.getElementById('app')).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <LanguageProvider initialRegion={initialRegion}>
-        <App />
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider initialRegion={initialRegion}>
+          <App />
+        </LanguageProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   </React.StrictMode>
 );

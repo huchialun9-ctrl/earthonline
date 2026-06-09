@@ -148,21 +148,21 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
 
           {/* Social Links & Github Badge */}
           <div className="dc-social-section" style={{ display: 'flex', gap: '25px', justifyContent: 'flex-start', alignItems: 'center', marginTop: '20px', padding: '0' }}>
-            <a href="https://github.com/huchialun9-ctrl/earthonline.git" target="_blank" rel="noreferrer" style={{ transition: 'transform 0.2s', display: 'flex', alignItems: 'center', color: '#fff', textDecoration: 'none', gap: '8px' }} onMouseOver={e => e.currentTarget.style.transform='scale(1.1) rotate(-2deg)'} onMouseOut={e => e.currentTarget.style.transform='scale(1) rotate(0)'}>
+            <a href="https://github.com/huchialun9-ctrl/earthonline.git" target="_blank" rel="noreferrer" style={{ transition: 'transform 0.2s', display: 'flex', alignItems: 'center', color: 'var(--text-color)', textDecoration: 'none', gap: '8px' }} onMouseOver={e => e.currentTarget.style.transform='scale(1.1) rotate(-2deg)'} onMouseOut={e => e.currentTarget.style.transform='scale(1) rotate(0)'}>
               <GithubIcon size={28} />
               <span style={{ fontSize: '1.2rem', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>GitHub</span>
             </a>
-            <a href="https://www.threads.com/@earthonline6?xmt=AQG048ez1j6AMkcDGAG_U01pj1JoVoCFFMvWnZ5MZGYhgfk" target="_blank" rel="noreferrer" style={{ transition: 'transform 0.2s', display: 'flex', alignItems: 'center', color: '#fff', textDecoration: 'none' }} onMouseOver={e => e.currentTarget.style.transform='scale(1.1) rotate(2deg)'} onMouseOut={e => e.currentTarget.style.transform='scale(1) rotate(0)'}>
+            <a href="https://www.threads.com/@earthonline6?xmt=AQG048ez1j6AMkcDGAG_U01pj1JoVoCFFMvWnZ5MZGYhgfk" target="_blank" rel="noreferrer" style={{ transition: 'transform 0.2s', display: 'flex', alignItems: 'center', color: 'var(--text-color)', textDecoration: 'none' }} onMouseOver={e => e.currentTarget.style.transform='scale(1.1) rotate(2deg)'} onMouseOut={e => e.currentTarget.style.transform='scale(1) rotate(0)'}>
               <ThreadsIcon size={28} />
             </a>
-            <button onClick={onOpenSocial} title="社群討論" style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1rem', padding: '0', fontWeight: 'bold', marginLeft: '10px' }} onMouseOver={e => { e.currentTarget.style.transform='scale(1.05)'; e.currentTarget.style.color='#fff'; e.currentTarget.style.textShadow='0 0 8px rgba(59, 130, 246, 0.8)'; }} onMouseOut={e => { e.currentTarget.style.transform='scale(1)'; e.currentTarget.style.color='#94a3b8'; e.currentTarget.style.textShadow='none'; }}>
+            <button onClick={onOpenSocial} title="社群討論" style={{ background: 'transparent', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1rem', padding: '0', fontWeight: 'bold', marginLeft: '10px' }} onMouseOver={e => { e.currentTarget.style.transform='scale(1.05)'; e.currentTarget.style.color='var(--text-color)'; e.currentTarget.style.textShadow='0 0 8px rgba(59, 130, 246, 0.8)'; }} onMouseOut={e => { e.currentTarget.style.transform='scale(1)'; e.currentTarget.style.color='var(--text-dim)'; e.currentTarget.style.textShadow='none'; }}>
               <Users size={22} /> <span>討論區</span>
             </button>
           </div>
 
           {/* GitHub Contribution Wall */}
           <div className="dc-contribution-wall" style={{ marginTop: '10px', paddingTop: '15px', borderTop: '1px solid #2d313b' }}>
-            <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <GithubIcon size={14} /> <span>開發者貢獻紀錄</span>
             </div>
             <img 
@@ -185,10 +185,10 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
         >
           {/* Server Location Badge Sticker */}
           <Draggable nodeRef={badgeRef}>
-            <div ref={badgeRef} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(20,20,20,0.85)', padding: '10px 18px', borderRadius: '12px', border: '1px solid #2d313b', color: '#f8fafc', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10, backdropFilter: 'blur(4px)', userSelect: 'none', cursor: 'move', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+            <div ref={badgeRef} style={{ position: 'absolute', top: '20px', right: '20px', background: 'var(--panel-bg)', padding: '10px 18px', borderRadius: '12px', border: '1px solid var(--border-color)', color: 'var(--text-color)', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10, backdropFilter: 'blur(4px)', userSelect: 'none', cursor: 'move', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
               <MapPin size={18} color="#ef4444" />
               <strong style={{ fontWeight: '600' }}>Node: {currentRegion.name} {currentRegion.flag}</strong>
-              <span style={{ color: '#64748b', fontSize: '0.85rem', marginLeft: '6px', borderLeft: '1px solid #333', paddingLeft: '12px' }}>Racks: <strong style={{ color: '#fff' }}>{level < 3 ? 1 : rackCount}</strong></span>
+              <span style={{ color: 'var(--text-dim)', fontSize: '0.85rem', marginLeft: '6px', borderLeft: '1px solid var(--border-color)', paddingLeft: '12px' }}>Racks: <strong style={{ color: 'var(--text-color)' }}>{level < 3 ? 1 : rackCount}</strong></span>
             </div>
           </Draggable>
 

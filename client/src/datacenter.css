@@ -1,11 +1,11 @@
-/* Modern Data Center Visualizer CSS - Solid Realistic Theme */
+/* Modern Data Center Visualizer CSS */
 
 .dc-modern-container {
   width: 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
-  background-color: #0d0f12; /* Solid dark grey background */
+  background-color: var(--bg-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,10 +15,11 @@
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(var(--border-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
   background-size: 50px 50px;
   pointer-events: none;
+  opacity: 0.3;
 }
 
 .dc-layout {
@@ -33,14 +34,13 @@
   z-index: 10;
 }
 
-/* Solid Status Card */
 .dc-status-card {
   width: 400px;
-  background-color: #1a1c23; /* Solid, non-transparent panel */
-  border: 1px solid #2d313b;
-  border-radius: 8px; /* Less rounded for an industrial look */
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   padding: 30px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   gap: 25px;
@@ -51,24 +51,23 @@
   align-items: center;
   gap: 12px;
   padding-bottom: 15px;
-  border-bottom: 1px solid #2d313b;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .dc-card-header h2 {
   margin: 0;
   font-size: 1.15rem;
-  color: #e2e8f0;
+  color: var(--text-color);
   font-weight: 500;
   letter-spacing: 0.5px;
 }
 
-/* Level Badge styling - Realistic */
 .dc-level-badge {
   display: flex;
   align-items: center;
   gap: 20px;
-  background-color: #121419;
-  border: 1px solid #232731;
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 20px;
 }
@@ -76,29 +75,28 @@
 .level-number {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #94a3b8; /* Subtle metallic color instead of neon */
+  color: var(--text-dim);
   font-family: monospace;
 }
 
 .level-info h3 {
   margin: 0 0 4px 0;
   font-size: 1.05rem;
-  color: #f1f5f9;
+  color: var(--text-color);
 }
 
 .level-info p {
   margin: 0;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--text-dim);
 }
 
-/* Metrics - Realistic */
 .dc-metrics {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background-color: #121419;
-  border: 1px solid #232731;
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 20px;
 }
@@ -111,17 +109,16 @@
 
 .metric-row span {
   flex-grow: 1;
-  color: #94a3b8;
+  color: var(--text-dim);
   font-size: 0.9rem;
 }
 
 .data-value {
-  color: #e2e8f0 !important; /* Clean white for data */
+  color: var(--text-color) !important;
   font-size: 1rem;
   font-family: monospace;
 }
 
-/* Progress Section */
 .dc-progress-section {
   display: flex;
   flex-direction: column;
@@ -132,32 +129,31 @@
 .progress-labels {
   display: flex;
   justify-content: space-between;
-  color: #64748b;
+  color: var(--text-dim);
   font-size: 0.85rem;
 }
 
 .progress-track {
   width: 100%;
   height: 6px;
-  background: #0f1115;
-  border: 1px solid #232731;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
   border-radius: 3px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background-color: #3b82f6; /* Solid standard blue */
+  background-color: var(--accent-color);
 }
 
 .progress-hint {
   margin: 5px 0 0 0;
   font-size: 0.75rem;
-  color: #475569;
+  color: var(--text-dim);
   text-align: center;
 }
 
-/* Social Section */
 .dc-social-section {
   display: flex;
   justify-content: flex-start;
@@ -165,33 +161,36 @@
   margin-top: 15px;
   padding-top: 15px;
 }
+
 .social-btn {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background-color: #121419;
-  border: 1px solid #232731;
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  color: #94a3b8;
+  color: var(--text-dim);
   text-decoration: none;
   font-size: 0.85rem;
   transition: all 0.2s;
 }
+
 .social-btn:hover {
-  background-color: #1a1c23;
-  color: #f8fafc;
-  border-color: #3b82f6;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border-color: var(--accent-color);
 }
+
 .social-icons {
   display: flex;
   gap: 10px;
 }
+
 .icon-only {
   padding: 8px;
 }
 
-/* Right Side: Visual Area */
 .dc-visual-area {
   flex-grow: 1;
   width: 100%;
@@ -207,7 +206,6 @@
   justify-content: center;
 }
 
-/* SVG Equipment Styling */
 .svg-equipment {
   width: 300px;
   height: 300px;
@@ -229,10 +227,10 @@
   100% { opacity: 0; }
 }
 
-.led-blink-fast { animation: blink 0.3s infinite alternate; }
-.led-blink-slow { animation: blink 1s infinite alternate; }
+.led-blink-fast { animation: blinkLed 0.3s infinite alternate; }
+.led-blink-slow { animation: blinkLed 1s infinite alternate; }
 
-@keyframes blink {
+@keyframes blinkLed {
   0% { opacity: 0.1; }
   100% { opacity: 1; }
 }

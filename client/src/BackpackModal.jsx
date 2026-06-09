@@ -4,13 +4,14 @@ const ITEM_INFO = {
   liquid_nitrogen: {
     name: '液態氮冷卻瓶',
     icon: 'liquid_nitrogen.png',
-    tagLabel: 'HEALTH',
-    color: '#22c55e',
-    bg: 'rgba(34,197,94,0.10)',
-    border: 'rgba(34,197,94,0.30)',
-    shortDesc: '瞬間恢復伺服器健康度',
+    tagLabel: 'COOLING',
+    color: '#a855f7',
+    bg: 'rgba(168,85,247,0.10)',
+    border: 'rgba(168,85,247,0.30)',
+    shortDesc: '30 分鐘免疫系統維護降頻',
     effects: [
-      { text: '立即恢復 +50% 健康度' },
+      { text: '「系統維護模式」期間免疫 0.5x 降頻懲罰' },
+      { text: '維護期間健康度不衰減，並獲得額外 PT' },
     ],
   },
   quantum_cooler: {

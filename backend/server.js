@@ -798,6 +798,13 @@ regions.forEach(regionName => {
             ptPerTick *= 2;
           }
 
+          // Cooling buff: counter SYSTEM_MAINTENANCE penalty + prevent decay
+          const hasCooling = user.activeBuffs && user.activeBuffs.get('cooling') > Date.now();
+          if (hasCooling && state.currentGlobalEvent?.type === 'SYSTEM_MAINTENANCE') {
+            decay = 0;
+            ptPerTick += 0.05;
+          }
+
           timeEarned = 2000;
         }
 
@@ -880,7 +887,7 @@ regions.forEach(regionName => {
     if (!socket.user) return;
     try {
       const shopItems = {
-        'liquid_nitrogen': { cost: 200, effect: 'health', value: 50 },
+        'liquid_nitrogen': { cost: 200, effect: 'buff', type: 'cooling', duration: 1800000 },
         'quantum_cooler': { cost: 500, effect: 'health', value: 100 },
         'overclock_chip': { cost: 1500, effect: 'buff', type: 'overclock', duration: 3600000 },
         'firewall': { cost: 1000, effect: 'buff', type: 'firewall', duration: 1800000 },
@@ -908,7 +915,7 @@ regions.forEach(regionName => {
         return;
       }
 
-      const itemNames = { liquid_nitrogen: '液態氮冷卻模組', quantum_cooler: '量子冷卻器', overclock_chip: '超頻晶片', firewall: '防火牆', generator: '備用發電機', neon_strip: '霓虹燈管', flash_drive: '隨身碟' };
+      const itemNames = { liquid_nitrogen: '液態氮冷卻瓶', quantum_cooler: '量子散熱塔', overclock_chip: '超頻晶片', firewall: '防火牆', generator: '備用發電機', neon_strip: '霓虹燈管', flash_drive: '隨身碟' };
       socket.emit('buy_result', { success: true, message: `✅ 已購買「${itemNames[itemId] || itemId}」並存入背包！` });
       socket.emit('user_state_update', {
         pts: result.accumulatedBonusPoints,
@@ -925,7 +932,7 @@ regions.forEach(regionName => {
     if (!socket.user) return;
     try {
       const shopItems = {
-        'liquid_nitrogen': { effect: 'health', value: 50 },
+        'liquid_nitrogen': { effect: 'buff', type: 'cooling', duration: 1800000 },
         'quantum_cooler':  { effect: 'health', value: 100 },
         'overclock_chip':  { effect: 'buff',   type: 'overclock', duration: 3600000 },
         'firewall':        { effect: 'buff',   type: 'firewall',  duration: 1800000 },
@@ -963,7 +970,7 @@ regions.forEach(regionName => {
         if (dbUser.health <= 0) {
           // 退回背包
           await User.updateOne({ username: socket.user.username }, { $inc: { [`inventory.${itemId}`]: 1 } });
-          socket.emit('use_item_result', { success: false, message: '伺服器已死機，無法使用冷卻模組！請先用備用發電機。' });
+          socket.emit('use_item_result', { success: false, message: '伺服器已死機，無法使用散熱道具！請先用備用發電機。' });
           return;
         }
         const newHealth = Math.min(100, dbUser.health + item.value);
@@ -976,7 +983,9 @@ regions.forEach(regionName => {
         const minLabel = Math.floor(item.duration / 60000);
         message = item.type === 'overclock'
           ? `⚡ PT 收益 ×2.0 倍，持續 ${minLabel} 分鐘！`
-          : `🛡️ 防火牆啟動，${minLabel} 分鐘內免疫衰減！`;
+          : item.type === 'cooling'
+            ? `❄️ 液態氮冷卻啟動，維護期間降頻免疫，持續 ${minLabel} 分鐘！`
+            : `🛡️ 防火牆啟動，${minLabel} 分鐘內免疫衰減！`;
 
       } else if (item.effect === 'revive') {
         const dbUser = await User.findOne({ username: socket.user.username });

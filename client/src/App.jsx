@@ -190,7 +190,7 @@ function LoginGateway({ onLogin }) {
               type="button" 
               onClick={handleDiscordLogin}
               style={{
-                width: '100%', padding: '12px', background: '#5865F2', color: '#fff',
+                width: '100%', padding: '12px', background: 'var(--info-color)', color: '#fff',
                 border: 'none', borderRadius: '4px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer',
                 marginTop: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
                 fontFamily: 'monospace'
@@ -331,7 +331,7 @@ function DocumentationOverlay({ onClose }) {
             </div>
             
             <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px', marginTop: '20px', borderLeft: '4px solid #5865F2' }}>
-              <h3 style={{ color: '#5865F2', marginTop: 0, marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h3 style={{ color: 'var(--info-color)', marginTop: 0, marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 桌面版專屬功能
               </h3>
               <ul style={{ color: 'var(--text-secondary)', lineHeight: '1.8', margin: 0, paddingLeft: '20px' }}>
@@ -350,7 +350,7 @@ function DocumentationOverlay({ onClose }) {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '10px',
-                    background: '#5865F2',
+                    background: 'var(--info-color)',
                     color: 'white',
                     padding: '12px 24px',
                     borderRadius: '8px',
@@ -1132,18 +1132,18 @@ function Dashboard({ token, onLogout, region }) {
         </div>
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {!window.electronAPI && (
-            <a href="https://drive.google.com/uc?export=download&id=1Xji_z7dB5Q16FfSyRvnm2mXqn3n0cAQ2" target="_blank" rel="noopener noreferrer" style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 16px', background: '#10b981', color: 'white', border: 'none', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)', fontSize: '0.9rem'}}>
+            <a href="https://drive.google.com/uc?export=download&id=1Xji_z7dB5Q16FfSyRvnm2mXqn3n0cAQ2" target="_blank" rel="noopener noreferrer" style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 16px', background: 'var(--success-color)', color: 'white', border: 'none', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)', fontSize: '0.9rem'}}>
               <Monitor size={16} /> 下載專屬電腦版
             </a>
           )}
           <div className="system-stats" style={{display: 'flex', alignItems: 'center', gap: '15px', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem'}}>
             <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
-              <span style={{color: '#94a3b8'}}>上線人數:</span> <strong style={{color: '#10b981'}}>{globalStats.activeUsers}</strong>
+              <span style={{color: '#64748b'}}>上線人數:</span> <strong style={{color: 'var(--success-color)'}}>{globalStats.activeUsers}</strong>
             </div>
             <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
-              <span style={{color: '#94a3b8'}}>{t('總人口')}:</span> <strong style={{color: '#e2e8f0'}}>{globalStats.totalPopulation}</strong>
+              <span style={{color: '#64748b'}}>{t('總人口')}:</span> <strong style={{color: '#e2e8f0'}}>{globalStats.totalPopulation}</strong>
             </div>
-            {!isConnected && <span style={{color: '#ef4444', fontWeight: 'bold'}}>[已斷線]</span>}
+            {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[已斷線]</span>}
           </div>
 
           <div className={`header-dropdown${dropdownOpen ? ' open' : ''}`} ref={dropdownRef}>
@@ -1170,7 +1170,7 @@ function Dashboard({ token, onLogout, region }) {
               <button className="dropdown-item" onClick={() => { setShowThemeMenu(!showThemeMenu); setDropdownOpen(false); }}>
                 <Palette size={16} /> 主題配色 (Themes)
               </button>
-              <a href="https://discord.gg/6P6NG49Mus" target="_blank" rel="noreferrer" className="dropdown-item" style={{color: '#5865F2'}} onClick={() => setDropdownOpen(false)}>
+              <a href="https://discord.gg/6P6NG49Mus" target="_blank" rel="noreferrer" className="dropdown-item" style={{color: 'var(--info-color)'}} onClick={() => setDropdownOpen(false)}>
                 <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.58,67.58,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
                 官方 Discord
               </a>
@@ -1224,7 +1224,7 @@ function Dashboard({ token, onLogout, region }) {
                 <div style={{overflow: 'hidden'}}>
                   <div style={{color: 'var(--text-main)', fontSize: '1.2rem', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{myNode?.username}</div>
                   <div style={{marginTop: '5px'}}>
-                    <a href="#" onClick={(e) => { e.preventDefault(); setShowDiscordModal(true); }} className="discord-link" style={{fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 8px', background: 'rgba(88, 101, 242, 0.2)', color: '#5865F2', borderRadius: '4px', textDecoration: 'none', whiteSpace: 'nowrap'}}>
+                    <a href="#" onClick={(e) => { e.preventDefault(); setShowDiscordModal(true); }} className="discord-link" style={{fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 8px', background: 'rgba(88, 101, 242, 0.2)', color: 'var(--info-color)', borderRadius: '4px', textDecoration: 'none', whiteSpace: 'nowrap'}}>
                       <LinkIcon size={14} /> 立即連結 Discord
                     </a>
                   </div>
@@ -1329,7 +1329,7 @@ function Dashboard({ token, onLogout, region }) {
                 </div>
                 <div className="overlay-value">{formatTime(globalStats.globalProduction)}</div>
               </div>
-              <div style={{width: '1px', background: 'var(--border-color)'}}></div>
+              <div style={{width: '1px', background: '#1e293b'}}></div>
               <div className="overlay-item">
                 <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
                   <Server size={16} /> 伺服器即時負載
@@ -1338,7 +1338,7 @@ function Dashboard({ token, onLogout, region }) {
                   {globalStats.totalPopulation > 0 ? ((globalStats.activeUsers / globalStats.totalPopulation) * 100).toFixed(1) : 0}%
                 </div>
               </div>
-              <div style={{width: '1px', background: 'var(--border-color)'}}></div>
+              <div style={{width: '1px', background: '#1e293b'}}></div>
               <div className="overlay-item">
                 <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
                   <Network size={16} /> 連線延遲 (Ping)
@@ -1367,7 +1367,7 @@ function Dashboard({ token, onLogout, region }) {
               {logs.map((log, i) => {
                 let logColor = 'inherit';
                 if (log.isChat) logColor = '#FFF';
-                if (log.isDiscordChat) logColor = '#5865F2';
+                if (log.isDiscordChat) logColor = 'var(--info-color)';
                 if (log.isWarning) logColor = 'var(--danger-color)';
                 
                 return (
@@ -1517,7 +1517,7 @@ function Dashboard({ token, onLogout, region }) {
       {showDiscordModal && (
         <div className="modal-overlay">
           <div className="modal-content" style={{maxWidth: '500px'}}>
-            <h3 style={{marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#5865F2'}}>
+            <h3 style={{marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--info-color)'}}>
               <LinkIcon /> 連結 Discord 帳號
             </h3>
             
@@ -1530,7 +1530,7 @@ function Dashboard({ token, onLogout, region }) {
                 <div style={{display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center'}}>
                   <a href="#" onClick={(e) => { e.preventDefault(); setShowManualBind(true); }} style={{color: '#888', fontSize: '0.85rem', marginRight: 'auto', textDecoration: 'underline'}}>無法使用授權？點此手動綁定</a>
                   <button type="button" onClick={() => setShowDiscordModal(false)} className="terminal-btn" style={{padding: '10px 15px', background: 'rgba(255,255,255,0.1)'}}>取消</button>
-                  <button onClick={handleBindDiscord} className="terminal-btn" style={{padding: '10px 20px', background: '#5865F2', color: '#fff', border: 'none', fontWeight: 'bold'}}>
+                  <button onClick={handleBindDiscord} className="terminal-btn" style={{padding: '10px 20px', background: 'var(--info-color)', color: '#fff', border: 'none', fontWeight: 'bold'}}>
                     🔗 前往 Discord 官方授權
                   </button>
                 </div>
@@ -1724,53 +1724,53 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
         fontFamily: 'var(--font-sans)', color: 'var(--text-main)', position: 'relative'
       }}>
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', paddingBottom: '15px', borderBottom: '1px solid rgba(255,255,255,0.06)'}}>
-          <h2 style={{margin: 0, display: 'flex', alignItems: 'center', gap: '12px', color: '#f8fafc', fontSize: '1.4rem', fontWeight: '700'}}>
+          <h2 style={{margin: 0, display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-color)', fontSize: '1.4rem', fontWeight: '700'}}>
             <User size={22} color="#3b82f6" /> 帳號設定與安全
           </h2>
           <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
             {!window.electronAPI && (
-              <a href="https://earthonline.onrender.com/downloads/EarthOnlineSetup.exe" style={{display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#10b981', textDecoration: 'none', background: 'rgba(16, 185, 129, 0.1)', padding: '6px 12px', borderRadius: '8px', fontWeight: '600'}}>
+              <a href="https://earthonline.onrender.com/downloads/EarthOnlineSetup.exe" style={{display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--success-color)', textDecoration: 'none', background: 'rgba(16, 185, 129, 0.1)', padding: '6px 12px', borderRadius: '8px', fontWeight: '600'}}>
                 📥 下載專屬電腦版
               </a>
             )}
-            <X size={20} style={{cursor: 'pointer', color: '#64748b', transition: 'color 0.2s'}} onClick={onClose} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#64748b'} />
+            <X size={20} style={{cursor: 'pointer', color: 'var(--text-dim)', transition: 'color 0.2s'}} onClick={onClose} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-dim)'} />
           </div>
         </div>
         
-        {error ? <div style={{color: '#ef4444', padding: '15px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px'}}>{error}</div> : !info ? <div style={{color: '#94a3b8', textAlign: 'center', padding: '30px 0'}}>讀取帳戶資訊中...</div> : (
+        {error ? <div style={{color: 'var(--danger-color)', padding: '15px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px'}}>{error}</div> : !info ? <div style={{color: 'var(--text-dim)', textAlign: 'center', padding: '30px 0'}}>讀取帳戶資訊中...</div> : (
           <div style={{display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.95rem'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)'}}>
-              <span style={{color: '#94a3b8'}}>代號 (Subject ID)</span>
-              <strong style={{color: '#f8fafc'}}>{info.username}</strong>
+              <span style={{color: 'var(--text-dim)'}}>代號 (Subject ID)</span>
+              <strong style={{color: 'var(--text-color)'}}>{info.username}</strong>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)'}}>
-              <span style={{color: '#94a3b8'}}>連線建立日 (Joined)</span>
-              <strong style={{color: '#f8fafc'}}>{new Date(info.createdAt).toLocaleDateString()}</strong>
+              <span style={{color: 'var(--text-dim)'}}>連線建立日 (Joined)</span>
+              <strong style={{color: 'var(--text-color)'}}>{new Date(info.createdAt).toLocaleDateString()}</strong>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)'}}>
-              <span style={{color: '#94a3b8'}}>累積生存時間</span>
-              <strong style={{color: '#f8fafc'}}>{(info.accumulatedTime / 3600).toFixed(1)} 小時</strong>
+              <span style={{color: 'var(--text-dim)'}}>累積生存時間</span>
+              <strong style={{color: 'var(--text-color)'}}>{(info.accumulatedTime / 3600).toFixed(1)} 小時</strong>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)'}}>
-              <span style={{color: '#94a3b8'}}>榮譽點數 (PT)</span>
-              <strong style={{color: '#3b82f6'}}>{Number(info.accumulatedBonusPoints || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}</strong>
+              <span style={{color: 'var(--text-dim)'}}>榮譽點數 (PT)</span>
+              <strong style={{color: 'var(--info-color)'}}>{Number(info.accumulatedBonusPoints || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}</strong>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0'}}>
-              <span style={{color: '#94a3b8'}}>Discord 通訊協定</span>
-              <strong style={{color: info.discord && info.discord.username ? '#5865F2' : '#94a3b8'}}>
+              <span style={{color: 'var(--text-dim)'}}>Discord 通訊協定</span>
+              <strong style={{color: info.discord && info.discord.username ? 'var(--info-color)' : 'var(--text-dim)'}}>
                 {info.discord && info.discord.username ? info.discord.username : '未綁定'}
               </strong>
             </div>
             <div style={{marginTop: '25px', padding: '20px', background: 'rgba(239, 68, 68, 0.05)', borderLeft: '4px solid #ef4444', borderRadius: '0 8px 8px 0'}}>
-              <div style={{color: '#ef4444', fontWeight: '600', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px'}}>
+              <div style={{color: 'var(--danger-color)', fontWeight: '600', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px'}}>
                 <ShieldCheck size={18} /> 專屬恢復金鑰 (Recovery Key)
               </div>
-              <p style={{fontSize: '0.85rem', color: '#94a3b8', marginBottom: '15px', lineHeight: '1.5'}}>
+              <p style={{fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: '15px', lineHeight: '1.5'}}>
                 如果您遺失密碼，這是【唯一】能找回帳號的憑證，請妥善保管並勿洩漏給他人。
               </p>
               <div style={{display: 'flex', gap: '10px'}}>
                 {info.recoveryKey === '未產生' ? (
-                  <button disabled={isGenerating} style={{flex: 1, padding: '10px', background: isGenerating ? '#94a3b8' : '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: isGenerating ? 'not-allowed' : 'pointer', transition: 'background 0.2s'}} onClick={handleGenerateKey} onMouseOver={e => { if(!isGenerating) e.currentTarget.style.background = '#dc2626'; }} onMouseOut={e => { if(!isGenerating) e.currentTarget.style.background = '#ef4444'; }}>
+                  <button disabled={isGenerating} style={{flex: 1, padding: '10px', background: isGenerating ? 'var(--text-dim)' : 'var(--danger-color)', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: isGenerating ? 'not-allowed' : 'pointer', transition: 'background 0.2s'}} onClick={handleGenerateKey} onMouseOver={e => { if(!isGenerating) e.currentTarget.style.background = 'var(--danger-color)'; }} onMouseOut={e => { if(!isGenerating) e.currentTarget.style.background = 'var(--danger-color)'; }}>
                     {isGenerating ? '生成中...' : '生成專屬金鑰'}
                   </button>
                 ) : (
@@ -1779,9 +1779,9 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
                       type={showKey ? "text" : "password"} 
                       value={info.recoveryKey} 
                       readOnly 
-                      style={{flex: 1, letterSpacing: showKey ? '1px' : '3px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: '#f8fafc', padding: '10px', borderRadius: '6px', outline: 'none'}}
+                      style={{flex: 1, letterSpacing: showKey ? '1px' : '3px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-color)', padding: '10px', borderRadius: '6px', outline: 'none'}}
                     />
-                    <button style={{padding: '0 15px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'}} onClick={() => setShowKey(!showKey)} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}>
+                    <button style={{padding: '0 15px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger-color)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'}} onClick={() => setShowKey(!showKey)} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}>
                       {showKey ? '隱藏' : '顯示'}
                     </button>
                   </>
@@ -1791,20 +1791,20 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
 
             {/* Email Binding Section */}
             <div style={{marginTop: '15px', padding: '20px', background: 'rgba(16, 185, 129, 0.05)', borderLeft: '4px solid #10b981', borderRadius: '0 8px 8px 0'}}>
-              <div style={{color: '#10b981', fontWeight: '600', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px'}}>
+              <div style={{color: 'var(--success-color)', fontWeight: '600', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px'}}>
                 <ShieldCheck size={18} /> 安全信箱綁定
               </div>
-              <p style={{fontSize: '0.85rem', color: '#94a3b8', marginBottom: '15px', lineHeight: '1.5'}}>
+              <p style={{fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: '15px', lineHeight: '1.5'}}>
                 綁定信箱可獲得額外的帳號保護，若遺失密碼可透過信箱快速找回。
               </p>
               {info.isEmailVerified ? (
-                <div style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981', background: 'rgba(16,185,129,0.1)', padding: '10px 15px', borderRadius: '6px'}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--success-color)', background: 'rgba(16,185,129,0.1)', padding: '10px 15px', borderRadius: '6px'}}>
                   <CheckCircle size={16} /> <span style={{fontWeight: '500'}}>已綁定：{info.email}</span>
                 </div>
               ) : info.email ? (
                 <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
-                  <span style={{color: '#f59e0b', flex: 1, background: 'rgba(245,158,11,0.1)', padding: '10px', borderRadius: '6px'}}>⏳ 等待驗證：{info.email}</span>
-                  <button style={{padding: '10px 15px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer'}} onClick={handleSendVerify} disabled={isSendingVerify}>
+                  <span style={{color: 'var(--warning-color)', flex: 1, background: 'rgba(245,158,11,0.1)', padding: '10px', borderRadius: '6px'}}>⏳ 等待驗證：{info.email}</span>
+                  <button style={{padding: '10px 15px', background: 'var(--success-color)', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer'}} onClick={handleSendVerify} disabled={isSendingVerify}>
                     {isSendingVerify ? '發送中...' : '重發驗證信'}
                   </button>
                 </div>
@@ -1815,9 +1815,9 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
                     placeholder="輸入電子郵件..." 
                     value={emailInput} 
                     onChange={e => setEmailInput(e.target.value)} 
-                    style={{flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: '#f8fafc', padding: '10px 15px', borderRadius: '6px', outline: 'none'}}
+                    style={{flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-color)', padding: '10px 15px', borderRadius: '6px', outline: 'none'}}
                   />
-                  <button style={{padding: '0 20px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s'}} onClick={handleSendVerify} disabled={isSendingVerify} onMouseOver={e => e.currentTarget.style.background = '#059669'} onMouseOut={e => e.currentTarget.style.background = '#10b981'}>
+                  <button style={{padding: '0 20px', background: 'var(--success-color)', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s'}} onClick={handleSendVerify} disabled={isSendingVerify} onMouseOver={e => e.currentTarget.style.background = 'var(--success-color)'} onMouseOut={e => e.currentTarget.style.background = 'var(--success-color)'}>
                     {isSendingVerify ? '發送中...' : '綁定'}
                   </button>
                 </div>
@@ -1826,10 +1826,10 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
 
             <div style={{marginTop: '25px', textAlign: 'center'}}>
               <button 
-                style={{background: 'transparent', color: '#64748b', border: 'none', padding: '8px 16px', fontSize: '0.85rem', cursor: 'pointer', transition: 'color 0.2s'}} 
+                style={{background: 'transparent', color: 'var(--text-dim)', border: 'none', padding: '8px 16px', fontSize: '0.85rem', cursor: 'pointer', transition: 'color 0.2s'}} 
                 onClick={handleDeleteAccount}
-                onMouseOver={e => e.currentTarget.style.color = '#ef4444'}
-                onMouseOut={e => e.currentTarget.style.color = '#64748b'}
+                onMouseOver={e => e.currentTarget.style.color = 'var(--danger-color)'}
+                onMouseOut={e => e.currentTarget.style.color = 'var(--text-dim)'}
               >
                 刪除帳號 (無法恢復)
               </button>

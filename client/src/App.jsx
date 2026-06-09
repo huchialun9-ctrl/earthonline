@@ -1438,11 +1438,12 @@ function Dashboard({ token, onLogout, region }) {
     }
   };
 
-  if (!myNode) {
-    return <FourPetalSpiral text="正在連線至全球節點網路..." />;
-  }
-
   return (
+    <>
+      <audio ref={audioRef} src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3" loop preload="auto" />
+      {!myNode ? (
+        <FourPetalSpiral text="正在連線至全球節點網路..." />
+      ) : (
     <div className="app-container" style={{ boxShadow: getEventGlow(), transition: 'box-shadow 1s ease-in-out' }}>
       {show100Celebration && (
         <div className="celebration-overlay">
@@ -2367,8 +2368,9 @@ function Dashboard({ token, onLogout, region }) {
           </div>
         </div>
       )}
-      <audio ref={audioRef} src="https://archive.org/download/subwoofer-lullaby-vinyl/Subwoofer+Lullaby.mp3" loop preload="auto" />
     </div>
+      )}
+    </>
   );
 }
 

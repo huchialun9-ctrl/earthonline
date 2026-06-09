@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
-import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Shield, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Tornado, Coins, Satellite, AlertTriangle, CheckCircle, MapPin, Monitor, ShoppingCart, Palette } from 'lucide-react';
+import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Shield, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Tornado, Coins, Satellite, Settings, AlertTriangle, CheckCircle, MapPin, Monitor, ShoppingCart, Palette } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import { useTheme } from './ThemeContext';
 import Draggable from 'react-draggable';
@@ -21,6 +21,15 @@ function LoginGateway({ onLogin }) {
   const [password, setPassword] = useState('');
   const [recoveryKey, setRecoveryKey] = useState('');
   const [region, setRegion] = useState('asia');
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('saved_username');
+    if (saved) {
+      setUsername(saved);
+      setRememberMe(true);
+    }
+  }, []);
   
   const [isDaytime, setIsDaytime] = useState(() => {
     const h = new Date().getHours();
@@ -38,6 +47,26 @@ function LoginGateway({ onLogin }) {
   
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  const getAudioCtx = () => {
+    if (!window.__eoAudioCtx) window.__eoAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return window.__eoAudioCtx;
+  };
+  const playBeep = (freq = 800, duration = 100, type = 'sine') => {
+    try {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration / 1000);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration / 1000);
+    } catch(e) {}
+  };
 
   // Check for discord token in URL
   useEffect(() => {
@@ -116,6 +145,7 @@ function LoginGateway({ onLogin }) {
       
       if (!res.ok) {
         setError(data.error || 'Request failed');
+        playBeep(300, 300, 'sawtooth');
         return;
       }
       
@@ -124,6 +154,14 @@ function LoginGateway({ onLogin }) {
         onLogin(data.token, data.username, region);
       } else {
         onLogin(data.token, data.user.username, region);
+      }
+      playBeep(523, 150);
+      setTimeout(() => playBeep(659, 150), 170);
+      setTimeout(() => playBeep(784, 200), 370);
+      if (rememberMe) {
+        localStorage.setItem('saved_username', username);
+      } else {
+        localStorage.removeItem('saved_username');
       }
     } catch (err) {
       setError('伺服器連線失敗');
@@ -220,6 +258,19 @@ function LoginGateway({ onLogin }) {
               required 
               className="terminal-input"
             />
+          </div>
+
+          <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={e => setRememberMe(e.target.checked)}
+              style={{ accentColor: 'var(--accent-color)', width: '16px', height: '16px', cursor: 'pointer' }}
+            />
+            <label htmlFor="rememberMe" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', cursor: 'pointer' }}>
+              記住帳號
+            </label>
           </div>
 
           <button type="submit" className="terminal-btn">
@@ -650,6 +701,7 @@ function Dashboard({ token, onLogout, region }) {
   const [showShopModal, setShowShopModal] = useState(false);
   const [discordId, setDiscordId] = useState('');
   const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const { theme, setTheme, themeData: currentThemeData, themes } = useTheme();
   
   const pingStartRef = useRef(0);
@@ -666,6 +718,44 @@ function Dashboard({ token, onLogout, region }) {
 
   const [bgmEnabled, setBgmEnabled] = useState(true);
   const audioRef = useRef(null);
+
+  const audioCtxRef = useRef(null);
+  const [notificationEnabled, setNotificationEnabled] = useState(() => {
+    const val = localStorage.getItem('eo_notifications');
+    return val === null ? true : val === 'true';
+  });
+  const getAudioCtx = () => {
+    if (!audioCtxRef.current) audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtxRef.current;
+  };
+  const playBeep = (freq = 800, duration = 100, type = 'sine') => {
+    if (!notificationEnabled) return;
+    try {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration / 1000);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration / 1000);
+    } catch(e) {}
+  };
+
+  const [pmTarget, setPmTarget] = useState(null);
+  const [pmInput, setPmInput] = useState('');
+  const [pmLog, setPmLog] = useState({});
+  const [showPm, setShowPm] = useState(false);
+  const pmTargetRef = useRef(null);
+  const showPmRef = useRef(false);
+
+  useEffect(() => {
+    pmTargetRef.current = pmTarget;
+    showPmRef.current = showPm;
+  }, [pmTarget, showPm]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -878,6 +968,7 @@ function Dashboard({ token, onLogout, region }) {
       } else {
         addLog(`[CHAT]${adminBadge} ${data.username}: ${data.message}`);
       }
+      playBeep(1000, 80);
     });
 
     s.on('social_data', (data) => {
@@ -888,8 +979,33 @@ function Dashboard({ token, onLogout, region }) {
       s.emit('get_social_data');
     });
 
+    s.on('friend_online', (data) => {
+      addLog(`[SYSTEM] 好友 ${data.username} 上線了！`);
+      playBeep(660, 120);
+      setTimeout(() => playBeep(880, 120), 140);
+    });
+
+    s.on('friend_offline', (data) => {
+      addLog(`[SYSTEM] 好友 ${data.username} 離線了`);
+    });
+
+    s.on('private_message', (data) => {
+      const msg = { from: data.from, text: data.message, time: new Date().toISOString().substring(11, 19), incoming: true };
+      setPmLog(prev => ({
+        ...prev,
+        [data.from]: [...(prev[data.from] || []), msg],
+      }));
+      addLog(`[PM] ${data.from}: ${data.message}`);
+      playBeep(1100, 60);
+      if (!showPmRef.current || pmTargetRef.current !== data.from) {
+        addLog(`[SYSTEM] 收到來自 ${data.from} 的私訊！`);
+      }
+    });
+
     s.on('friend_request_received', (data) => {
       addLog(`[SYSTEM] 收到來自 ${data.from} 的好友邀請！`);
+      playBeep(880, 150);
+      setTimeout(() => playBeep(1100, 150), 170);
       s.emit('get_social_data');
     });
 
@@ -1178,6 +1294,18 @@ function Dashboard({ token, onLogout, region }) {
     setChatInput('');
   };
 
+  const handleSendPm = (e) => {
+    e.preventDefault();
+    if (!pmTarget || !pmInput.trim() || !socket) return;
+    socket.emit('send_private_message', { targetUsername: pmTarget, message: pmInput });
+    const msg = { from: '我', text: pmInput, time: new Date().toISOString().substring(11, 19), incoming: false };
+    setPmLog(prev => ({
+      ...prev,
+      [pmTarget]: [...(prev[pmTarget] || []), msg],
+    }));
+    setPmInput('');
+  };
+
   const handleAdminMute = () => {
     if (!socket || !adminTarget.trim()) return;
     const duration = parseInt(document.getElementById('muteDuration')?.value || '5', 10);
@@ -1391,6 +1519,9 @@ function Dashboard({ token, onLogout, region }) {
               <button className="dropdown-item" onClick={() => { setShowThemeMenu(!showThemeMenu); setDropdownOpen(false); }}>
                 <Palette size={16} /> 主題配色 (Themes)
               </button>
+              <button className="dropdown-item" onClick={() => { setShowSettings(true); setDropdownOpen(false); }}>
+                <Settings size={16} /> 設定 (Settings)
+              </button>
               {(myRole === 'admin' || myRole === 'moderator') && (
                 <button className="dropdown-item" style={{color: 'var(--danger-color)'}} onClick={() => { setShowAdminPanel(true); setDropdownOpen(false); }}>
                   <Shield size={16} /> 管理員功能 (Admin)
@@ -1593,6 +1724,50 @@ function Dashboard({ token, onLogout, region }) {
             </form>
           </div>
           </Draggable>
+          {showPm && pmTarget && (
+          <Draggable handle=".pm-header">
+            <div style={{
+              position: 'absolute', bottom: '130px', right: '20px', width: '320px', height: '350px',
+              background: 'var(--panel-bg)', border: '1px solid var(--accent-color)', borderRadius: '8px',
+              display: 'flex', flexDirection: 'column', zIndex: 1000, boxShadow: '0 10px 30px rgba(0,0,0,0.7)',
+            }}>
+              <div className="pm-header" style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 15px',
+                borderBottom: '1px solid var(--border-color)', cursor: 'move',
+                color: 'var(--accent-color)', fontWeight: 'bold', fontSize: '0.9rem'
+              }}>
+                <span>💬 {pmTarget}</span>
+                <button onClick={() => setShowPm(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}>
+                  <X size={16} />
+                </button>
+              </div>
+              <div style={{ flex: 1, overflowY: 'auto', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {(pmLog[pmTarget] || []).map((msg, i) => (
+                  <div key={i} style={{
+                    alignSelf: msg.incoming ? 'flex-start' : 'flex-end',
+                    background: msg.incoming ? 'rgba(255,255,255,0.08)' : 'rgba(0,255,65,0.12)',
+                    color: msg.incoming ? 'var(--text-color)' : 'var(--accent-color)',
+                    padding: '6px 12px', borderRadius: '8px', maxWidth: '80%', fontSize: '0.85rem',
+                    wordBreak: 'break-word'
+                  }}>
+                    <div style={{ fontSize: '0.7rem', opacity: 0.6, marginBottom: '2px' }}>{msg.from} [{msg.time}]</div>
+                    {msg.text}
+                  </div>
+                ))}
+              </div>
+              <form onSubmit={handleSendPm} style={{ display: 'flex', borderTop: '1px solid var(--border-color)', padding: '8px' }}>
+                <input
+                  type="text" value={pmInput} onChange={e => setPmInput(e.target.value)}
+                  placeholder="輸入私訊..." maxLength={500}
+                  style={{ flex: 1, background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '6px 10px', borderRadius: '4px', outline: 'none', fontSize: '0.85rem' }}
+                />
+                <button type="submit" style={{ background: 'var(--accent-color)', color: '#000', border: 'none', padding: '6px 12px', borderRadius: '4px', marginLeft: '5px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.85rem' }}>
+                  送出
+                </button>
+              </form>
+            </div>
+          </Draggable>
+          )}
         </main>
       </div>
 
@@ -1750,7 +1925,7 @@ function Dashboard({ token, onLogout, region }) {
 
       {/* Full Page About Documentation */}
       {showAboutModal && <DocumentationOverlay onClose={() => setShowAboutModal(false)} />}
-      {showSocialModal && <SocialModal onClose={() => setShowSocialModal(false)} socialTab={socialTab} setSocialTab={setSocialTab} socialData={socialData} socket={socket} myNode={myNode} />}
+      {showSocialModal && <SocialModal onClose={() => setShowSocialModal(false)} socialTab={socialTab} setSocialTab={setSocialTab} socialData={socialData} socket={socket} myNode={myNode} onPmUser={(username) => { setPmTarget(username); setShowPm(true); setShowSocialModal(false); }} />}
       {showShopModal && <ShopModal onClose={() => setShowShopModal(false)} pts={myNode?.accumulatedBonusPoints} onBuy={(id) => { if (socket?.connected) { socket.emit('buy_item', id); } else { alert('連線未就緒，無法購買'); } }} onAdRevive={() => setShowAdRevive(true)} adReviveRemaining={adReviveRemaining} />}
 
       {showAccountInfo && <AccountInfoModal token={token} apiUrl={API_URL} onClose={() => setShowAccountInfo(false)} onLogout={onLogout} />}
@@ -2138,6 +2313,65 @@ function Dashboard({ token, onLogout, region }) {
         </div>
       )}
 
+      {showSettings && (
+        <div className="modal-overlay" onClick={() => setShowSettings(false)}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: 'var(--surface-color)', border: '1px solid var(--accent-color)',
+            borderRadius: '12px', padding: '30px', maxWidth: '450px', width: '90%',
+            color: 'var(--text-color)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+              <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Settings size={20} /> 設定 (Settings)
+              </h3>
+              <X size={20} style={{ cursor: 'pointer', color: 'var(--text-dim)' }} onClick={() => setShowSettings(false)} />
+            </div>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '8px' }}>
+                字體大小 (Font Size): {document.documentElement.style.fontSize || '16px'}
+              </label>
+              <input
+                type="range" min="12" max="24" step="1"
+                defaultValue={parseInt(localStorage.getItem('eo_fontSize')) || 16}
+                onChange={e => {
+                  const val = e.target.value;
+                  document.documentElement.style.fontSize = val + 'px';
+                  localStorage.setItem('eo_fontSize', val);
+                }}
+                style={{ width: '100%', accentColor: 'var(--accent-color)' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                <span>12px</span><span>24px</span>
+              </div>
+            </div>
+            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>語言 (Language)</span>
+              <button
+                onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
+                style={{
+                  background: 'var(--bg-light)', border: '1px solid var(--border-color)',
+                  color: 'var(--accent-color)', padding: '8px 16px', borderRadius: '6px',
+                  cursor: 'pointer', fontWeight: 'bold', fontFamily: 'var(--font-sans)'
+                }}
+              >
+                {language === 'zh' ? 'English' : '中文'}
+              </button>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>通知音效 (Sound Notifications)</span>
+              <input
+                type="checkbox"
+                checked={notificationEnabled}
+                onChange={e => {
+                  setNotificationEnabled(e.target.checked);
+                  localStorage.setItem('eo_notifications', e.target.checked);
+                }}
+                style={{ accentColor: 'var(--accent-color)', width: '18px', height: '18px', cursor: 'pointer' }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
       <audio ref={audioRef} src="https://archive.org/download/subwoofer-lullaby-vinyl/Subwoofer+Lullaby.mp3" loop />
     </div>
   );
@@ -2396,7 +2630,7 @@ function App() {
   return <Dashboard token={token} onLogout={handleLogout} region={region} />;
 }
 
-function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myNode }) {
+function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myNode, onPmUser }) {
   const { t, language, setLanguage } = useLanguage();
   const sortedPlayers = [...(socialData.allPlayers || [])].sort((a, b) => (b.online ? 1 : 0) - (a.online ? 1 : 0));
   return (
@@ -2463,11 +2697,14 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myN
                   <span style={{ color: f.online ? '#0f0' : '#888', fontWeight: 'bold' }}>●</span>
                   <span>{f.username}</span>
                 </div>
+                <div>
+                <button onClick={() => onPmUser && onPmUser(f.username)} style={{ background: 'rgba(0,255,136,0.2)', border: '1px solid var(--accent-color)', color: 'var(--accent-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', marginRight: '5px' }}>💬 私訊</button>
                 <button onClick={() => {
                   if (window.confirm(`確定要刪除好友 ${f.username} 嗎？`)) {
                     socket.emit('remove_friend', { targetUsername: f.username });
                   }
                 }} style={{ background: 'rgba(255,65,108,0.2)', border: '1px solid var(--danger-color)', color: 'var(--danger-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>刪除</button>
+                </div>
               </div>
             ))
           )}

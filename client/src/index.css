@@ -996,6 +996,69 @@ body {
     padding: 0 10px;
     font-size: 0.8rem;
   }
+  .main-content {
+    flex-direction: column;
+    padding: 10px;
+  }
+  .metrics-terminal {
+    width: 100%;
+    max-height: none;
+    order: 2;
+  }
+  .geographic-matrix {
+    width: 100%;
+    order: 1;
+    min-height: 50vh;
+  }
+  .system-header {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    height: auto;
+  }
+  .system-title {
+    width: 100%;
+    justify-content: center;
+  }
+  .header-right {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .system-stats {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+  .map-overlays {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 100%;
+  }
+  .map-overlays .floating-panel {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+  }
+  .login-box {
+    width: 95%;
+    padding: 20px 15px;
+  }
+  .bottom-log-console {
+    width: calc(100% - 10px);
+    left: 5px;
+    bottom: 5px;
+    max-height: 100px;
+    font-size: 0.75rem;
+  }
+}
+
+/* 1024px breakpoint */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .metrics-terminal {
+    width: 260px;
+  }
 }
 
 /* Four-Petal Spiral Loading */

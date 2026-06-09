@@ -1136,23 +1136,20 @@ function Dashboard({ token, onLogout, region }) {
     const duration = parseInt(document.getElementById('muteDuration')?.value || '5', 10);
     socket.emit('mod_mute_user', { targetUsername: adminTarget.trim(), duration });
     addLog(`[MOD] 發出禁言指令：${adminTarget.trim()} ${duration} 分鐘`);
-    socket.emit('get_all_players');
-    setAdminTarget('');
+    setTimeout(() => socket.emit('get_all_players'), 300);
   };
 
   const handleAdminUnmute = () => {
     if (!socket || !adminTarget.trim()) return;
     socket.emit('mod_unmute_user', { targetUsername: adminTarget.trim() });
     addLog(`[MOD] 發出解禁指令：${adminTarget.trim()}`);
-    socket.emit('get_all_players');
-    setAdminTarget('');
+    setTimeout(() => socket.emit('get_all_players'), 300);
   };
 
   const handleAdminDelete = () => {
     if (!socket || !adminTarget.trim()) return;
     socket.emit('mod_delete_message', { messageId: Date.now().toString(), targetUsername: adminTarget.trim() });
     addLog(`[MOD] 發出刪除訊息指令：${adminTarget.trim()}`);
-    setAdminTarget('');
   };
 
   const handleAdminBan = () => {
@@ -1160,16 +1157,14 @@ function Dashboard({ token, onLogout, region }) {
     const duration = parseInt(document.getElementById('banDuration')?.value || '1440', 10);
     socket.emit('mod_ban_user', { targetUsername: adminTarget.trim(), duration });
     addLog(`[MOD] 發出封鎖指令：${adminTarget.trim()} ${duration} 分鐘`);
-    socket.emit('get_all_players');
-    setAdminTarget('');
+    setTimeout(() => socket.emit('get_all_players'), 300);
   };
 
   const handleAdminUnban = () => {
     if (!socket || !adminTarget.trim()) return;
     socket.emit('mod_unban_user', { targetUsername: adminTarget.trim() });
     addLog(`[MOD] 發出解除封鎖指令：${adminTarget.trim()}`);
-    socket.emit('get_all_players');
-    setAdminTarget('');
+    setTimeout(() => socket.emit('get_all_players'), 300);
   };
 
   const [adminPtsAmount, setAdminPtsAmount] = useState(0);
@@ -1178,8 +1173,7 @@ function Dashboard({ token, onLogout, region }) {
     if (!socket || !adminTarget.trim() || adminPtsAmount <= 0) return;
     socket.emit('mod_add_pts', { targetUsername: adminTarget.trim(), amount: adminPtsAmount });
     addLog(`[MOD] 給予 ${adminTarget.trim()} ${adminPtsAmount} PT`);
-    socket.emit('get_all_players');
-    setAdminTarget('');
+    setTimeout(() => socket.emit('get_all_players'), 300);
     setAdminPtsAmount(0);
   };
 

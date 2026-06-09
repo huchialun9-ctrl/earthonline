@@ -460,19 +460,6 @@ body {
   box-shadow: inset 0 -3px 5px rgba(0,0,0,0.05);
 }
 
-/* Goggles for Flying Ace */
-.snoopy-goggles {
-  position: absolute;
-  width: 30px;
-  height: 14px;
-  border: 2px solid #8B4513;
-  border-radius: 8px;
-  top: -32px;
-  left: 12px;
-  background: rgba(200,230,255,0.3);
-  z-index: 2;
-}
-
 /* Scarf for Flying Ace */
 .snoopy-scarf {
   position: absolute;
@@ -485,42 +472,6 @@ body {
   animation: scarfFlow 2s ease-in-out infinite alternate;
 }
 
-/* Snoopy Positions */
-.snoopy-dance {
-  top: 35%;
-  left: 10%;
-  animation: snoopyDance 2s ease-in-out infinite;
-}
-
-.snoopy-dance .snoopy-body {
-  animation: bodyDance 0.5s ease-in-out infinite alternate;
-}
-
-.snoopy-flying {
-  top: 10%;
-  right: 15%;
-  animation: snoopyFly 4s ease-in-out infinite;
-  transform: rotate(-10deg);
-}
-
-.snoopy-flying .snoopy-leg-fl,
-.snoopy-flying .snoopy-leg-fr,
-.snoopy-flying .snoopy-leg-bl,
-.snoopy-flying .snoopy-leg-br {
-  animation: legFly 1s ease-in-out infinite alternate;
-}
-
-.snoopy-sleep {
-  bottom: 15%;
-  left: 20%;
-  animation: snoopySleep 6s ease-in-out infinite;
-  transform: rotate(-5deg);
-}
-
-.snoopy-sleep .snoopy-body {
-  animation: bodySleep 3s ease-in-out infinite;
-}
-
 .snoopy-z {
   position: absolute;
   top: -30px;
@@ -529,17 +480,121 @@ body {
   animation: zFloat 2.5s ease-in-out infinite;
 }
 
-.snoopy-walk {
-  bottom: 10%;
-  right: 10%;
-  animation: snoopyWalk 8s ease-in-out infinite;
+/* Snoopy on doghouse */
+.snoopy-onhouse {
+  z-index: 3;
 }
 
-.snoopy-walk .snoopy-leg-fl,
-.snoopy-walk .snoopy-leg-fr,
-.snoopy-walk .snoopy-leg-bl,
-.snoopy-walk .snoopy-leg-br {
-  animation: legWalk 0.6s ease-in-out infinite alternate;
+.snoopy-onhouse .snoopy-body {
+  transform: scale(0.8);
+}
+
+/* Doghouse */
+.doghouse {
+  position: absolute;
+  z-index: 2;
+}
+
+.doghouse-roof {
+  width: 80px;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 25px solid #c0392b;
+  margin-left: -5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.doghouse-body {
+  width: 70px;
+  height: 50px;
+  background: #e74c3c;
+  border-radius: 0 0 4px 4px;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.doghouse-hole {
+  width: 25px;
+  height: 20px;
+  background: #2d2d2d;
+  border-radius: 50% 50% 40% 40%;
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.doghouse-text {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 7px;
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-family: Arial, sans-serif;
+}
+
+/* Woodstock */
+.woodstock {
+  position: absolute;
+  z-index: 2;
+}
+
+.woodstock-body {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  background: #f1c40f;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.woodstock-wing {
+  position: absolute;
+  width: 10px;
+  height: 6px;
+  background: #e67e22;
+  border-radius: 50% 50% 0 0;
+  top: 8px;
+  left: -4px;
+  transform: rotate(-20deg);
+  animation: wingFlap 0.3s ease-in-out infinite alternate;
+}
+
+.woodstock-eye {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #2d2d2d;
+  border-radius: 50%;
+  top: 5px;
+  left: 9px;
+}
+
+.woodstock-beak {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-right: 6px solid #e67e22;
+  top: 6px;
+  right: -4px;
+}
+
+.woodstock-tail {
+  position: absolute;
+  width: 8px;
+  height: 4px;
+  background: #e67e22;
+  border-radius: 0 0 50% 50%;
+  bottom: -2px;
+  left: -3px;
+  transform: rotate(-30deg);
+  animation: tailWagW 0.5s ease-in-out infinite alternate;
 }
 
 /* Floating decorations */
@@ -558,16 +613,15 @@ body {
 .sfloat-note1 { top: 30%; left: 25%; animation-delay: 0s; font-size: 24px; }
 .sfloat-note2 { top: 20%; left: 45%; animation-delay: 1.5s; font-size: 18px; }
 .sfloat-note3 { top: 40%; left: 60%; animation-delay: 3s; font-size: 22px; }
-.sfloat-star1 { top: 15%; left: 70%; animation-delay: 0.8s; }
-.sfloat-star2 { top: 50%; left: 80%; animation-delay: 2.5s; }
+.sfloat-note4 { top: 45%; left: 35%; animation-delay: 0.7s; font-size: 16px; }
+.sfloat-note5 { top: 15%; left: 55%; animation-delay: 2.2s; font-size: 20px; }
+.sfloat-star1 { top: 10%; left: 70%; animation-delay: 0.8s; }
+.sfloat-star2 { top: 50%; left: 10%; animation-delay: 2.5s; }
 .sfloat-heart { top: 25%; left: 15%; animation-delay: 2s; font-size: 16px; }
+.sfloat-heart2 { top: 55%; left: 50%; animation-delay: 1s; font-size: 18px; }
+.sfloat-joy { top: 35%; left: 75%; animation-delay: 3s; font-size: 16px; }
 
-/* Keyframes */
-@keyframes snoopyFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
+/* Animation Keyframes */
 @keyframes earWag {
   0%, 100% { transform: rotate(-15deg); }
   50% { transform: rotate(-25deg); }
@@ -576,6 +630,90 @@ body {
 @keyframes tailWag {
   0%, 100% { transform: rotate(30deg) scaleY(1); }
   50% { transform: rotate(45deg) scaleY(1.2); }
+}
+
+@keyframes snDance {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  25% { transform: translateY(-12px) rotate(5deg); }
+  50% { transform: translateY(-5px) rotate(-3deg); }
+  75% { transform: translateY(-15px) rotate(6deg); }
+}
+
+@keyframes snFly {
+  0%, 100% { transform: translate(0, 0) rotate(-10deg); }
+  25% { transform: translate(25px, -12px) rotate(-5deg); }
+  50% { transform: translate(50px, -5px) rotate(-12deg); }
+  75% { transform: translate(25px, -18px) rotate(-7deg); }
+}
+
+@keyframes snSleep {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(5px) rotate(-2deg); }
+}
+
+@keyframes snWalk {
+  0% { transform: translateX(0) translateY(0); }
+  20% { transform: translateX(-40px) translateY(-3px); }
+  40% { transform: translateX(-80px) translateY(0); }
+  60% { transform: translateX(-40px) translateY(-2px); }
+  80% { transform: translateX(10px) translateY(-3px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+
+@keyframes snJump {
+  0%, 100% { transform: translateY(0) scale(1); }
+  15% { transform: translateY(-35px) scale(0.95); }
+  30% { transform: translateY(-5px) scale(1); }
+  45% { transform: translateY(-25px) scale(0.95); }
+  60% { transform: translateY(0) scale(1); }
+}
+
+@keyframes snSpin {
+  0% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(90deg) translateY(-8px); }
+  50% { transform: rotate(180deg) translateY(0); }
+  75% { transform: rotate(270deg) translateY(-8px); }
+  100% { transform: rotate(360deg) translateY(0); }
+}
+
+@keyframes snFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-12px) scale(1.02); }
+}
+
+@keyframes woodFly {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(20px, -15px); }
+  50% { transform: translate(40px, -5px); }
+  75% { transform: translate(20px, -20px); }
+}
+
+@keyframes wingFlap {
+  0% { transform: rotate(-20deg); }
+  100% { transform: rotate(20deg); }
+}
+
+@keyframes tailWagW {
+  0% { transform: rotate(-30deg); }
+  100% { transform: rotate(-10deg); }
+}
+
+@keyframes scarfFlow {
+  0% { transform: translateX(0) rotate(0deg); }
+  100% { transform: translateX(-8px) rotate(-10deg); }
+}
+
+@keyframes zFloat {
+  0% { transform: translateY(0) translateX(0); opacity: 1; }
+  50% { transform: translateY(-15px) translateX(8px); opacity: 0.7; }
+  100% { transform: translateY(-30px) translateX(15px); opacity: 0; }
+}
+
+@keyframes floatieFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.4; }
+  25% { transform: translateY(-12px) rotate(10deg); opacity: 0.7; }
+  50% { transform: translateY(-5px) rotate(-5deg); opacity: 0.5; }
+  75% { transform: translateY(-18px) rotate(8deg); opacity: 0.8; }
 }
 
 @keyframes snoopyDance {

@@ -720,7 +720,8 @@ regions.forEach(regionName => {
               filter: { username: user.username },
               update: { $inc: incFields }
             }
-          });
+  });
+
         }
       }
       
@@ -1172,6 +1173,17 @@ regions.forEach(regionName => {
     } catch (err) {
       console.error('[MOD] unban_user error:', err);
     }
+  });
+
+  // Moderation: Get online users list
+  socket.on('get_online_users', () => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    const users = [];
+    for (const [sid, u] of connectedUsers.entries()) {
+      if (u.username) users.push(u.username);
+    }
+    socket.emit('online_users', [...new Set(users)]);
   });
 
   // Friend System Handlers

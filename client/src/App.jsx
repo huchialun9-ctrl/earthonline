@@ -120,43 +120,97 @@ function LoginGateway({ onLogin }) {
   return (
     <div className="login-gateway">
       <div className="login-box">
-        {/* Cartoon Screen-Off Style Animations */}
-        <div className="cartoon-container">
-          <div className="cartoon-bg-shapes">
-            <div className="cshape cshape-cloud1">☁️</div>
-            <div className="cshape cshape-cloud2">☁️</div>
-            <div className="cshape cshape-star1">⭐</div>
-            <div className="cshape cshape-star2">✨</div>
-            <div className="cshape cshape-moon">🌙</div>
-            <div className="cshape cshape-heart1">❤️</div>
-            <div className="cshape cshape-heart2">💖</div>
-            <div className="cshape cshape-smile1">😊</div>
-            <div className="cshape cshape-smile2">😄</div>
-            <div className="cshape cshape-rainbow">🌈</div>
-            <div className="cshape cshape-cat">🐱</div>
-            <div className="cshape cshape-dog">🐶</div>
-            <div className="cshape cshape-butterfly1">🦋</div>
-            <div className="cshape cshape-butterfly2">🌸</div>
-            <div className="cshape cshape-bounce1">🔵</div>
-            <div className="cshape cshape-bounce2">🟠</div>
-            <div className="cshape cshape-bounce3">🟢</div>
-            <div className="cshape cshape-bounce4">🟡</div>
-            <div className="cshape cshape-bounce5">🟣</div>
-            <div className="cshape cshape-bounce6">🔴</div>
+        {/* Snoopy Animations */}
+        <div className="snoopy-container">
+          <div className="snoopy-bg-deco"></div>
+
+          {/* Snoopy 1 - Dancing */}
+          <div className="snoopy snoopy-dance">
+            <div className="snoopy-body">
+              <div className="snoopy-ear-l"></div>
+              <div className="snoopy-ear-r"></div>
+              <div className="snoopy-head">
+                <div className="snoopy-eye-l"></div>
+                <div className="snoopy-eye-r"></div>
+                <div className="snoopy-nose"></div>
+                <div className="snoopy-smile"></div>
+              </div>
+              <div className="snoopy-tail"></div>
+              <div className="snoopy-leg-fl"></div>
+              <div className="snoopy-leg-fr"></div>
+              <div className="snoopy-leg-bl"></div>
+              <div className="snoopy-leg-br"></div>
+            </div>
           </div>
-          <div className="cartoon-dots">
-            {Array.from({ length: 40 }, (_, i) => (
-              <div key={i} className="cdot" style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 8}s`,
-                animationDuration: `${6 + Math.random() * 6}s`,
-                width: `${4 + Math.random() * 8}px`,
-                height: `${4 + Math.random() * 8}px`,
-                background: ['#FF6B6B','#4ECDC4','#45B7D1','#F7DC6F','#BB8FCE','#F1948A','#82E0AA','#F8C471'][i % 8],
-                borderRadius: Math.random() > 0.5 ? '50%' : '3px',
-              }} />
-            ))}
+
+          {/* Snoopy 2 - Flying Ace */}
+          <div className="snoopy snoopy-flying">
+            <div className="snoopy-goggles"></div>
+            <div className="snoopy-body">
+              <div className="snoopy-ear-l"></div>
+              <div className="snoopy-ear-r"></div>
+              <div className="snoopy-head">
+                <div className="snoopy-eye-l"></div>
+                <div className="snoopy-eye-r"></div>
+                <div className="snoopy-nose"></div>
+                <div className="snoopy-smile"></div>
+              </div>
+              <div className="snoopy-tail"></div>
+              <div className="snoopy-leg-fl"></div>
+              <div className="snoopy-leg-fr"></div>
+              <div className="snoopy-leg-bl"></div>
+              <div className="snoopy-leg-br"></div>
+            </div>
+            <div className="snoopy-scarf"></div>
+          </div>
+
+          {/* Snoopy 3 - Sleeping/Flooting */}
+          <div className="snoopy snoopy-sleep">
+            <div className="snoopy-body">
+              <div className="snoopy-ear-l"></div>
+              <div className="snoopy-ear-r"></div>
+              <div className="snoopy-head">
+                <div className="snoopy-eye-l snoopy-eye-closed"></div>
+                <div className="snoopy-eye-r snoopy-eye-closed"></div>
+                <div className="snoopy-nose"></div>
+                <div className="snoopy-smile"></div>
+              </div>
+              <div className="snoopy-tail"></div>
+              <div className="snoopy-leg-fl"></div>
+              <div className="snoopy-leg-fr"></div>
+              <div className="snoopy-leg-bl"></div>
+              <div className="snoopy-leg-br"></div>
+            </div>
+            <div className="snoopy-z">💤</div>
+          </div>
+
+          {/* Snoopy 4 - Walking */}
+          <div className="snoopy snoopy-walk">
+            <div className="snoopy-body">
+              <div className="snoopy-ear-l"></div>
+              <div className="snoopy-ear-r"></div>
+              <div className="snoopy-head">
+                <div className="snoopy-eye-l"></div>
+                <div className="snoopy-eye-r"></div>
+                <div className="snoopy-nose"></div>
+                <div className="snoopy-smile"></div>
+              </div>
+              <div className="snoopy-tail"></div>
+              <div className="snoopy-leg-fl"></div>
+              <div className="snoopy-leg-fr"></div>
+              <div className="snoopy-leg-bl"></div>
+              <div className="snoopy-leg-br"></div>
+            </div>
+          </div>
+
+          {/* Floating music notes & stars */}
+          <div className="snoopy-floaties">
+            <div className="sfloat sfloat-note1">♪</div>
+            <div className="sfloat sfloat-note2">♫</div>
+            <div className="sfloat sfloat-note3">♪</div>
+            <div className="sfloat sfloat-star1">⭐</div>
+            <div className="sfloat sfloat-star2">✨</div>
+            <div className="sfloat sfloat-heart">💕</div>
           </div>
         </div>
 

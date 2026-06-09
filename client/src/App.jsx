@@ -536,6 +536,9 @@ function Dashboard({ token, onLogout, region }) {
   const [socket, setSocket] = useState(null);
   const [nodes, setNodes] = useState([]);
   const [myNode, setMyNode] = useState(null);
+  const [myRole, setMyRole] = useState('user');
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [adminTarget, setAdminTarget] = useState('');
   const [globalStats, setGlobalStats] = useState({ activeUsers: 0, totalPopulation: 0, globalProduction: 0, socialCompression: '1.000' });
   const [hubStats, setHubStats] = useState(null);
 
@@ -625,17 +628,27 @@ function Dashboard({ token, onLogout, region }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Global keydown listener for Terminal
+  // Global keydown listener for Terminal + Escape
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === '`' || e.key === '~') {
         e.preventDefault();
         setIsTerminalOpen(prev => !prev);
       }
+      if (e.key === 'Escape') {
+        if (showLeaderboard) setShowLeaderboard(false);
+        else if (showDiscordModal) setShowDiscordModal(false);
+        else if (showAboutModal) setShowAboutModal(false);
+        else if (showSocialModal) setShowSocialModal(false);
+        else if (showShopModal) setShowShopModal(false);
+        else if (showAccountInfo) setShowAccountInfo(false);
+        else if (showThemeMenu) setShowThemeMenu(false);
+        else if (showAdminPanel) setShowAdminPanel(false);
+      }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, []);
+  }, [showLeaderboard, showDiscordModal, showAboutModal, showSocialModal, showShopModal, showAccountInfo, showThemeMenu, showAdminPanel]);
 
   // Scroll terminal to bottom
   useEffect(() => {
@@ -740,6 +753,7 @@ function Dashboard({ token, onLogout, region }) {
 
     s.on('init_data', async (data) => {
       setMyNode(data);
+      setMyRole(data.role || 'user');
       addLog(`身分確認：節點 [${data.username}] 成功接入全球網路`);
       
       if (data.discordProfile) {
@@ -844,7 +858,16 @@ function Dashboard({ token, onLogout, region }) {
     });
 
     s.on('chat_message_deleted', (data) => {
-      addLog(`[MOD] 管理員 ${data.modUsername} 刪除了一則訊息`);
+      setLogs(prev => {
+        let updated = prev;
+        if (data.targetUsername) {
+          updated = updated.filter(l => !l.text?.includes(` ${data.targetUsername}: `));
+        }
+        const time = new Date().toISOString().substring(11, 19);
+        updated = [...updated, { text: `[MOD] 管理員 ${data.modUsername} 刪除了一則訊息`, time }];
+        if (updated.length > 200) updated = updated.slice(-200);
+        return updated;
+      });
     });
 
     s.on('chat_system_message', (data) => {
@@ -1051,6 +1074,28 @@ function Dashboard({ token, onLogout, region }) {
     if (!chatInput.trim() || !socket) return;
     socket.emit('send_chat', { message: chatInput });
     setChatInput('');
+  };
+
+  const handleAdminMute = () => {
+    if (!socket || !adminTarget.trim()) return;
+    const duration = parseInt(document.getElementById('muteDuration')?.value || '5', 10);
+    socket.emit('mod_mute_user', { targetUsername: adminTarget.trim(), duration });
+    addLog(`[MOD] 發出禁言指令：${adminTarget.trim()} ${duration} 分鐘`);
+    setAdminTarget('');
+  };
+
+  const handleAdminUnmute = () => {
+    if (!socket || !adminTarget.trim()) return;
+    socket.emit('mod_unmute_user', { targetUsername: adminTarget.trim() });
+    addLog(`[MOD] 發出解禁指令：${adminTarget.trim()}`);
+    setAdminTarget('');
+  };
+
+  const handleAdminDelete = () => {
+    if (!socket || !adminTarget.trim()) return;
+    socket.emit('mod_delete_message', { messageId: Date.now().toString(), targetUsername: adminTarget.trim() });
+    addLog(`[MOD] 發出刪除訊息指令：${adminTarget.trim()}`);
+    setAdminTarget('');
   };
 
   const handleTerminalSubmit = (e) => {
@@ -1359,10 +1404,33 @@ function Dashboard({ token, onLogout, region }) {
 
           {/* Bottom Console Log Module */}
           <Draggable nodeRef={logRef} handle=".log-header">
-            <div ref={logRef} className="bottom-log-console" style={{display: 'flex', flexDirection: 'column', height: '250px'}}>
+            <div ref={logRef} className="bottom-log-console" style={{display: 'flex', flexDirection: 'column'}}>
               <div className="log-header" style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-color)', cursor: 'move'}}>
               <Activity size={16} /> 世界頻道 / 系統日誌 (World Chat)
+              {(myRole === 'admin' || myRole === 'moderator') && (
+                <button onClick={() => setShowAdminPanel(!showAdminPanel)} style={{marginLeft: 'auto', background: showAdminPanel ? 'var(--danger-color)' : 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '2px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem'}}>
+                  {showAdminPanel ? '關閉管理' : '⚙ 管理'}
+                </button>
+              )}
             </div>
+            {showAdminPanel && (
+              <div style={{padding: '8px', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center', background: 'rgba(255,0,0,0.05)'}}>
+                <span style={{color: 'var(--danger-color)', fontSize: '0.8rem', fontWeight: 'bold'}}>管理員功能</span>
+                <input type="text" value={adminTarget} onChange={e => setAdminTarget(e.target.value)} placeholder="目標使用者名稱" style={{flex: 1, minWidth: '120px', background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '4px 8px', borderRadius: '4px', outline: 'none', fontSize: '0.8rem'}} />
+                <select id="muteDuration" defaultValue="5" style={{background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '4px', borderRadius: '4px', fontSize: '0.8rem'}}>
+                  <option value="1">1 分鐘</option>
+                  <option value="5">5 分鐘</option>
+                  <option value="10">10 分鐘</option>
+                  <option value="30">30 分鐘</option>
+                  <option value="60">1 小時</option>
+                  <option value="360">6 小時</option>
+                  <option value="1440">24 小時</option>
+                </select>
+                <button onClick={handleAdminMute} style={{background: 'var(--danger-color)', border: 'none', color: '#fff', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem'}}>禁言</button>
+                <button onClick={handleAdminUnmute} style={{background: 'var(--success-color)', border: 'none', color: '#fff', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem'}}>解禁</button>
+                <button onClick={handleAdminDelete} style={{background: 'var(--warning-color)', border: 'none', color: '#000', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem'}}>刪除訊息</button>
+              </div>
+            )}
             <div className="log-content" style={{flex: 1, overflowY: 'auto'}}>
               {logs.map((log, i) => {
                 let logColor = 'inherit';

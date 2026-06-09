@@ -963,6 +963,7 @@ regions.forEach(regionName => {
       socket.emit('init_data', {
         userId: user.id,
         username: user.username,
+        role: user.role,
         discordProfile: user.discordProfile,
         ip: user.ipObfuscated,
         country: user.country,
@@ -1079,7 +1080,7 @@ regions.forEach(regionName => {
     try {
       const dbUser = await User.findOne({ username: user.username }, 'role');
       if (!dbUser || dbUser.role === 'user') return;
-      nspIo.emit('chat_message_deleted', { messageId: data.messageId, modUsername: user.username });
+      nspIo.emit('chat_message_deleted', { messageId: data.messageId, targetUsername: data.targetUsername, modUsername: user.username });
       console.log(`[MOD] ${user.username} deleted a message`);
     } catch (err) {
       console.error('[MOD] delete_message error:', err);

@@ -503,7 +503,9 @@ function CountdownBanner() {
       borderBottom: '1px solid rgba(255,255,255,0.1)',
       gap: '15px',
       flexWrap: 'wrap',
-      flexShrink: 0
+      flexShrink: 0,
+      position: 'relative',
+      zIndex: 50
     }}>
       <div style={{display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.95rem', fontWeight: '600'}}>
         <span style={{color: '#ffcc00'}}>✧</span> 

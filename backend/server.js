@@ -9,8 +9,8 @@ dotenv.config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
-const User = require('./models/User'); 
-const discordBot = require('./discordBot'); 
+const User = require('./models/User'); // Required for updateMany
+const discordBot = require('./discordBot'); // Starts discord bot and cron jobs
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const os = require('os');
@@ -23,9 +23,9 @@ const FILTERED_WORDS = ['fuck', 'shit', 'asshole', 'bitch', 'damn', 'cao', '幹'
 // Chat rate limiting
 const chatCooldowns = new Map();
 
-// Discord role cache
+// Discord role cache: discordId -> { role, ts }
 const roleCache = new Map();
-const ROLE_CACHE_TTL = 60 * 1000; 
+const ROLE_CACHE_TTL = 60 * 1000; // 1 minute
 
 async function getCachedRole(discordId) {
   const cached = roleCache.get(discordId);
@@ -89,7 +89,7 @@ process.on('unhandledRejection', (reason) => {
   console.error('[SYS] Unhandled Rejection:', reason);
 });
 
-// Heartbeat tracking
+// Heartbeat tracking for disconnect compensation
 const heartbeatTimestamps = new Map();
 const reviveCounts = new Map();
 
@@ -99,6 +99,7 @@ const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || '';
 const BACKEND_URL = process.env.BACKEND_URL || 'https://earthonline.onrender.com';
 const DISCORD_REDIRECT_URI = process.env.DISCORD_REDIRECT_URI || 'http://localhost:3001/api/auth/discord/callback';
 
+// Discord Webhook configuration
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || null;
 
 async function sendDiscordWebhook(message) {
@@ -115,7 +116,7 @@ async function sendDiscordWebhook(message) {
   }
 }
 
-// IP 預設模糊安全防護 [v2.0.0]
+// IP 預設模糊化防護 [v2.0.0]
 function obfuscateIp(ip) {
   if (!ip) return '0.0.0.0';
   const ipv4Match = ip.match(/^(\d{1,3}\.\d{1,3})\.\d{1,3}\.\d{1,3}$/);
@@ -144,6 +145,7 @@ apiRouter.post('/register', async (req, res, next) => {
       return res.status(400).json({ error: '同一 IP 一天最多只能註冊 3 個帳號。' });
     }
 
+    // VPN/Proxy Check
     if (ip !== '::1' && ip !== '127.0.0.1') {
       try {
         const fetch = (await import('node-fetch')).default;
@@ -517,7 +519,7 @@ app.get('/api/auth/discord/callback', async (req, res) => {
   }
 });
 
-// Leaderboard Endpoint (整合 Discord 伺服器加成 1.5 倍特權)
+// Leaderboard Endpoint (整合 Discord 供應商 1.5 倍加成)
 apiRouter.get('/leaderboard', async (req, res) => {
   try {
     const users = await User.find({}, 'username accumulatedTime accumulatedBonusPoints discord country')
@@ -532,8 +534,8 @@ apiRouter.get('/leaderboard', async (req, res) => {
       const realRole = discordId !== '無' ? await getCachedRole(discordId) : '';
       const isBooster = realRole.includes('核心能源供應商');
       
-      const boostMultiplier = isBooster ? 1.5 : 1.0;
-      const points = Math.floor(idleTimeSeconds * boostMultiplier) + (u.accumulatedBonusPoints || 0);
+      const speedMultiplier = isBooster ? 1.5 : 1.0;
+      const points = Math.floor(idleTimeSeconds * speedMultiplier) + (u.accumulatedBonusPoints || 0);
 
       return {
         username: u.username,
@@ -776,7 +778,7 @@ regions.forEach(regionName => {
       }
     });
 
-    // ── 購買道具（整合 Discord 加成供應商黑市商城終身 8 折特權） ─────────────────
+    // ── 購買道具（整合 8 折特權，原生 async 修正） ─────────────────
     socket.on('buy_item', async (itemId) => {
       if (!socket.user) return;
       try {
@@ -811,7 +813,7 @@ regions.forEach(regionName => {
           return;
         }
 
-        socket.emit('buy_result', { success: true, message: `✅ 已購買「${itemId}」並存入背包！${isBooster ? ' (已自動折抵加成商 20% 關稅)' : ''}` });
+        socket.emit('buy_result', { success: true, message: `✅ 已購買「${itemId}」並存入背包！${isBooster ? ' (已折抵加成商 20% 關稅)' : ''}` });
         socket.emit('user_state_update', {
           pts: result.accumulatedBonusPoints,
           inventory: result.inventory ? Object.fromEntries(result.inventory) : {}
@@ -822,7 +824,7 @@ regions.forEach(regionName => {
       }
     });
 
-    // ── 使用道具（原生無錯異步綁定） ──────────────────────────────────
+    // ── 使用道具（乾淨底層，不夾雜任何錯誤代碼殘留物） ──────────────────────────────────
     socket.on('use_item', async (itemId) => {
       if (!socket.user) return;
       try {
@@ -1061,7 +1063,7 @@ regions.forEach(regionName => {
         }
 
         if (connectedUsers.size % 10 === 0 && connectedUsers.size > 0) {
-          sendDiscordWebhook(`🌐 **【地理節點高載通報】**\n偵測到大量節點湧入，目前全服掛機人數已達 **${connectedUsers.size}** 人！`);
+          sendDiscordWebhook(`🌐 **【地理節點高載通報】**\n偵測到大量節點湧入，目前全服掛機人數已達 **${connectedUsers.size}** 人！\n來自 \`${user.country}\` 的節點點亮了板塊。`);
         }
 
         nspIo.emit('node_connected', { id: user.id, lat: user.lat, lon: user.lon });
@@ -1310,9 +1312,11 @@ regions.forEach(regionName => {
         try {
           const dbUser = await User.findOne({ username: user.username });
           if (!dbUser) return;
+          
           if ((dbUser.accumulatedBonusPoints || 0) < BROADCAST_COST) {
             return socket.emit('terminal_response', `[ERROR] INSUFFICIENT BONUS POINTS.`);
           }
+          
           await User.updateOne({ username: user.username }, { $inc: { accumulatedBonusPoints: -BROADCAST_COST } });
           nspIo.emit('global_broadcast', { username: user.username, message: message });
           socket.emit('terminal_response', `[SUCCESS] BROADCAST TRANSMITTED GLOBALLY.`);
@@ -1353,7 +1357,7 @@ regions.forEach(regionName => {
       }
     });
 
-    // ── 處理中斷連線（整合 Discord 供應商特權：太陽風暴天災免疫防護） ──────────────────
+    // ── 處理中斷連線（加成供應商免罪護盾特權） ──────────────────
     socket.on('disconnect', async () => {
       const disconnectedUser = connectedUsers.get(socket.id);
       if (disconnectedUser) {

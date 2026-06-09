@@ -698,12 +698,12 @@ function Dashboard({ token, onLogout, region }) {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const res = await fetch(`${API_URL}/leaderboard`);
+        const res = await fetch(`${API_URL}/leaderboard`, { cache: 'no-store' });
         if (res.ok) setLeaderboard(await res.json());
       } catch(err) {}
     };
     fetchLeaderboard();
-    const intv = setInterval(fetchLeaderboard, 30000);
+    const intv = setInterval(fetchLeaderboard, 5000);
     return () => clearInterval(intv);
   }, []);
 

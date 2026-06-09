@@ -111,6 +111,7 @@ export function ThemeProvider({ children }) {
     root.style.setProperty('--bg-color', t.bg);
     root.style.setProperty('--bg-light', t.bgLight);
     root.style.setProperty('--surface-color', t.surface);
+    root.style.setProperty('--panel-bg', t.surface);
     root.style.setProperty('--text-color', t.text);
     root.style.setProperty('--text-dim', t.textDim);
     root.style.setProperty('--border-color', t.border);
@@ -118,6 +119,9 @@ export function ThemeProvider({ children }) {
     root.style.setProperty('--warning-color', t.warning);
     root.style.setProperty('--success-color', t.success);
     root.style.setProperty('--info-color', t.info);
+    root.style.setProperty('--text-primary', t.text);
+    root.style.setProperty('--text-secondary', t.textDim);
+    root.style.setProperty('--text-main', t.text);
   }, [currentTheme]);
 
   return (

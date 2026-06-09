@@ -188,7 +188,7 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
             <div ref={badgeRef} style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(20,20,20,0.85)', padding: '10px 18px', borderRadius: '12px', border: '1px solid #2d313b', color: '#f8fafc', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10, backdropFilter: 'blur(4px)', userSelect: 'none', cursor: 'move', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
               <MapPin size={18} color="#ef4444" />
               <strong style={{ fontWeight: '600' }}>Node: {currentRegion.name} {currentRegion.flag}</strong>
-              <span style={{ color: '#64748b', fontSize: '0.85rem', marginLeft: '6px', borderLeft: '1px solid #333', paddingLeft: '12px' }}>Racks: <strong style={{ color: '#fff' }}>{level < 3 ? 1 : rackCount}</strong></span>
+              <span style={{ color: 'var(--text-dim)', fontSize: '0.85rem', marginLeft: '6px', borderLeft: '1px solid #333', paddingLeft: '12px' }}>Racks: <strong style={{ color: '#fff' }}>{level < 3 ? 1 : rackCount}</strong></span>
             </div>
           </Draggable>
 

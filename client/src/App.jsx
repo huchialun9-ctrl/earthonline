@@ -628,17 +628,27 @@ function Dashboard({ token, onLogout, region }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Global keydown listener for Terminal
+  // Global keydown listener for Terminal + Escape
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === '`' || e.key === '~') {
         e.preventDefault();
         setIsTerminalOpen(prev => !prev);
       }
+      if (e.key === 'Escape') {
+        if (showLeaderboard) setShowLeaderboard(false);
+        else if (showDiscordModal) setShowDiscordModal(false);
+        else if (showAboutModal) setShowAboutModal(false);
+        else if (showSocialModal) setShowSocialModal(false);
+        else if (showShopModal) setShowShopModal(false);
+        else if (showAccountInfo) setShowAccountInfo(false);
+        else if (showThemeMenu) setShowThemeMenu(false);
+        else if (showAdminPanel) setShowAdminPanel(false);
+      }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, []);
+  }, [showLeaderboard, showDiscordModal, showAboutModal, showSocialModal, showShopModal, showAccountInfo, showThemeMenu, showAdminPanel]);
 
   // Scroll terminal to bottom
   useEffect(() => {

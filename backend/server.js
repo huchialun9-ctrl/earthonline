@@ -1020,6 +1020,12 @@ regions.forEach(regionName => {
       }
       const dbUser = await db.findUserByUsername(decoded.username);
       
+      // Ban check — reject banned users
+      if (dbUser && dbUser.bannedUntil && dbUser.bannedUntil > Date.now()) {
+        socket.emit('auth_error', { message: '此帳號已被封鎖，無法登入。' });
+        return;
+      }
+      
       if (geo.country !== 'UNKNOWN') {
         await User.updateOne({ username: decoded.username }, { $set: { country: geo.country } });
       }

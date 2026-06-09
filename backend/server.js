@@ -1214,17 +1214,6 @@ regions.forEach(regionName => {
     }
   });
 
-  // Moderation: Get online users list
-  socket.on('get_online_users', () => {
-    const user = connectedUsers.get(socket.id);
-    if (!user) return;
-    const users = [];
-    for (const [sid, u] of connectedUsers.entries()) {
-      if (u.username) users.push(u.username);
-    }
-    socket.emit('online_users', [...new Set(users)]);
-  });
-
   // Friend System Handlers
   const isUserOnline = (username) => {
     for (const [id, user] of connectedUsers.entries()) {

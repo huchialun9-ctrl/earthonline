@@ -977,64 +977,6 @@ regions.forEach(regionName => {
     }
   });
 
-      
-      if (item.effect === 'health') {
-        if (result.health <= 0) {
-          await User.updateOne({ username: socket.user.username }, { $inc: { accumulatedBonusPoints: item.cost } });
-          socket.emit('buy_result', { success: false, message: '伺服器已死機，無法使用冷卻模組！請使用備用發電機。' });
-          return;
-        }
-        const newHealth = Math.min(100, result.health + item.value);
-        await User.updateOne({ username: socket.user.username }, { $set: { health: newHealth } });
-      } else if (item.effect === 'buff') {
-        await User.updateOne(
-          { username: socket.user.username },
-          { $set: { [`activeBuffs.${item.type}`]: Date.now() + item.duration } }
-        );
-      } else if (item.effect === 'revive') {
-        if (result.health > 0) {
-          await User.updateOne({ username: socket.user.username }, { $inc: { accumulatedBonusPoints: item.cost } });
-          socket.emit('buy_result', { success: false, message: '伺服器運作正常，不需要發電機！' });
-          return;
-        }
-        await User.updateOne({ username: socket.user.username }, { $set: { health: item.value } });
-      } else if (item.effect === 'cosmetic') {
-        await User.updateOne(
-          { username: socket.user.username },
-          { $inc: { [`inventory.${itemId}`]: 1 } }
-        );
-        message = '已獲得霓虹燈管！';
-      } else if (item.effect === 'random') {
-        const rand = Math.random();
-        if (rand < 0.3) {
-          await User.updateOne({ username: socket.user.username }, { $inc: { accumulatedTime: 86400 * 1000 } });
-          message = '大吉！獲得 1 天生存時間！';
-        } else if (rand < 0.6) {
-          await User.updateOne({ username: socket.user.username }, { $inc: { accumulatedBonusPoints: 2000 } });
-          message = '中吉！獲得 2000 PT！';
-        } else if (rand < 0.9) {
-          await User.updateOne({ username: socket.user.username }, { $inc: { accumulatedBonusPoints: 500 } });
-          message = '小吉！回本 500 PT！';
-        } else {
-          await User.updateOne({ username: socket.user.username }, { $inc: { health: -50 } });
-          message = '大凶！抽到電腦病毒，健康度 -50！';
-        }
-      }
-      
-      const finalUser = await User.findOne({ username: socket.user.username });
-      socket.emit('buy_result', { success: true, message, health: finalUser.health, pts: finalUser.accumulatedBonusPoints });
-      socket.emit('user_state_update', {
-        health: finalUser.health,
-        pts: finalUser.accumulatedBonusPoints,
-        activeBuffs: finalUser.activeBuffs ? Object.fromEntries(finalUser.activeBuffs) : {},
-        inventory: finalUser.inventory ? Object.fromEntries(finalUser.inventory) : {}
-      });
-    } catch (err) {
-      console.error(err);
-      socket.emit('buy_result', { success: false, message: '系統錯誤' });
-    }
-  });
-
   // Ad revive: restore health after watching an ad
   socket.on('ad_revive', async () => {
     if (!socket.user) return;

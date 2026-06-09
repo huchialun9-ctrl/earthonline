@@ -828,6 +828,11 @@ function Dashboard({ token, onLogout, region }) {
       }
     });
 
+    s.on('chat_verification_required', (data) => {
+      addLog(`[SYSTEM] ⚠️ ${data.message}`);
+      alert('⚠️ ' + data.message);
+    });
+
     s.on('pong', () => {
       setPing(Date.now() - pingStartRef.current);
     });

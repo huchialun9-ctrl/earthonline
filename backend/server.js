@@ -1022,7 +1022,12 @@ regions.forEach(regionName => {
     // Require Discord binding or email verification to chat
     try {
       const dbUser = await User.findOne({ username: user.username }, 'discord isEmailVerified role mutedUntil bannedUntil');
-      if (!dbUser) return;
+      if (!dbUser) {
+        console.log(`[CHAT] User ${user.username} not found in DB`);
+        return;
+      }
+      
+      console.log(`[CHAT] ${user.username} - discord:${!!dbUser.discord?.id} email:${!!dbUser.isEmailVerified} role:${dbUser.role}`);
       
       if (!dbUser.discord?.id && !dbUser.isEmailVerified) {
         socket.emit('chat_verification_required', { message: '請先綁定 Discord 或驗證電子郵件後才能使用世界聊天。' });

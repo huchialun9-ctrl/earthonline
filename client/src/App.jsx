@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
-import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Tornado, Coins, Satellite, AlertTriangle, CheckCircle, MapPin, Monitor, ShoppingCart, Palette } from 'lucide-react';
+import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Shield, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Tornado, Coins, Satellite, AlertTriangle, CheckCircle, MapPin, Monitor, ShoppingCart, Palette } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import { useTheme } from './ThemeContext';
 import Draggable from 'react-draggable';
@@ -1098,6 +1098,21 @@ function Dashboard({ token, onLogout, region }) {
     setAdminTarget('');
   };
 
+  const handleAdminBan = () => {
+    if (!socket || !adminTarget.trim()) return;
+    const duration = parseInt(document.getElementById('banDuration')?.value || '1440', 10);
+    socket.emit('mod_ban_user', { targetUsername: adminTarget.trim(), duration });
+    addLog(`[MOD] 發出封鎖指令：${adminTarget.trim()} ${duration} 分鐘`);
+    setAdminTarget('');
+  };
+
+  const handleAdminUnban = () => {
+    if (!socket || !adminTarget.trim()) return;
+    socket.emit('mod_unban_user', { targetUsername: adminTarget.trim() });
+    addLog(`[MOD] 發出解除封鎖指令：${adminTarget.trim()}`);
+    setAdminTarget('');
+  };
+
   const handleTerminalSubmit = (e) => {
     e.preventDefault();
     if (!terminalInput.trim()) return;
@@ -1215,6 +1230,11 @@ function Dashboard({ token, onLogout, region }) {
               <button className="dropdown-item" onClick={() => { setShowThemeMenu(!showThemeMenu); setDropdownOpen(false); }}>
                 <Palette size={16} /> 主題配色 (Themes)
               </button>
+              {(myRole === 'admin' || myRole === 'moderator') && (
+                <button className="dropdown-item" style={{color: 'var(--danger-color)'}} onClick={() => { setShowAdminPanel(true); setDropdownOpen(false); }}>
+                  <Shield size={16} /> 管理員功能 (Admin)
+                </button>
+              )}
               <a href="https://discord.gg/6P6NG49Mus" target="_blank" rel="noreferrer" className="dropdown-item" style={{color: 'var(--info-color)'}} onClick={() => setDropdownOpen(false)}>
                 <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.58,67.58,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
                 官方 Discord
@@ -1429,6 +1449,16 @@ function Dashboard({ token, onLogout, region }) {
                 <button onClick={handleAdminMute} style={{background: 'var(--danger-color)', border: 'none', color: '#fff', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem'}}>禁言</button>
                 <button onClick={handleAdminUnmute} style={{background: 'var(--success-color)', border: 'none', color: '#fff', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem'}}>解禁</button>
                 <button onClick={handleAdminDelete} style={{background: 'var(--warning-color)', border: 'none', color: '#000', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem'}}>刪除訊息</button>
+                <select id="banDuration" defaultValue="1440" style={{background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '4px', borderRadius: '4px', fontSize: '0.8rem'}}>
+                  <option value="60">1 小時</option>
+                  <option value="360">6 小時</option>
+                  <option value="1440">24 小時</option>
+                  <option value="4320">3 天</option>
+                  <option value="10080">7 天</option>
+                  <option value="43200">30 天</option>
+                </select>
+                <button onClick={handleAdminBan} style={{background: '#000', border: '1px solid var(--danger-color)', color: 'var(--danger-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem'}}>封鎖</button>
+                <button onClick={handleAdminUnban} style={{background: 'var(--success-color)', border: 'none', color: '#fff', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem'}}>解封</button>
               </div>
             )}
             <div className="log-content" style={{flex: 1, overflowY: 'auto'}}>

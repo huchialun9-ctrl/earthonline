@@ -18,6 +18,9 @@ const os = require('os');
 // Filtered words for chat moderation
 const FILTERED_WORDS = ['fuck', 'shit', 'asshole', 'bitch', 'damn', 'cao', '幹', '靠北', '操你媽', 'fucking', 'stupid', 'idiot', 'nigger', 'bastard', 'piss off', 'suck my', 'motherfucker'];
 
+// Chat rate limiting
+const chatCooldowns = new Map();
+
 // Run offline time migration once on startup
 db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', err));
 

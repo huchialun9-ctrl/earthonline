@@ -18,6 +18,24 @@
   --info-color: #3b82f6;
   --font-mono: 'Nunito', 'Noto Sans TC', sans-serif;
   --font-sans: 'Nunito', 'Noto Sans TC', sans-serif;
+  --terminal-bg: #0a0e17;
+  --terminal-surface: #161d2e;
+  --terminal-border: #1e293b;
+  --terminal-text: #e2e8f0;
+  --terminal-text-dim: #64748b;
+  --terminal-accent: #00ff41;
+}
+
+/* Terminal-style elements always stay dark regardless of theme */
+.terminal-dark {
+  background: var(--terminal-bg) !important;
+  color: var(--terminal-text) !important;
+  border-color: var(--terminal-border) !important;
+}
+.terminal-dark-surface {
+  background: var(--terminal-surface) !important;
+  color: var(--terminal-text) !important;
+  border-color: var(--terminal-border) !important;
 }
 
 * {
@@ -81,9 +99,9 @@ body {
 /* Left Sidebar - Metrics Terminal */
 .metrics-terminal {
   width: 320px;
-  background: rgba(20, 22, 25, 0.95);
+  background: var(--panel-bg);
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   display: flex;
@@ -97,7 +115,7 @@ body {
 
 .metric-group {
   padding: 15px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
 }
 .metric-group:last-child {
   border-bottom: none;
@@ -126,7 +144,7 @@ body {
 .geographic-matrix {
   flex: 1;
   position: relative;
-  background-color: #000; /* Map container bg */
+  background-color: var(--bg-color);
 }
 
 /* Overlays on Map */
@@ -140,9 +158,9 @@ body {
 }
 
 .floating-panel {
-  background: rgba(20, 22, 25, 0.95);
+  background: var(--panel-bg);
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -175,7 +193,7 @@ body {
 .leaflet-container {
   height: 100%;
   width: 100%;
-  background: #000 !important;
+  background: var(--bg-color) !important;
 }
 .leaflet-control-zoom {
   border: 1px solid var(--border-color) !important;
@@ -200,8 +218,8 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: rgba(10, 15, 25, 0.8) !important;
-  border: 1px solid rgba(0, 210, 255, 0.15) !important;
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--border-color) !important;
   border-top: 2px solid var(--accent-color) !important;
   border-radius: 8px !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 210, 255, 0.05) !important;
@@ -216,7 +234,7 @@ body {
   letter-spacing: 1.5px;
   margin-bottom: 8px;
   padding-bottom: 6px;
-  border-bottom: 1px dashed rgba(0, 210, 255, 0.3);
+  border-bottom: 1px dashed var(--border-color);
 }
 
 .log-content {
@@ -225,7 +243,7 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  color: #a0aec0;
+  color: var(--text-dim);
   padding-right: 5px;
 }
 
@@ -257,7 +275,7 @@ body {
   height: 100vh;
   width: 100vw;
   background-color: var(--bg-color);
-  background-image: radial-gradient(circle at center, #111 0%, #000 100%);
+  background-image: radial-gradient(circle at center, var(--surface-color) 0%, var(--bg-color) 100%);
 }
 
 /* Rotating Earth Animation */
@@ -292,7 +310,7 @@ body {
 }
 
 .login-box {
-  background: rgba(13, 13, 13, 0.9);
+  background: var(--surface-color);
   border: 1px solid var(--accent-color);
   padding: 40px;
   width: 400px;
@@ -401,7 +419,7 @@ body {
   transition: all 0.2s;
 }
 .discord-link:hover {
-  color: #fff;
+  color: var(--text-color);
   text-shadow: 0 0 10px var(--accent-color);
 }
 
@@ -413,7 +431,7 @@ body {
 .pro-doc-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: #000000;
+  background: var(--bg-color);
   z-index: 10000;
   display: flex;
   flex-direction: column;
@@ -424,8 +442,8 @@ body {
 .pro-doc-header {
   padding: 0 40px;
   height: 60px;
-  border-bottom: 1px solid #1f1f1f;
-  background: #050505;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--surface-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -437,7 +455,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #ededed;
+  color: var(--text-color);
   font-size: 0.85rem;
   letter-spacing: 2px;
   font-family: monospace;
@@ -445,8 +463,8 @@ body {
 
 .pro-doc-close {
   background: transparent;
-  border: 1px solid #333;
-  color: #888;
+  border: 1px solid var(--border-color);
+  color: var(--text-dim);
   padding: 6px 12px;
   font-size: 0.75rem;
   font-family: monospace;
@@ -457,8 +475,8 @@ body {
   transition: all 0.2s;
 }
 .pro-doc-close:hover {
-  border-color: #fff;
-  color: #fff;
+  border-color: var(--text-color);
+  color: var(--text-color);
 }
 
 .pro-doc-body {
@@ -484,7 +502,7 @@ body {
 }
 
 .pro-doc-sidebar li {
-  color: #666;
+  color: var(--text-dim);
   font-size: 0.85rem;
   font-family: monospace;
   margin-bottom: 15px;
@@ -515,7 +533,7 @@ body {
 }
 
 .doc-title {
-  color: #ededed;
+  color: var(--text-color);
   font-size: 2.2rem;
   font-weight: 500;
   letter-spacing: -0.03em;
@@ -523,14 +541,14 @@ body {
 }
 
 .doc-lead {
-  color: #a1a1aa;
+  color: var(--text-dim);
   font-size: 1.15rem;
   line-height: 1.6;
   margin-bottom: 40px;
 }
 
 .doc-text {
-  color: #888;
+  color: var(--text-dim);
   font-size: 0.95rem;
   line-height: 1.8;
   margin-bottom: 20px;
@@ -540,26 +558,26 @@ body {
   display: grid;
   grid-template-columns: 150px 1fr;
   gap: 15px;
-  border-top: 1px solid #1f1f1f;
+  border-top: 1px solid var(--border-color);
   padding-top: 20px;
   margin-top: 20px;
 }
 
 .doc-grid-label {
-  color: #ededed;
+  color: var(--text-color);
   font-size: 0.85rem;
   font-weight: 500;
 }
 
 .doc-grid-value {
-  color: #888;
+  color: var(--text-dim);
   font-size: 0.9rem;
   line-height: 1.6;
 }
 .doc-grid-value a {
-  color: #ededed;
+  color: var(--text-color);
   text-decoration: underline;
-  text-decoration-color: #333;
+  text-decoration-color: var(--border-color);
   text-underline-offset: 4px;
 }
 .doc-grid-value a:hover {
@@ -658,7 +676,7 @@ body {
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: #12151a;
+  background-color: var(--surface-color);
   min-width: 180px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
   border: 1px solid var(--border-color);
@@ -708,8 +726,8 @@ body {
 }
 
 .dropdown-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background-color: var(--bg-light);
+  color: var(--text-color);
 }
 
 /* =========================================

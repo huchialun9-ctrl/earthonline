@@ -68,14 +68,7 @@ db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', er
 const app = express();
 const apiRouter = express.Router({ mergeParams: true });
 app.use(helmet());
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000,https://earthonline1.pages.dev,https://earthonline-2m7.pages.dev,https://earthonline.qzz.io,https://earthonline.onrender.com').split(',').map(s => s.trim());
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
-  }
-};
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use('/downloads', express.static(path.join(__dirname, 'public/downloads')));
 app.use(morgan('short'));
@@ -660,7 +653,7 @@ app.use((err, req, res, next) => {
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: ALLOWED_ORIGINS, methods: ['GET', 'POST'] }
+  cors: { origin: '*', methods: ['GET', 'POST'] }
 });
 
 discordBot.setIoInstance(io);

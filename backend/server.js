@@ -1258,6 +1258,50 @@ regions.forEach(regionName => {
     }
   });
 
+  // Moderation: Add points to user (moderator+ only)
+  socket.on('mod_add_pts', async (data) => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    try {
+      const dbUser = await User.findOne({ username: user.username }, 'role');
+      if (!dbUser || dbUser.role === 'user') return;
+      const amount = Math.min(Math.abs(parseInt(data.amount) || 0), 100000);
+      if (amount <= 0) {
+        socket.emit('terminal_response', `[MOD] 請輸入有效的點數數量（1 ~ 100000）`);
+        return;
+      }
+      const target = await User.findOneAndUpdate(
+        { username: data.targetUsername },
+        { $inc: { accumulatedBonusPoints: amount } },
+        { new: true }
+      );
+      if (!target) {
+        socket.emit('terminal_response', `[MOD] 找不到使用者 ${data.targetUsername}`);
+        return;
+      }
+      nspIo.emit('chat_system_message', { message: `[系統] 管理員給予 ${data.targetUsername} ${amount} PT` });
+      for (const [sid, u] of connectedUsers.entries()) {
+        if (u.username === data.targetUsername) {
+          nspIo.to(sid).emit('user_state_update', { pts: target.accumulatedBonusPoints });
+          break;
+        }
+      }
+    } catch (err) {
+      console.error('[MOD] add_pts error:', err);
+    }
+  });
+
+  // Get online users list
+  socket.on('get_online_users', () => {
+    const user = connectedUsers.get(socket.id);
+    if (!user) return;
+    const users = [];
+    for (const [sid, u] of connectedUsers.entries()) {
+      if (u.username) users.push(u.username);
+    }
+    socket.emit('online_users', [...new Set(users)]);
+  });
+
   // Friend System Handlers
   const isUserOnline = (username) => {
     for (const [id, user] of connectedUsers.entries()) {

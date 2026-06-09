@@ -1148,6 +1148,16 @@ function Dashboard({ token, onLogout, region }) {
     setAdminTarget('');
   };
 
+  const [adminPtsAmount, setAdminPtsAmount] = useState(0);
+
+  const handleAdminAddPts = () => {
+    if (!socket || !adminTarget.trim() || adminPtsAmount <= 0) return;
+    socket.emit('mod_add_pts', { targetUsername: adminTarget.trim(), amount: adminPtsAmount });
+    addLog(`[MOD] 給予 ${adminTarget.trim()} ${adminPtsAmount} PT`);
+    setAdminTarget('');
+    setAdminPtsAmount(0);
+  };
+
   const handleStartAdRevive = () => {
     if (!socket || adReviveRemaining <= 0 || adPlaying) return;
     setAdPlaying(true);
@@ -1754,6 +1764,17 @@ function Dashboard({ token, onLogout, region }) {
 
               <div style={{display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap'}}>
                 <button onClick={handleAdminDelete} style={{background: 'var(--warning-color)', border: 'none', color: '#000', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem'}}>刪除該使用者所有訊息</button>
+              </div>
+
+              <div style={{display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', borderTop: '1px solid var(--border-color)', paddingTop: '12px'}}>
+                <span style={{color: 'var(--text-color)', fontSize: '0.9rem'}}>給予 PT:</span>
+                <input type="number" value={adminPtsAmount} onChange={e => setAdminPtsAmount(Math.max(0, parseInt(e.target.value) || 0))} min="1" max="100000" style={{width: '100px', background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '6px 8px', borderRadius: '4px', outline: 'none', fontSize: '0.9rem'}} />
+                <button onClick={handleAdminAddPts} disabled={!adminTarget.trim() || adminPtsAmount <= 0} style={{
+                  background: adminTarget.trim() && adminPtsAmount > 0 ? 'var(--accent-color)' : 'var(--border-color)',
+                  color: adminTarget.trim() && adminPtsAmount > 0 ? '#000' : 'var(--text-dim)',
+                  border: 'none', padding: '6px 14px', borderRadius: '4px', cursor: adminTarget.trim() && adminPtsAmount > 0 ? 'pointer' : 'not-allowed',
+                  fontSize: '0.85rem', fontWeight: 'bold'
+                }}>發送 PT</button>
               </div>
             </div>
           </div>

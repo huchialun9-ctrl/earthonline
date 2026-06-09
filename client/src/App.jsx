@@ -138,7 +138,7 @@ function LoginGateway({ onLogin }) {
           
           <div className="form-group" style={{marginBottom: '15px'}}>
             <label style={{color: 'var(--accent-color)'}}>GLOBAL REGION (伺服器分區)</label>
-            <select value={region} onChange={e => setRegion(e.target.value)} className="terminal-input" style={{appearance: 'auto', background: 'rgba(0,0,0,0.5)', color: 'var(--accent-color)', fontWeight: 'bold'}}>
+            <select value={region} onChange={e => setRegion(e.target.value)} className="terminal-input" style={{appearance: 'auto', background: 'var(--surface-color)', color: 'var(--accent-color)', fontWeight: 'bold'}}>
               <option value="asia">[Asia-East] 亞洲樞紐</option>
               <option value="us">[US-West] 美洲中樞</option>
               <option value="eu">[EU-Central] 歐洲陣列</option>
@@ -1029,7 +1029,7 @@ function Dashboard({ token, onLogout, region }) {
         flexShrink: 0
       }}>
         <span style={{ marginRight: '10px', fontSize: '1.2rem' }}>{icon}</span> {text} 
-        <span style={{ marginLeft: '10px', background: 'rgba(0,0,0,0.2)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.9rem', color: currentEvent.type === 'SYSTEM_MAINTENANCE' || currentEvent.type === 'DATA_GOLD_RUSH' ? '#000' : '#fff' }}>{timeLeft}</span>
+        <span style={{ marginLeft: '10px', background: 'var(--bg-light)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.9rem', color: currentEvent.type === 'SYSTEM_MAINTENANCE' || currentEvent.type === 'DATA_GOLD_RUSH' ? '#000' : '#fff' }}>{timeLeft}</span>
       </div>
     );
   };
@@ -1151,8 +1151,8 @@ function Dashboard({ token, onLogout, region }) {
               onClick={() => setDropdownOpen(prev => !prev)}
               style={{
                 display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 15px', borderRadius: '8px',
-                background: dropdownOpen ? 'rgba(255,255,255,0.2)' : 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255,255,255,0.2)', color: '#fff',
+                background: dropdownOpen ? 'var(--bg-light)' : 'var(--surface-color)',
+                border: '1px solid var(--border-color)', color: 'var(--text-color)',
                 cursor: 'pointer', fontWeight: 'bold', transition: 'all 0.2s', fontFamily: 'var(--font-sans)'
               }}
             >
@@ -1232,7 +1232,7 @@ function Dashboard({ token, onLogout, region }) {
               </div>
             )}
             
-            <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '15px', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '8px', lineHeight: '1.8'}}>
+            <div style={{fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '15px', background: 'var(--bg-light)', padding: '10px', borderRadius: '8px', lineHeight: '1.8'}}>
               <div>node-id: {myNode?.userId}</div>
               <div>ip: {myNode?.ip}</div>
               <div>region: {myNode?.country?.toLowerCase()}</div>
@@ -1402,7 +1402,7 @@ function Dashboard({ token, onLogout, region }) {
                 onChange={e => setChatInput(e.target.value)}
                 placeholder={t("輸入訊息，與全球節點交流...")}
                 maxLength={200}
-                style={{flex: 1, background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px', borderRadius: '4px', outline: 'none', fontSize: '0.9rem'}}
+                style={{flex: 1, background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '8px', borderRadius: '4px', outline: 'none', fontSize: '0.9rem'}}
               />
               <button type="submit" style={{background: 'var(--accent-color)', color: '#000', border: 'none', padding: '0 15px', borderRadius: '4px', marginLeft: '5px', fontWeight: 'bold', cursor: 'pointer'}}>
                 發送
@@ -1779,7 +1779,7 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
                       type={showKey ? "text" : "password"} 
                       value={info.recoveryKey} 
                       readOnly 
-                      style={{flex: 1, letterSpacing: showKey ? '1px' : '3px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-color)', padding: '10px', borderRadius: '6px', outline: 'none'}}
+                      style={{flex: 1, letterSpacing: showKey ? '1px' : '3px', background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '10px', borderRadius: '6px', outline: 'none'}}
                     />
                     <button style={{padding: '0 15px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger-color)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'}} onClick={() => setShowKey(!showKey)} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}>
                       {showKey ? '隱藏' : '顯示'}
@@ -1815,7 +1815,7 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
                     placeholder="輸入電子郵件..." 
                     value={emailInput} 
                     onChange={e => setEmailInput(e.target.value)} 
-                    style={{flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-color)', padding: '10px 15px', borderRadius: '6px', outline: 'none'}}
+                    style={{flex: 1, background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '10px 15px', borderRadius: '6px', outline: 'none'}}
                   />
                   <button style={{padding: '0 20px', background: 'var(--success-color)', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s'}} onClick={handleSendVerify} disabled={isSendingVerify} onMouseOver={e => e.currentTarget.style.background = 'var(--success-color)'} onMouseOut={e => e.currentTarget.style.background = 'var(--success-color)'}>
                     {isSendingVerify ? '發送中...' : '綁定'}
@@ -1960,7 +1960,7 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket }) {
       
       {/* Footer / Open Source Badge */}
       <div style={{ position: 'fixed', bottom: '15px', left: '0', width: '100%', textAlign: 'center', pointerEvents: 'none', zIndex: 9999 }}>
-        <a href="https://github.com/huchialun9-ctrl/earthonline" target="_blank" rel="noreferrer" style={{ pointerEvents: 'auto', display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.6)', padding: '6px 14px', borderRadius: '20px', textDecoration: 'none', color: '#888', fontSize: '0.8rem', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s' }} onMouseEnter={e => {e.currentTarget.style.background='rgba(255,255,255,0.1)'; e.currentTarget.style.color='#fff'}} onMouseLeave={e => {e.currentTarget.style.background='rgba(0,0,0,0.6)'; e.currentTarget.style.color='#888'}}>
+        <a href="https://github.com/huchialun9-ctrl/earthonline" target="_blank" rel="noreferrer" style={{ pointerEvents: 'auto', display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--panel-bg)', padding: '6px 14px', borderRadius: '20px', textDecoration: 'none', color: 'var(--text-dim)', fontSize: '0.8rem', backdropFilter: 'blur(4px)', border: '1px solid var(--border-color)', transition: 'all 0.2s' }} onMouseEnter={e => {e.currentTarget.style.background='var(--bg-light)'; e.currentTarget.style.color='var(--text-color)'}} onMouseLeave={e => {e.currentTarget.style.background='var(--panel-bg)'; e.currentTarget.style.color='var(--text-dim)'}}>
           <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
           Open Source on GitHub
           <img src="https://img.shields.io/github/license/huchialun9-ctrl/earthonline?style=flat-square&color=blue" alt="MIT License" style={{ height: '14px', marginLeft: '4px' }} />

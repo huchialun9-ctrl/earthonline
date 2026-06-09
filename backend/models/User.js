@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, sparse: true, unique: true },
   isEmailVerified: { type: Boolean, default: false },
   emailVerificationToken: { type: String },
+  emailVerificationTokenExpires: { type: Number },
   redeemedCodes: { type: [String], default: [] },
   friends: { type: [String], default: [] },
   friendRequests: { type: [String], default: [] },

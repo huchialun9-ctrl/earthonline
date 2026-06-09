@@ -2,15 +2,20 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 const geoip = require('geoip-lite');
+const path = require('path');
+const fs = require('fs');
 const dotenv = require('dotenv');
 dotenv.config();
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
-const User = require('./models/User'); // Required for updateMany
-const discordBot = require('./discordBot'); // Starts discord bot and cron jobs
+const User = require('./models/User');
+const discordBot = require('./discordBot');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const os = require('os');
@@ -62,21 +67,31 @@ db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', er
 
 const app = express();
 const apiRouter = express.Router({ mergeParams: true });
-app.use(cors());
+app.use(helmet());
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000,https://earthonline1.pages.dev,https://earthonline.onrender.com').split(',').map(s => s.trim());
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  }
+};
+app.use(cors(corsOptions));
 app.use(express.json());
-const path = require('path');
 app.use('/downloads', express.static(path.join(__dirname, 'public/downloads')));
+app.use(morgan('short'));
 
-// Global error/crash logging
-const fs = require('fs');
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() });
+});
 const crashLogPath = path.join(__dirname, 'crash.log');
 
-function writeCrashLog(type, err) {
+async function writeCrashLog(type, err) {
   try {
     const timestamp = new Date().toISOString();
     const stack = err?.stack || err?.message || String(err);
     const logEntry = `[${timestamp}] [${type}] ${stack}\n`;
-    fs.appendFileSync(crashLogPath, logEntry);
+    await fs.promises.appendFile(crashLogPath, logEntry);
   } catch (e) {
     console.error('[SYS] Failed to write crash log:', e);
   }
@@ -85,6 +100,7 @@ function writeCrashLog(type, err) {
 process.on('uncaughtException', (err) => {
   writeCrashLog('UNCAUGHT_EXCEPTION', err);
   console.error('[SYS] Uncaught Exception:', err);
+  process.exit(1);
 });
 
 process.on('unhandledRejection', (reason) => {
@@ -94,9 +110,14 @@ process.on('unhandledRejection', (reason) => {
 
 // Heartbeat tracking for disconnect compensation
 const heartbeatTimestamps = new Map();
-const reviveCounts = new Map();
+let reviveCounts = new Map();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'earth_online_secret_key_9988';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) { console.error('[SYS] FATAL: JWT_SECRET environment variable is required'); process.exit(1); }
+// Validate critical env vars at startup
+['DISCORD_CLIENT_ID', 'DISCORD_CLIENT_SECRET', 'MONGODB_URI'].forEach(key => {
+  if (!process.env[key]) console.warn(`[SYS] WARNING: ${key} environment variable is not set`);
+});
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || '';
 const BACKEND_URL = process.env.BACKEND_URL || 'https://earthonline.onrender.com';
@@ -131,16 +152,25 @@ function obfuscateIp(ip) {
 // Daily world flux report (runs after regions are initialized)
 // Moved inside region setup to access correct scope
 
+// Rate limiters for auth endpoints
+const registerLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: { error: 'Too many registrations from this IP, please try again later' } });
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: { error: 'Too many login attempts, please try again later' } });
+const sendVerificationLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 3, message: { error: 'Too many verification emails sent, please try again later' } });
+
 // Auth Endpoints
-apiRouter.post('/register', async (req, res, next) => {
+apiRouter.post('/register', registerLimiter, async (req, res, next) => {
   try {
   const { username, password } = req.body;
   let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   if (ip && ip.includes(',')) ip = ip.split(',')[0].trim();
 
   if (!username || !password) return res.status(400).json({ error: 'Missing credentials' });
+  const trimmedUser = username.trim();
+  if (trimmedUser.length < 2 || trimmedUser.length > 20) return res.status(400).json({ error: 'Username must be 2-20 characters' });
+  if (!/^[a-zA-Z0-9_\u4e00-\u9fff]+$/.test(trimmedUser)) return res.status(400).json({ error: 'Username can only contain letters, numbers, underscores, and Chinese characters' });
+  if (password.length < 4) return res.status(400).json({ error: 'Password must be at least 4 characters' });
   
-  if (await db.findUserByUsername(username)) {
+  if (await db.findUserByUsername(trimmedUser)) {
     return res.status(400).json({ error: 'Username already exists' });
   }
 
@@ -157,7 +187,10 @@ apiRouter.post('/register', async (req, res, next) => {
       // Validate IP format before using in URL
       const ipv4Regex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
       const cleanIp = ipv4Regex.test(ip) ? ip : '0.0.0.0';
-      const ipCheck = await fetch(`http://ip-api.com/json/${cleanIp}?fields=proxy,hosting`).then(r => r.json());
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      const ipCheck = await fetch(`https://ip-api.com/json/${cleanIp}?fields=proxy,hosting`, { signal: controller.signal }).then(r => r.json());
+      clearTimeout(timeout);
       if (ipCheck.proxy || ipCheck.hosting) {
         return res.status(403).json({ error: '系統偵測到您正在使用 VPN 或代理伺服器，請關閉後再試。' });
       }
@@ -167,10 +200,10 @@ apiRouter.post('/register', async (req, res, next) => {
   }
   
   const hashedPassword = await bcrypt.hash(password, 10);
-  const recoveryKey = 'EO-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+  const recoveryKey = 'EO-' + crypto.randomBytes(4).toString('hex').toUpperCase();
   const newUser = {
     id: 'EO-' + Date.now(),
-    username,
+    username: trimmedUser,
     password: hashedPassword,
     registeredAt: Date.now(),
     recoveryKey,
@@ -179,12 +212,12 @@ apiRouter.post('/register', async (req, res, next) => {
   };
   
   await db.createUser(newUser);
-  const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '7d' });
-  res.json({ success: true, message: 'Registration successful', recoveryKey, token, username });
+  const token = jwt.sign({ username: trimmedUser }, JWT_SECRET, { expiresIn: '7d' });
+  res.json({ success: true, message: 'Registration successful', recoveryKey, token, username: trimmedUser });
   } catch (err) { next(err); }
 });
 
-apiRouter.post('/login', async (req, res, next) => {
+apiRouter.post('/login', loginLimiter, async (req, res, next) => {
   try {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Missing credentials' });
@@ -240,7 +273,7 @@ apiRouter.post('/auth/generate-recovery-key', async (req, res, next) => {
       return res.json({ success: true, recoveryKey: user.recoveryKey, existed: true });
     }
     
-    const recoveryKey = 'EO-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const recoveryKey = 'EO-' + crypto.randomBytes(4).toString('hex').toUpperCase();
     await User.updateOne({ username: user.username }, { recoveryKey });
     
     res.json({ success: true, recoveryKey });
@@ -302,7 +335,7 @@ apiRouter.post('/auth/delete-account', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-apiRouter.post('/auth/send-verification', async (req, res) => {
+apiRouter.post('/auth/send-verification', sendVerificationLimiter, async (req, res) => {
   const { email } = req.body;
   const authHeader = req.headers.authorization;
   if (!authHeader || !email) return res.status(400).json({ error: 'Missing token or email' });
@@ -313,18 +346,17 @@ apiRouter.post('/auth/send-verification', async (req, res) => {
     const user = await User.findOne({ username: decoded.username });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    // Ensure email is valid format
-    if (!/^\S+@\S+\.\S+$/.test(email)) return res.status(400).json({ error: 'Invalid email format' });
-
-    // Check if email already in use
-    const existingEmail = await User.findOne({ email });
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(normalizedEmail)) return res.status(400).json({ error: 'Invalid email format' });
+    const existingEmail = await User.findOne({ email: normalizedEmail });
     if (existingEmail && existingEmail.username !== user.username) {
       return res.status(400).json({ error: 'Email already in use' });
     }
 
     const verificationToken = crypto.randomBytes(32).toString('hex');
-    user.email = email;
+    user.email = normalizedEmail;
     user.emailVerificationToken = verificationToken;
+    user.emailVerificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
     user.isEmailVerified = false;
     await user.save();
 
@@ -374,9 +406,13 @@ apiRouter.post('/auth/verify-email', async (req, res) => {
   try {
     const user = await User.findOne({ emailVerificationToken: token });
     if (!user) return res.status(400).json({ error: 'Invalid or expired verification token' });
+    if (user.emailVerificationTokenExpires && Date.now() > user.emailVerificationTokenExpires) {
+      return res.status(400).json({ error: 'Verification token has expired' });
+    }
 
     user.isEmailVerified = true;
     user.emailVerificationToken = null; // Clear the token
+    user.emailVerificationTokenExpires = null;
     await user.save();
 
     res.json({ success: true, message: 'Email verified successfully' });
@@ -389,10 +425,12 @@ apiRouter.post('/auth/verify-email', async (req, res) => {
 apiRouter.post('/bind-discord-manual', async (req, res) => {
   const { token, discordId, username: globalName, avatar: avatarUrl } = req.body;
   if (!token || !discordId) return res.status(400).json({ error: 'Missing token or discordId' });
+  if (!/^\d{17,20}$/.test(discordId)) return res.status(400).json({ error: 'Invalid Discord ID format' });
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    const profile = { id: discordId, username: globalName || discordId, avatar: avatarUrl || `https://cdn.discordapp.com/embed/avatars/${(BigInt(discordId) >> 22n) % 6n}.png` };
+    const avatarIndex = (BigInt(discordId) >> 22n) % 6n;
+    const profile = { id: discordId, username: globalName || discordId, avatar: avatarUrl || `https://cdn.discordapp.com/embed/avatars/${avatarIndex}.png` };
     const success = await db.updateUserDiscord(decoded.username, profile);
     if (success) {
       res.json({ success: true, message: 'Discord ID bound successfully manually' });
@@ -432,7 +470,9 @@ app.get('/api/auth/discord/callback', async (req, res) => {
     if (returnTo) {
       try {
         const returnUrl = new URL(returnTo);
-        const allowedHosts = ['localhost', 'earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline.qzz.io'];
+        const allowedHosts = process.env.NODE_ENV === 'development'
+          ? ['localhost', 'earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline.qzz.io']
+          : ['earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline.qzz.io'];
         if (!allowedHosts.includes(returnUrl.hostname)) {
           returnTo = null;
         }
@@ -452,6 +492,8 @@ app.get('/api/auth/discord/callback', async (req, res) => {
     const fetch = (await import('node-fetch')).default;
     
     // Exchange code for token
+    const tokenController = new AbortController();
+    const tokenTimeout = setTimeout(() => tokenController.abort(), 10000);
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
       method: 'POST',
       body: new URLSearchParams({
@@ -462,8 +504,10 @@ app.get('/api/auth/discord/callback', async (req, res) => {
         redirect_uri: redirectUri,
         scope: 'identify',
       }),
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      signal: tokenController.signal
     });
+    clearTimeout(tokenTimeout);
 
     const tokenData = await tokenResponse.json();
     if (!tokenData.access_token) {
@@ -471,9 +515,13 @@ app.get('/api/auth/discord/callback', async (req, res) => {
     }
 
     // Fetch user profile
+    const userController = new AbortController();
+    const userTimeout = setTimeout(() => userController.abort(), 10000);
     const userResponse = await fetch('https://discord.com/api/users/@me', {
-      headers: { authorization: `${tokenData.token_type} ${tokenData.access_token}` }
+      headers: { authorization: `${tokenData.token_type} ${tokenData.access_token}` },
+      signal: userController.signal
     });
+    clearTimeout(userTimeout);
 
     const userData = await userResponse.json();
 
@@ -518,8 +566,7 @@ app.get('/api/auth/discord/callback', async (req, res) => {
       );
       
       // Redirect to frontend with token in query params
-      const separator = returnTo && returnTo.includes('?') ? '&' : '?';
-      return res.redirect(`${returnTo || '/'}${separator}token=${token}`);
+      return res.redirect(`${returnTo || '/'}#token=${token}`);
       
     } else {
       // Bind action
@@ -606,13 +653,14 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
   console.error('[SYS] Express Error:', err);
-  res.status(500).json({ error: 'Internal Server Error' });
+  const statusCode = err.statusCode || err.status || 500;
+  res.status(statusCode).json({ error: err.message || 'Internal Server Error' });
 });
 
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: '*', methods: ['GET', 'POST'] }
+  cors: { origin: ALLOWED_ORIGINS, methods: ['GET', 'POST'] }
 });
 
 discordBot.setIoInstance(io);
@@ -1592,7 +1640,7 @@ regions.forEach(regionName => {
 
     if (cmdUpper === 'REPORT') {
       try {
-        const allUsers = await User.find({});
+        const allUsers = await User.find({}).lean().limit(2000);
         let realCount = 0;
         let botCount = 0;
         let botNames = [];
@@ -1632,7 +1680,7 @@ regions.forEach(regionName => {
       }
     } else if (cmdUpper === 'NUKE_BOTS') {
       // Admin check
-      if (user.username !== '大拇哥科技' && user.username !== 'admin') {
+      if (user.role !== 'admin') {
         socket.emit('terminal_response', '[ERROR] 權限不足：僅管理員可執行此指令。');
         return;
       }

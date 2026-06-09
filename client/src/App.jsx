@@ -119,6 +119,13 @@ function LoginGateway({ onLogin }) {
 
   return (
     <div className="login-gateway">
+      {/* Pixel Art Decorative Elements */}
+      <div className="login-moon"></div>
+      <div className="login-cloud"></div>
+      <div className="login-cloud"></div>
+      <div className="login-cloud"></div>
+      <div className="login-cloud"></div>
+      
       <div className="login-box">
         {/* Animated Rotating Earth */}
         <div className="earth-container">
@@ -126,19 +133,19 @@ function LoginGateway({ onLogin }) {
         </div>
 
         <div style={{textAlign: 'center', marginBottom: '25px', zIndex: 10, position: 'relative'}}>
-          <h2 style={{fontFamily: 'var(--font-sans)', color: 'var(--text-main)', fontSize: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}}>
-            <Globe2 className="icon-glow icon-spin" size={32} /> 地球在線
+          <h2 style={{fontFamily: "'Press Start 2P', cursive", color: 'var(--accent-color)', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', textShadow: '2px 2px 0 rgba(0, 0, 0, 0.5)'}}>
+            <Globe2 className="icon-glow icon-spin" size={28} /> 地球在線
           </h2>
-          <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '5px'}}>全球節點觀測與管理中心</p>
+          <p style={{color: 'var(--text-dim)', fontSize: '0.9rem', marginTop: '8px', fontFamily: "'VT323', monospace", letterSpacing: '1px'}}>全球節點觀測與管理中心</p>
         </div>
         
         <form onSubmit={handleSubmit} className="login-form">
           {error && <div className="error-message">{error}</div>}
-          {successMsg && <div style={{color: '#00ffaa', marginBottom: '10px', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold'}}>{successMsg}</div>}
+          {successMsg && <div style={{color: 'var(--success-color)', marginBottom: '10px', textAlign: 'center', fontSize: '0.85rem', fontFamily: "'VT323', monospace"}}>{successMsg}</div>}
           
           <div className="form-group" style={{marginBottom: '15px'}}>
-            <label style={{color: 'var(--accent-color)'}}>GLOBAL REGION (伺服器分區)</label>
-            <select value={region} onChange={e => setRegion(e.target.value)} className="terminal-input" style={{appearance: 'auto', background: 'var(--surface-color)', color: 'var(--accent-color)', fontWeight: 'bold'}}>
+            <label style={{color: 'var(--accent-color)'}}>GLOBAL REGION</label>
+            <select value={region} onChange={e => setRegion(e.target.value)} className="terminal-input" style={{appearance: 'auto', background: 'var(--bg-color)', color: 'var(--accent-color)'}}>
               <option value="asia">[Asia-East] 亞洲樞紐</option>
               <option value="us">[US-West] 美洲中樞</option>
               <option value="eu">[EU-Central] 歐洲陣列</option>
@@ -146,19 +153,20 @@ function LoginGateway({ onLogin }) {
           </div>
           
           <div className="form-group">
-            <label>SUBJECT ID (帳號 / 信箱)</label>
+            <label>SUBJECT ID</label>
             <input 
               type="text" 
               value={username} 
               onChange={e => setUsername(e.target.value)} 
               required 
               className="terminal-input"
+              placeholder="帳號 / 信箱"
             />
           </div>
 
           {isForgot && (
             <div className="form-group">
-              <label>RECOVERY KEY (恢復金鑰)</label>
+              <label>RECOVERY KEY</label>
               <input 
                 type="text" 
                 value={recoveryKey} 
@@ -171,18 +179,19 @@ function LoginGateway({ onLogin }) {
           )}
 
           <div className="form-group">
-            <label>{isForgot ? 'NEW ACCESS CODE (新密碼)' : 'ACCESS CODE (密碼)'}</label>
+            <label>{isForgot ? 'NEW ACCESS CODE' : 'ACCESS CODE'}</label>
             <input 
               type="password" 
               value={password} 
               onChange={e => setPassword(e.target.value)} 
               required 
               className="terminal-input"
+              placeholder="密碼"
             />
           </div>
 
           <button type="submit" className="terminal-btn">
-            {isForgot ? '重置安全授權 (RESET)' : isRegister ? '建立節點連線 (註冊)' : '驗證並接入 (登入)'}
+            {isForgot ? 'RESET PASSWORD' : isRegister ? 'CREATE ACCOUNT' : 'LOGIN'}
           </button>
 
           {!isForgot && (
@@ -190,22 +199,37 @@ function LoginGateway({ onLogin }) {
               type="button" 
               onClick={handleDiscordLogin}
               style={{
-                width: '100%', padding: '12px', background: 'var(--info-color)', color: '#fff',
-                border: 'none', borderRadius: '4px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer',
+                width: '100%', padding: '14px', background: 'var(--surface-color)', color: 'var(--info-color)',
+                border: '2px solid var(--info-color)', borderRadius: '0', fontSize: '0.7rem', cursor: 'pointer',
                 marginTop: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                fontFamily: 'monospace'
+                fontFamily: "'Press Start 2P', cursive",
+                boxShadow: '4px 4px 0 rgba(0, 0, 0, 0.2)',
+                transition: 'all 0.2s',
+                imageRendering: 'pixelated'
+              }}
+              onMouseOver={e => {
+                e.currentTarget.style.background = 'var(--info-color)';
+                e.currentTarget.style.color = '#fff';
+                e.currentTarget.style.boxShadow = '2px 2px 0 rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.transform = 'translate(2px, 2px)';
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.background = 'var(--surface-color)';
+                e.currentTarget.style.color = 'var(--info-color)';
+                e.currentTarget.style.boxShadow = '4px 4px 0 rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.transform = 'translate(0, 0)';
               }}
             >
-              <svg width="20" height="20" viewBox="0 0 127.14 96.36" fill="#fff"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.59,67.59,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
-              使用 Discord 快速登入
+              <svg width="18" height="18" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.59,67.59,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
+              DISCORD LOGIN
             </button>
           )}
         </form>
         
-        <div style={{textAlign: 'center', marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px'}}>
+        <div style={{textAlign: 'center', marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
           {!isForgot && (
             <span className="toggle-link" onClick={() => setIsRegister(!isRegister)}>
-              {isRegister ? '>> 返回登入程序' : '>> 申請新節點授權'}
+              {isRegister ? '>> BACK TO LOGIN' : '>> CREATE ACCOUNT'}
             </span>
           )}
           <span 
@@ -218,7 +242,7 @@ function LoginGateway({ onLogin }) {
               setSuccessMsg('');
             }}
           >
-            {isForgot ? '>> 返回登入程序' : '>> 遺失安全授權 (忘記密碼)'}
+            {isForgot ? '>> BACK TO LOGIN' : '>> FORGOT PASSWORD'}
           </span>
         </div>
       </div>

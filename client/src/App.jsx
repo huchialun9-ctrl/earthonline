@@ -573,6 +573,13 @@ function Dashboard({ token, onLogout, region }) {
     return () => clearInterval(inv);
   }, [BASE_URL]);
 
+  // 管理員面板開啟時自動載入全部玩家名單
+  useEffect(() => {
+    if (showAdminPanel && socket?.connected) {
+      socket.emit('get_all_players');
+    }
+  }, [showAdminPanel, socket]);
+
   const [lifespan, setLifespan] = useState(0);
   const [sessionTime, setSessionTime] = useState(0);
   const sessionStartRef = useRef(null);

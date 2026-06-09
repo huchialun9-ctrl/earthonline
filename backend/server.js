@@ -15,6 +15,9 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const os = require('os');
 
+// Filtered words for chat moderation
+const FILTERED_WORDS = ['fuck', 'shit', 'asshole', 'bitch', 'damn', 'cao', '幹', '靠北', '操你媽', 'fucking', 'stupid', 'idiot', 'nigger', 'bastard', 'piss off', 'suck my', 'motherfucker'];
+
 // Run offline time migration once on startup
 db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', err));
 
@@ -25,7 +28,33 @@ app.use(express.json());
 const path = require('path');
 app.use('/downloads', express.static(path.join(__dirname, 'public/downloads')));
 
+// Global error/crash logging
+const fs = require('fs');
+const crashLogPath = path.join(__dirname, 'crash.log');
 
+function writeCrashLog(type, err) {
+  try {
+    const timestamp = new Date().toISOString();
+    const stack = err?.stack || err?.message || String(err);
+    const logEntry = `[${timestamp}] [${type}] ${stack}\n`;
+    fs.appendFileSync(crashLogPath, logEntry);
+  } catch (e) {
+    console.error('[SYS] Failed to write crash log:', e);
+  }
+}
+
+process.on('uncaughtException', (err) => {
+  writeCrashLog('UNCAUGHT_EXCEPTION', err);
+  console.error('[SYS] Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  writeCrashLog('UNHANDLED_REJECTION', reason);
+  console.error('[SYS] Unhandled Rejection:', reason);
+});
+
+// Heartbeat tracking for disconnect compensation
+const heartbeatTimestamps = new Map();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'earth_online_secret_key_9988';
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -48,6 +77,15 @@ async function sendDiscordWebhook(message) {
   } catch (err) {
     console.error('[SYS] Discord Webhook error:', err);
   }
+}
+
+function obfuscateIp(ip) {
+  if (!ip) return '0.0.0.0';
+  const ipv4Match = ip.match(/^(\d{1,3}\.\d{1,3})\.\d{1,3}\.\d{1,3}$/);
+  if (ipv4Match) return ipv4Match[1] + '.x.x';
+  const ipv6Match = ip.match(/^([0-9a-f:]+:[0-9a-f:]+):/i);
+  if (ipv6Match) return ipv6Match[1] + ':xxxx:xxxx';
+  return 'x.x.x.x';
 }
 
 // Daily world flux report (runs after regions are initialized)
@@ -825,6 +863,7 @@ regions.forEach(regionName => {
         username: decoded.username,
         discordProfile: dbUser?.discord || null,
         ip: ip,
+        ipObfuscated: obfuscateIp(ip),
         country: geo.country,
         lat: geo.ll[0] + (Math.random() - 0.5) * 0.1,
         lon: geo.ll[1] + (Math.random() - 0.5) * 0.1,
@@ -886,7 +925,7 @@ regions.forEach(regionName => {
         userId: user.id,
         username: user.username,
         discordProfile: user.discordProfile,
-        ip: user.ip,
+        ip: user.ipObfuscated,
         country: user.country,
         lat: user.lat,
         lon: user.lon,
@@ -1325,15 +1364,6 @@ regions.forEach(regionName => {
       }
       connectedUsers.delete(socket.id);
       heartbeatTimestamps.delete(disconnectedUser.username);
-      // Clear active session on disconnect
-      try {
-        await User.updateOne(
-          { username: disconnectedUser.username },
-          { $set: { activeSession: null } }
-        );
-      } catch(e) {
-        console.error('[SYS] Failed to clear active session:', e);
-      }
       console.log(`[SYS] Node Disconnected: ${socket.id}`);
       io.emit('node_disconnected', { id: socket.id });
     }

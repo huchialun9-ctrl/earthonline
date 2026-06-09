@@ -1142,6 +1142,31 @@ function Dashboard({ token, onLogout, region }) {
     setAdminTarget('');
   };
 
+  const handleStartAdRevive = () => {
+    if (!socket || adReviveRemaining <= 0 || adPlaying) return;
+    setAdPlaying(true);
+    const ads = ['/ads/zixi_casino.png', '/ads/zixi_app.png'];
+    setCurrentAd(ads[Math.floor(Math.random() * ads.length)]);
+    setAdSlogan(AD_SLOGANS[0]);
+    setAdCountdown(15);
+    let sloganIdx = 0;
+    const timer = setInterval(() => {
+      setAdCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          clearInterval(sloganTimer);
+          socket.emit('ad_revive');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    const sloganTimer = setInterval(() => {
+      sloganIdx = (sloganIdx + 1) % AD_SLOGANS.length;
+      setAdSlogan(AD_SLOGANS[sloganIdx]);
+    }, 2500);
+  };
+
   const handleTerminalSubmit = (e) => {
     e.preventDefault();
     if (!terminalInput.trim()) return;

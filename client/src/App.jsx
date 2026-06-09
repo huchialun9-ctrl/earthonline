@@ -1703,6 +1703,7 @@ function Dashboard({ token, onLogout, region }) {
             </div>
           </div>
         </Draggable>
+      </div>
       )}
 
       {showThemeMenu && (

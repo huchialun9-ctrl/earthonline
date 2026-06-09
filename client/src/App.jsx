@@ -120,29 +120,44 @@ function LoginGateway({ onLogin }) {
   return (
     <div className="login-gateway">
       <div className="login-box">
-        {/* Advanced Animated Background */}
-        <div className="anim-container">
-          <div className="anim-core"></div>
-          <div className="anim-ring anim-ring-1"></div>
-          <div className="anim-ring anim-ring-2"></div>
-          <div className="anim-ring anim-ring-3"></div>
-          <div className="anim-particle-field">
-            {Array.from({ length: 30 }, (_, i) => (
-              <div key={i} className="anim-particle" style={{
+        {/* Cartoon Screen-Off Style Animations */}
+        <div className="cartoon-container">
+          <div className="cartoon-bg-shapes">
+            <div className="cshape cshape-cloud1">☁️</div>
+            <div className="cshape cshape-cloud2">☁️</div>
+            <div className="cshape cshape-star1">⭐</div>
+            <div className="cshape cshape-star2">✨</div>
+            <div className="cshape cshape-moon">🌙</div>
+            <div className="cshape cshape-heart1">❤️</div>
+            <div className="cshape cshape-heart2">💖</div>
+            <div className="cshape cshape-smile1">😊</div>
+            <div className="cshape cshape-smile2">😄</div>
+            <div className="cshape cshape-rainbow">🌈</div>
+            <div className="cshape cshape-cat">🐱</div>
+            <div className="cshape cshape-dog">🐶</div>
+            <div className="cshape cshape-butterfly1">🦋</div>
+            <div className="cshape cshape-butterfly2">🌸</div>
+            <div className="cshape cshape-bounce1">🔵</div>
+            <div className="cshape cshape-bounce2">🟠</div>
+            <div className="cshape cshape-bounce3">🟢</div>
+            <div className="cshape cshape-bounce4">🟡</div>
+            <div className="cshape cshape-bounce5">🟣</div>
+            <div className="cshape cshape-bounce6">🔴</div>
+          </div>
+          <div className="cartoon-dots">
+            {Array.from({ length: 40 }, (_, i) => (
+              <div key={i} className="cdot" style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${3 + Math.random() * 4}s`,
-                width: `${2 + Math.random() * 4}px`,
-                height: `${2 + Math.random() * 4}px`,
-                opacity: 0.3 + Math.random() * 0.7,
+                animationDelay: `${Math.random() * 8}s`,
+                animationDuration: `${6 + Math.random() * 6}s`,
+                width: `${4 + Math.random() * 8}px`,
+                height: `${4 + Math.random() * 8}px`,
+                background: ['#FF6B6B','#4ECDC4','#45B7D1','#F7DC6F','#BB8FCE','#F1948A','#82E0AA','#F8C471'][i % 8],
+                borderRadius: Math.random() > 0.5 ? '50%' : '3px',
               }} />
             ))}
           </div>
-          <div className="anim-scanline"></div>
-          <div className="anim-pulse-ring"></div>
-          <div className="anim-grid"></div>
-          <div className="anim-glowing-orb"></div>
         </div>
 
         <div style={{textAlign: 'center', marginBottom: '25px', zIndex: 10, position: 'relative'}}>

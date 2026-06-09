@@ -716,8 +716,24 @@ function Dashboard({ token, onLogout, region }) {
   // Ref for react-draggable
   const logRef = useRef(null);
 
-  const [bgmEnabled, setBgmEnabled] = useState(true);
+  const [bgmEnabled, setBgmEnabled] = useState(() => {
+    const saved = localStorage.getItem('eo_bgm');
+    return saved === null ? true : saved === 'true';
+  });
   const audioRef = useRef(null);
+
+  const toggleBgm = () => {
+    const newVal = !bgmEnabled;
+    setBgmEnabled(newVal);
+    localStorage.setItem('eo_bgm', String(newVal));
+    if (audioRef.current) {
+      if (newVal) {
+        audioRef.current.play().catch(() => {});
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  };
 
   const audioCtxRef = useRef(null);
   const [notificationEnabled, setNotificationEnabled] = useState(() => {
@@ -760,16 +776,11 @@ function Dashboard({ token, onLogout, region }) {
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = 0.2;
-      if (bgmEnabled) {
-        audioRef.current.play().catch(e => {
-          console.log('BGM Autoplay prevented:', e);
-          setBgmEnabled(false);
-        });
-      } else {
-        audioRef.current.pause();
-      }
+      audioRef.current.play().catch(() => {
+        setBgmEnabled(false);
+      });
     }
-  }, [bgmEnabled]);
+  }, []);
 
   // Terminal State
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
@@ -1537,7 +1548,7 @@ function Dashboard({ token, onLogout, region }) {
             </div>
           </div>
 
-          <button onClick={() => setBgmEnabled(prev => !prev)} style={{padding: '5px 12px', borderRadius: '8px', background: bgmEnabled ? 'rgba(0,255,136,0.1)' : 'rgba(255,50,50,0.1)', border: bgmEnabled ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,50,50,0.3)', color: bgmEnabled ? 'var(--success-color)' : 'var(--danger-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'monospace'}} title={bgmEnabled ? '關閉背景音樂' : '開啟背景音樂'}>
+          <button onClick={toggleBgm} style={{padding: '5px 12px', borderRadius: '8px', background: bgmEnabled ? 'rgba(0,255,136,0.1)' : 'rgba(255,50,50,0.1)', border: bgmEnabled ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,50,50,0.3)', color: bgmEnabled ? 'var(--success-color)' : 'var(--danger-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'monospace'}} title={bgmEnabled ? '關閉背景音樂' : '開啟背景音樂'}>
 {bgmEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
 {bgmEnabled ? 'BGM ON' : 'BGM OFF'}
 </button>
@@ -1636,28 +1647,12 @@ function Dashboard({ token, onLogout, region }) {
         {/* Right Geographic Matrix */}
         <main className="geographic-matrix">
           <div className="map-overlays" style={{display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'flex-start'}}>
-            <div className="floating-panel" style={{display: 'flex', gap: '30px', padding: '15px 25px'}}>
+            <div className="floating-panel" style={{padding: '15px 25px'}}>
               <div className="overlay-item">
                 <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
                   <Globe2 size={16} /> 全球總掛機時間
                 </div>
                 <div className="overlay-value">{formatTime(globalStats.globalProduction)}</div>
-              </div>
-              <div style={{width: '1px', background: 'var(--border-color)'}}></div>
-              <div className="overlay-item">
-                <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-                  <Server size={16} /> 伺服器即時負載
-                </div>
-                <div className="overlay-value" style={{color: 'var(--danger-color)'}}>
-                  {globalStats.totalPopulation > 0 ? ((globalStats.activeUsers / globalStats.totalPopulation) * 100).toFixed(1) : 0}%
-                </div>
-              </div>
-              <div style={{width: '1px', background: 'var(--border-color)'}}></div>
-              <div className="overlay-item">
-                <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-                  <Network size={16} /> 連線延遲 (Ping)
-                </div>
-                <div className="overlay-value" style={{fontSize: '1.2rem', marginTop: '4px'}}>{ping} ms</div>
               </div>
             </div>
           </div>
@@ -2372,7 +2367,7 @@ function Dashboard({ token, onLogout, region }) {
           </div>
         </div>
       )}
-      <audio ref={audioRef} src="https://archive.org/download/subwoofer-lullaby-vinyl/Subwoofer+Lullaby.mp3" loop />
+      <audio ref={audioRef} src="https://archive.org/download/subwoofer-lullaby-vinyl/Subwoofer+Lullaby.mp3" loop preload="auto" />
     </div>
   );
 }

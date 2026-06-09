@@ -124,8 +124,88 @@ function LoginGateway({ onLogin }) {
         <div className="snoopy-container">
           <div className="snoopy-bg-deco"></div>
 
-          {/* Snoopy 1 - Dancing */}
-          <div className="snoopy snoopy-dance">
+          {/* Helper: renderSnoopy creates a Snoopy character */}
+          {[
+            { cls: 'sdance1', anim: 'snDance', delay: '0s', top: '30%', left: '8%', scale: 1 },
+            { cls: 'sdance2', anim: 'snDance', delay: '1s', top: '50%', left: '5%', scale: 0.85 },
+            { cls: 'sdance3', anim: 'snDance', delay: '2s', top: '65%', left: '12%', scale: 0.7 },
+            { cls: 'sfly1', anim: 'snFly', delay: '0s', top: '8%', left: '55%', scale: 1.1 },
+            { cls: 'sfly2', anim: 'snFly', delay: '2s', top: '5%', left: '75%', scale: 0.85 },
+            { cls: 'ssleep1', anim: 'snSleep', delay: '0s', top: '72%', left: '35%', scale: 0.9 },
+            { cls: 'ssleep2', anim: 'snSleep', delay: '3s', top: '75%', left: '50%', scale: 0.7 },
+            { cls: 'swalk1', anim: 'snWalk', delay: '0s', top: '82%', left: '60%', scale: 0.95 },
+            { cls: 'swalk2', anim: 'snWalk', delay: '4s', top: '85%', left: '70%', scale: 0.8 },
+            { cls: 'sjump1', anim: 'snJump', delay: '0s', top: '45%', left: '78%', scale: 0.9 },
+            { cls: 'sjump2', anim: 'snJump', delay: '0.8s', top: '55%', left: '72%', scale: 0.75 },
+            { cls: 'sjump3', anim: 'snJump', delay: '1.6s', top: '40%', left: '85%', scale: 0.65 },
+            { cls: 'sjump4', anim: 'snJump', delay: '2.4s', top: '60%', left: '82%', scale: 0.7 },
+            { cls: 'sspin1', anim: 'snSpin', delay: '0s', top: '25%', left: '82%', scale: 0.8 },
+            { cls: 'sspin2', anim: 'snSpin', delay: '1.5s', top: '20%', left: '90%', scale: 0.65 },
+            { cls: 'sfloat1', anim: 'snFloat', delay: '0s', top: '15%', left: '30%', scale: 0.6 },
+            { cls: 'sfloat2', anim: 'snFloat', delay: '2s', top: '60%', left: '20%', scale: 0.55 },
+            { cls: 'sfloat3', anim: 'snFloat', delay: '4s', top: '35%', left: '40%', scale: 0.5 },
+            { cls: 'sfloat4', anim: 'snFloat', delay: '1s', top: '22%', left: '50%', scale: 0.5 },
+            { cls: 'sfloat5', anim: 'snFloat', delay: '3s', top: '68%', left: '30%', scale: 0.55 },
+          ].map((s, i) => (
+            <div key={i} className={`snoopy ${s.cls}`} style={{
+              top: s.top, left: s.left,
+              animation: `${s.anim} ${3 + (i % 3) * 0.5}s ease-in-out infinite`,
+              animationDelay: s.delay,
+              transform: `scale(${s.scale})`,
+            }}>
+              <div className="snoopy-body">
+                <div className="snoopy-ear-l"></div>
+                <div className="snoopy-ear-r"></div>
+                <div className="snoopy-head">
+                  <div className="snoopy-eye-l"></div>
+                  <div className="snoopy-eye-r"></div>
+                  <div className="snoopy-nose"></div>
+                  <div className="snoopy-smile"></div>
+                </div>
+                <div className="snoopy-tail"></div>
+                <div className="snoopy-leg-fl"></div>
+                <div className="snoopy-leg-fr"></div>
+                <div className="snoopy-leg-bl"></div>
+                <div className="snoopy-leg-br"></div>
+              </div>
+              {i < 2 && <div className="snoopy-scarf"></div>}
+              {(i >= 4 && i <= 5) && <div className="snoopy-z">💤</div>}
+            </div>
+          ))}
+
+          {/* Woodstock birds */}
+          {[
+            { top: '18%', left: '35%', delay: '0s', dur: '3s' },
+            { top: '28%', left: '68%', delay: '1s', dur: '4s' },
+            { top: '55%', left: '15%', delay: '2s', dur: '3.5s' },
+            { top: '70%', left: '22%', delay: '0.5s', dur: '4.5s' },
+            { top: '12%', left: '42%', delay: '1.5s', dur: '3s' },
+          ].map((b, i) => (
+            <div key={`b${i}`} className="woodstock" style={{
+              top: b.top, left: b.left,
+              animation: `woodFly ${b.dur}s ease-in-out infinite`,
+              animationDelay: b.delay,
+            }}>
+              <div className="woodstock-body">
+                <div className="woodstock-wing"></div>
+                <div className="woodstock-eye"></div>
+                <div className="woodstock-beak"></div>
+                <div className="woodstock-tail"></div>
+              </div>
+            </div>
+          ))}
+
+          {/* Doghouse */}
+          <div className="doghouse" style={{ bottom: '12%', right: '15%' }}>
+            <div className="doghouse-roof"></div>
+            <div className="doghouse-body">
+              <div className="doghouse-hole"></div>
+              <div className="doghouse-text">SNOOPY</div>
+            </div>
+          </div>
+
+          {/* Snoopy on doghouse */}
+          <div className="snoopy snoopy-onhouse" style={{ bottom: '25%', right: '18%', animation: 'snFloat 4s ease-in-out infinite' }}>
             <div className="snoopy-body">
               <div className="snoopy-ear-l"></div>
               <div className="snoopy-ear-r"></div>
@@ -138,79 +218,21 @@ function LoginGateway({ onLogin }) {
               <div className="snoopy-tail"></div>
               <div className="snoopy-leg-fl"></div>
               <div className="snoopy-leg-fr"></div>
-              <div className="snoopy-leg-bl"></div>
-              <div className="snoopy-leg-br"></div>
             </div>
           </div>
 
-          {/* Snoopy 2 - Flying Ace */}
-          <div className="snoopy snoopy-flying">
-            <div className="snoopy-goggles"></div>
-            <div className="snoopy-body">
-              <div className="snoopy-ear-l"></div>
-              <div className="snoopy-ear-r"></div>
-              <div className="snoopy-head">
-                <div className="snoopy-eye-l"></div>
-                <div className="snoopy-eye-r"></div>
-                <div className="snoopy-nose"></div>
-                <div className="snoopy-smile"></div>
-              </div>
-              <div className="snoopy-tail"></div>
-              <div className="snoopy-leg-fl"></div>
-              <div className="snoopy-leg-fr"></div>
-              <div className="snoopy-leg-bl"></div>
-              <div className="snoopy-leg-br"></div>
-            </div>
-            <div className="snoopy-scarf"></div>
-          </div>
-
-          {/* Snoopy 3 - Sleeping/Flooting */}
-          <div className="snoopy snoopy-sleep">
-            <div className="snoopy-body">
-              <div className="snoopy-ear-l"></div>
-              <div className="snoopy-ear-r"></div>
-              <div className="snoopy-head">
-                <div className="snoopy-eye-l snoopy-eye-closed"></div>
-                <div className="snoopy-eye-r snoopy-eye-closed"></div>
-                <div className="snoopy-nose"></div>
-                <div className="snoopy-smile"></div>
-              </div>
-              <div className="snoopy-tail"></div>
-              <div className="snoopy-leg-fl"></div>
-              <div className="snoopy-leg-fr"></div>
-              <div className="snoopy-leg-bl"></div>
-              <div className="snoopy-leg-br"></div>
-            </div>
-            <div className="snoopy-z">💤</div>
-          </div>
-
-          {/* Snoopy 4 - Walking */}
-          <div className="snoopy snoopy-walk">
-            <div className="snoopy-body">
-              <div className="snoopy-ear-l"></div>
-              <div className="snoopy-ear-r"></div>
-              <div className="snoopy-head">
-                <div className="snoopy-eye-l"></div>
-                <div className="snoopy-eye-r"></div>
-                <div className="snoopy-nose"></div>
-                <div className="snoopy-smile"></div>
-              </div>
-              <div className="snoopy-tail"></div>
-              <div className="snoopy-leg-fl"></div>
-              <div className="snoopy-leg-fr"></div>
-              <div className="snoopy-leg-bl"></div>
-              <div className="snoopy-leg-br"></div>
-            </div>
-          </div>
-
-          {/* Floating music notes & stars */}
+          {/* Floating notes & stars */}
           <div className="snoopy-floaties">
             <div className="sfloat sfloat-note1">♪</div>
             <div className="sfloat sfloat-note2">♫</div>
             <div className="sfloat sfloat-note3">♪</div>
+            <div className="sfloat sfloat-note4">♩</div>
+            <div className="sfloat sfloat-note5">♬</div>
             <div className="sfloat sfloat-star1">⭐</div>
             <div className="sfloat sfloat-star2">✨</div>
             <div className="sfloat sfloat-heart">💕</div>
+            <div className="sfloat sfloat-heart2">❤️</div>
+            <div className="sfloat sfloat-joy">💛</div>
           </div>
         </div>
 

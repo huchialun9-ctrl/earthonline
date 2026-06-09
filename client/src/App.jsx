@@ -545,6 +545,16 @@ function Dashboard({ token, onLogout, region }) {
   const [adReviveRemaining, setAdReviveRemaining] = useState(3);
   const [currentAd, setCurrentAd] = useState('');
   const [adPlaying, setAdPlaying] = useState(false);
+  const [adSlogan, setAdSlogan] = useState('');
+  const AD_SLOGANS = [
+    { title: '子熙生態・無限可能', lines: ['玩遊戲・賺代幣・擁抱區塊鏈', 'Play. Earn. Own.'] },
+    { title: '12 款經典博弈遊戲', lines: ['硬幣翻轉・輪盤・21點・賽馬・骰寶', '老虎機・賓果・爆擊 Crash・德州撲克'] },
+    { title: '雙代幣經濟', lines: ['子熙幣 (ZXC) — 遊戲流通代幣', '佑戩幣 (YJC) — 稀缺保值（1 YJC = 1 億 ZXC）'] },
+    { title: '你的裝置・就是你的冷錢包', lines: ['Device-Linker App 私鑰存於本地', 'PIN 碼簽署・安全又方便'] },
+    { title: '10 大寶箱系統', lines: ['從普通到超越・保證掉落機制', '你敢挑戰超越寶箱嗎？'] },
+    { title: '完整虛擬經濟', lines: ['股票市場・期貨交易・銀行・公司經營', '當舖・玩家交易市場・貸款系統'] },
+    { title: '最強鏈上賭場・盡在子熙', lines: ['https://zixi-casino.vercel.app', '可驗證公平・鏈上結算・雙語界面'] },
+  ];
   const [globalStats, setGlobalStats] = useState({ activeUsers: 0, totalPopulation: 0, globalProduction: 0, socialCompression: '1.000' });
   const [hubStats, setHubStats] = useState(null);
 
@@ -563,6 +573,7 @@ function Dashboard({ token, onLogout, region }) {
   const [lifespan, setLifespan] = useState(0);
   const [sessionTime, setSessionTime] = useState(0);
   const sessionStartRef = useRef(null);
+  const lifespanBaseRef = useRef(null);
   const [show100Celebration, setShow100Celebration] = useState(false);
   const [logs, setLogs] = useState([
     { text: '[SYS] 地球在線連線建立中...', time: new Date().toISOString().substring(11, 19) },
@@ -934,24 +945,16 @@ function Dashboard({ token, onLogout, region }) {
     };
   }, [token, onLogout]);
 
-  // Lifespan timer
+  // Lifespan timer — set base once, never reset
   useEffect(() => {
     if (!myNode || myNode.accumulatedTime === undefined) return;
-    
-    // Check if we are currently boosted
-    const isBoosted = globalStats.multiplier && globalStats.multiplier > 1.0;
-    const rate = isBoosted ? 1.2 : 1.0;
-    
-    // Avoid using Date.now() - connectedAt because server time might be different from client time, causing negative values.
-    const baseAccumulatedSeconds = (myNode.accumulatedTime || 0) / 1000;
-    
-    let currentLocalLifespan = baseAccumulatedSeconds;
+    if (lifespanBaseRef.current !== null) return;
+    lifespanBaseRef.current = (myNode.accumulatedTime || 0) / 1000;
 
+    let currentLocalLifespan = lifespanBaseRef.current;
     const interval = setInterval(() => {
-      currentLocalLifespan += rate;
+      currentLocalLifespan += 1;
       setLifespan(Math.floor(currentLocalLifespan));
-      
-      // Update Electron Desktop App Presence if available
       if (window.electronAPI) {
         window.electronAPI.updatePresence({
           details: `生存時間: ${formatTime(Math.floor(currentLocalLifespan))}`,
@@ -960,12 +963,10 @@ function Dashboard({ token, onLogout, region }) {
         });
       }
     }, 1000);
-
-    // Run once immediately
     setLifespan(Math.floor(currentLocalLifespan));
 
     return () => clearInterval(interval);
-  }, [myNode, globalStats.multiplier]);
+  }, [myNode]);
 
   // Session timer — counts from the moment user connects
   useEffect(() => {
@@ -1146,17 +1147,24 @@ function Dashboard({ token, onLogout, region }) {
     setAdPlaying(true);
     const ads = ['/ads/zixi_casino.png', '/ads/zixi_app.png'];
     setCurrentAd(ads[Math.floor(Math.random() * ads.length)]);
+    setAdSlogan(AD_SLOGANS[0]);
     setAdCountdown(15);
+    let sloganIdx = 0;
     const timer = setInterval(() => {
       setAdCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer);
+          clearInterval(sloganTimer);
           socket.emit('ad_revive');
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
+    const sloganTimer = setInterval(() => {
+      sloganIdx = (sloganIdx + 1) % AD_SLOGANS.length;
+      setAdSlogan(AD_SLOGANS[sloganIdx]);
+    }, 2500);
   };
 
 
@@ -1750,15 +1758,20 @@ function Dashboard({ token, onLogout, region }) {
         }}>
           <div onClick={e => e.stopPropagation()} style={{
             background: 'var(--surface-color)', border: '1px solid var(--accent-color)',
-            borderRadius: '12px', padding: '40px', maxWidth: '420px', width: '90%',
+            borderRadius: '12px', padding: '24px', maxWidth: '640px', width: '95%',
             textAlign: 'center'
           }}>
             {adCountdown > 0 ? (
               <>
-                <div style={{marginBottom: '15px', borderRadius: '8px', overflow: 'hidden', maxHeight: '250px'}}>
+                <div style={{marginBottom: '12px', borderRadius: '8px', overflow: 'hidden', maxHeight: '360px'}}>
                   <img src={currentAd} alt="ad" style={{width: '100%', height: 'auto', display: 'block', borderRadius: '8px'}} />
                 </div>
-                <div style={{color: 'var(--text-color)', fontSize: '1.1rem', marginBottom: '10px'}}>觀看廣告中...</div>
+                <div style={{color: 'var(--accent-color)', fontSize: '1.3rem', fontWeight: 'bold', marginBottom: '4px', minHeight: '1.8em', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  {adSlogan?.title || ''}
+                </div>
+                <div style={{color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '10px', minHeight: '2.4em', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px'}}>
+                  {adSlogan?.lines?.map((line, i) => <span key={i}>{line}</span>)}
+                </div>
                 <div style={{color: 'var(--accent-color)', fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '15px'}}>{adCountdown}s</div>
                 <div style={{color: 'var(--text-dim)', fontSize: '0.75rem', marginBottom: '10px'}}>贊助商：子熙生態系</div>
                 <div style={{width: '100%', height: '4px', background: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden'}}>

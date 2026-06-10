@@ -243,6 +243,7 @@ const io = new Server(server, {
 discordBot.setIoInstance(io);
 
 const { isPaused } = require('./state/tickState');
+const { calcLevel, calcLevelProgress } = require('./services/levelService');
 const regions = REGIONS;
 const regionStates = {
   asia: { connectedUsers: new Map(), currentGlobalEvent: null, multiplier: 1.0, activeUsers: 0, globalProduction: 0, socialCompression: '1.000' },
@@ -391,7 +392,9 @@ regions.forEach(regionName => {
         pts: dbUser.accumulatedBonusPoints,
         activeBuffs: dbUser.activeBuffs ? Object.fromEntries(dbUser.activeBuffs) : {},
         inventory: dbUser.inventory ? Object.fromEntries(dbUser.inventory) : {},
-        cosmetics: dbUser.cosmetics ? Object.fromEntries(dbUser.cosmetics) : {}
+        cosmetics: dbUser.cosmetics ? Object.fromEntries(dbUser.cosmetics) : {},
+        level: calcLevel(dbUser.accumulatedTime),
+        levelProgress: calcLevelProgress(dbUser.accumulatedTime)
       });
       if (connectedUsers.has(socket.id)) {
         const cu = connectedUsers.get(socket.id);
@@ -598,6 +601,8 @@ regions.forEach(regionName => {
         inventory: user.inventory,
         activeBuffs: user.activeBuffs,
         cosmetics: dbUser?.cosmetics ? Object.fromEntries(dbUser.cosmetics) : {},
+        level: calcLevel(user.accumulatedTime),
+        levelProgress: calcLevelProgress(user.accumulatedTime),
         createdAt: user.createdAt,
         connectedAt: user.connectedAt,
         activeUsers: connectedUsers.size,

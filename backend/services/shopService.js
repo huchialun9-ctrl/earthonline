@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const { SHOP_ITEMS, ITEM_NAMES } = require('../config/constants');
+const { calcLevel, calcLevelProgress } = require('./levelService');
 
 async function buyItem(username, itemId) {
   const item = SHOP_ITEMS[itemId];
@@ -127,7 +128,9 @@ async function useItem(username, itemId) {
       pts: finalUser.accumulatedBonusPoints,
       activeBuffs: finalUser.activeBuffs ? Object.fromEntries(finalUser.activeBuffs) : {},
       inventory: finalUser.inventory ? Object.fromEntries(finalUser.inventory) : {},
-      cosmetics: finalUser.cosmetics ? Object.fromEntries(finalUser.cosmetics) : {}
+      cosmetics: finalUser.cosmetics ? Object.fromEntries(finalUser.cosmetics) : {},
+      level: calcLevel(finalUser.accumulatedTime),
+      levelProgress: calcLevelProgress(finalUser.accumulatedTime)
     }
   };
 }

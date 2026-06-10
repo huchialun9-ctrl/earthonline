@@ -2664,21 +2664,37 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myN
         </div>
       </div>
       
-      {/* Toast Notification */}
+      {/* Toast Notification — full center overlay */}
       {toast && (
         <div style={{
-          position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)',
-          zIndex: 99999, padding: '12px 28px', borderRadius: '10px',
-          background: toast.type === 'success' ? 'rgba(0,255,170,0.18)' : 'rgba(255,65,100,0.18)',
-          border: `1px solid ${toast.type === 'success' ? 'rgba(0,255,170,0.5)' : 'rgba(255,65,100,0.5)'}`,
-          color: toast.type === 'success' ? '#00ffaa' : '#ff416c',
-          fontWeight: 'bold', fontSize: '1rem',
-          backdropFilter: 'blur(12px)',
-          boxShadow: toast.type === 'success' ? '0 0 30px rgba(0,255,170,0.15)' : '0 0 30px rgba(255,65,100,0.15)',
-          animation: 'fadeInUp 0.25s ease',
-          pointerEvents: 'none',
+          position: 'fixed', inset: 0, zIndex: 99999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.15s ease',
         }}>
-          {toast.message}
+          <div style={{
+            background: '#0a0e17', border: `1px solid ${toast.type === 'success' ? 'rgba(0,255,170,0.3)' : 'rgba(255,65,100,0.3)'}`,
+            borderRadius: '16px', padding: '30px 40px',
+            textAlign: 'center', maxWidth: '420px',
+            boxShadow: toast.type === 'success'
+              ? '0 0 60px rgba(0,255,170,0.12), 0 20px 60px rgba(0,0,0,0.5)'
+              : '0 0 60px rgba(255,65,100,0.12), 0 20px 60px rgba(0,0,0,0.5)',
+            animation: 'popIn 0.25s ease',
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '12px' }}>
+              {toast.type === 'success' ? '✅' : '⚠️'}
+            </div>
+            <div style={{
+              color: toast.type === 'success' ? '#00ffaa' : '#ff416c',
+              fontWeight: 'bold', fontSize: '1.2rem',
+              lineHeight: 1.5, marginBottom: '16px',
+            }}>
+              {toast.message}
+            </div>
+            <div style={{ color: '#555', fontSize: '0.8rem', letterSpacing: '1px' }}>
+              視窗將自動關閉...
+            </div>
+          </div>
         </div>
       )}
 

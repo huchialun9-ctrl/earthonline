@@ -610,6 +610,7 @@ function Dashboard({ token, onLogout, region }) {
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [toast, setToast] = useState(null); // { message, type } for non-blocking notifications
+  const toastTimerRef = useRef(null);
   const { theme, setTheme, themeData: currentThemeData, themes } = useTheme();
   
   const pingStartRef = useRef(0);
@@ -971,12 +972,16 @@ function Dashboard({ token, onLogout, region }) {
       setAllPlayersList(list || []);
     });
 
+    const showToast = (msg, type) => {
+      setToast({ message: msg, type });
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = setTimeout(() => setToast(null), 4000);
+    };
+
     s.on('buy_result', (data) => {
       if (data.success) {
         addLog(`[SYSTEM] ${data.message}`);
-        setToast({ message: data.message, type: 'success' });
-        setTimeout(() => setToast(null), 2500);
-        // Immediately update inventory so backpack reflects purchase
+        showToast(data.message, 'success');
         if (data.inventory) {
           setMyNode(prev => prev ? { ...prev, inventory: data.inventory } : prev);
         }
@@ -988,8 +993,7 @@ function Dashboard({ token, onLogout, region }) {
     s.on('use_item_result', (data) => {
       if (data.success) {
         addLog(`[SYSTEM] ${data.message}`);
-        setToast({ message: data.message, type: 'success' });
-        setTimeout(() => setToast(null), 2500);
+        showToast(data.message, 'success');
       } else {
         addLog(`[SYSTEM] ⚠️ ${data.message}`);
       }
@@ -2663,17 +2667,18 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myN
       {/* Toast Notification */}
       {toast && (
         <div style={{
-          position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)',
-          zIndex: 99999, padding: '10px 24px', borderRadius: '8px',
-          background: toast.type === 'success' ? 'rgba(0,255,170,0.15)' : 'rgba(255,65,100,0.15)',
-          border: `1px solid ${toast.type === 'success' ? 'rgba(0,255,170,0.4)' : 'rgba(255,65,100,0.4)'}`,
+          position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)',
+          zIndex: 99999, padding: '12px 28px', borderRadius: '10px',
+          background: toast.type === 'success' ? 'rgba(0,255,170,0.18)' : 'rgba(255,65,100,0.18)',
+          border: `1px solid ${toast.type === 'success' ? 'rgba(0,255,170,0.5)' : 'rgba(255,65,100,0.5)'}`,
           color: toast.type === 'success' ? '#00ffaa' : '#ff416c',
-          fontWeight: 'bold', fontSize: '0.9rem',
-          backdropFilter: 'blur(8px)',
-          animation: 'fadeInUp 0.2s ease',
-          pointerEvents: 'none', whiteSpace: 'nowrap',
+          fontWeight: 'bold', fontSize: '1rem',
+          backdropFilter: 'blur(12px)',
+          boxShadow: toast.type === 'success' ? '0 0 30px rgba(0,255,170,0.15)' : '0 0 30px rgba(255,65,100,0.15)',
+          animation: 'fadeInUp 0.25s ease',
+          pointerEvents: 'none',
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.message}
+          {toast.message}
         </div>
       )}
 

@@ -1076,27 +1076,29 @@ function Dashboard({ token, onLogout, region }) {
     };
   }, [token, onLogout]);
 
-  // Lifespan display: 1:1 real-time count from server's initial accumulatedTime
-  // Only reads server base once to avoid backward jumps on re-sync
+  // Lifespan display: 1:1 real-time count, ref-based like session timer
+  const lifespanStartRef = useRef(null);
+  const lifespanBaseRef = useRef(0);
+
   useEffect(() => {
     if (!myNode || myNode.accumulatedTime === undefined) return;
-    if (lifespanIntervalRef.current) return; // already running
-    const baseSeconds = Math.floor((myNode.accumulatedTime || 0) / 1000);
-    const startAt = Date.now();
-    setLifespan(baseSeconds);
-
-    lifespanIntervalRef.current = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startAt) / 1000);
-      setLifespan(baseSeconds + elapsed);
+    if (!lifespanStartRef.current) {
+      lifespanBaseRef.current = Math.floor((myNode.accumulatedTime || 0) / 1000);
+      lifespanStartRef.current = Date.now();
+      setLifespan(lifespanBaseRef.current);
+    }
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - lifespanStartRef.current) / 1000);
+      setLifespan(lifespanBaseRef.current + elapsed);
       if (window.electronAPI) {
         window.electronAPI.updatePresence({
-          details: `生存時間: ${formatTime(baseSeconds + elapsed)}`,
+          details: `生存時間: ${formatTime(lifespanBaseRef.current + elapsed)}`,
           state: `區域: ${region === 'asia' ? 'Asia' : region === 'us' ? 'US' : 'EU'} | 積分: ${Math.floor((myNode?.accumulatedBonusPoints || 0))} PT`,
           username: myNode.username
         });
       }
     }, 1000);
-    return () => clearInterval(lifespanIntervalRef.current);
+    return () => clearInterval(interval);
   }, [myNode, region]);
 
   // Session timer — counts from the moment user connects

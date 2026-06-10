@@ -8,6 +8,7 @@ import ShopModal from './ShopModal';
 import BackpackModal from './BackpackModal';
 import useTimer from './hooks/useTimer';
 import useSocket from './hooks/useSocket';
+import useGameState from './hooks/useGameState';
 import './index.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';
@@ -552,9 +553,7 @@ function Dashboard({ token, onLogout, region }) {
   const SOCKET_URL = BASE_URL;
   const { socket, isConnected, ping } = useSocket(SOCKET_URL, region, token, onLogout);
 
-  const [nodes, setNodes] = useState([]);
-  const [myNode, setMyNode] = useState(null);
-  const [myRole, setMyRole] = useState('user');
+  const { nodes, myNode, setMyNode, myRole, globalStats, hubStats, leaderboard, currentEvent } = useGameState(socket, API_URL, BASE_URL);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [adminTarget, setAdminTarget] = useState('');
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -567,8 +566,6 @@ function Dashboard({ token, onLogout, region }) {
   const [currentAd, setCurrentAd] = useState('');
   const [adPlaying, setAdPlaying] = useState(false);
   const [adSlogan, setAdSlogan] = useState('');
-  const [globalStats, setGlobalStats] = useState({ activeUsers: 0, totalPopulation: 0, globalProduction: 0, socialCompression: '1.000' });
-
   // 管理員面板開啟時自動載入全部玩家名單
   useEffect(() => {
     if (showAdminPanel && socket?.connected) {
@@ -600,9 +597,7 @@ function Dashboard({ token, onLogout, region }) {
   const pingStartRef = useRef(0);
   const [socialTab, setSocialTab] = useState('friends'); // 'friends', 'all', 'requests'
   const [socialData, setSocialData] = useState({ allPlayers: [], friends: [], friendRequests: [] });
-  const [leaderboard, setLeaderboard] = useState([]);
   const [sortMode, setSortMode] = useState('points');
-  const [currentEvent, setCurrentEvent] = useState(null);
 
   // Ref for react-draggable
   const logRef = useRef(null);
@@ -665,13 +660,11 @@ function Dashboard({ token, onLogout, region }) {
   }, [pmTarget, showPm]);
 
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && bgmEnabled) {
       audioRef.current.volume = 0.2;
-      audioRef.current.play().catch(() => {
-        setBgmEnabled(false);
-      });
+      audioRef.current.play().catch(() => setBgmEnabled(false));
     }
-  }, []);
+  }, [bgmEnabled]);
 
   // Terminal State
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
@@ -748,18 +741,6 @@ function Dashboard({ token, onLogout, region }) {
     }
   }, [showSocialModal, socket]);
 
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      try {
-        const res = await fetch(`${API_URL}/leaderboard`, { cache: 'no-store' });
-        if (res.ok) setLeaderboard(await res.json());
-      } catch(err) { console.error('[LB] Failed to fetch leaderboard:', err); }
-    };
-    fetchLeaderboard();
-    const intv = setInterval(fetchLeaderboard, 5000);
-    return () => clearInterval(intv);
-  }, []);
-
   const [boundDiscord, setBoundDiscord] = useState(null);
 
   const handleBindDiscord = (e) => {
@@ -827,29 +808,12 @@ function Dashboard({ token, onLogout, region }) {
     });
 
     s.on('init_data', async (data) => {
-      setMyNode(data);
-      setMyRole(data.role || 'user');
       addLog(`身分確認：節點 [${data.username}] 成功接入全球網路`);
-      
       if (data.discordProfile && data.discordProfile.id) {
-        setBoundDiscord({
-          username: data.discordProfile.username,
-          avatar: data.discordProfile.avatar
-        });
+        setBoundDiscord({ username: data.discordProfile.username, avatar: data.discordProfile.avatar });
       } else {
         setBoundDiscord(null);
       }
-      if (data.currentGlobalEvent) {
-        setCurrentEvent(data.currentGlobalEvent);
-      }
-    });
-
-    s.on('global_event_started', (eventData) => {
-      setCurrentEvent(eventData);
-    });
-
-    s.on('global_event_ended', () => {
-      setCurrentEvent(null);
     });
 
     s.on('terminal_response', (msg) => {
@@ -910,44 +874,14 @@ function Dashboard({ token, onLogout, region }) {
       s.emit('get_social_data');
     });
 
-    s.on('all_nodes', (data) => {
-      setNodes(data);
-      addLog(`成功同步 ${data.length} 個物理座標節點資料`);
-    });
-
     s.on('node_connected', (node) => {
-      setNodes(prev => {
-        if (!prev.find(n => n.id === node.id)) {
-          return [...prev, node];
-        }
-        return prev;
-      });
       addLog(`警告：偵測到新物理節點活動於座標 [${node.lat.toFixed(2)}, ${node.lon.toFixed(2)}]`);
     });
 
-    s.on('node_disconnected', ({ id }) => {
-      setNodes(prev => prev.filter(n => n.id !== id));
+    s.on('node_disconnected', () => {
       addLog(`通知：節點連線中斷，正在重新計算社會總壓迫常數`);
     });
     
-    s.on('disconnect', () => {
-      setIsConnected(false);
-    });
-
-    s.on('global_stats', (stats) => {
-      setGlobalStats(stats);
-    });
-
-    s.on('user_state_update', (data) => {
-      // Server sends `pts` but UI reads `accumulatedBonusPoints` — remap key
-      const normalized = { ...data };
-      if ('pts' in normalized) {
-        normalized.accumulatedBonusPoints = normalized.pts;
-        delete normalized.pts;
-      }
-      setMyNode(prev => prev ? { ...prev, ...normalized } : normalized);
-    });
-
     s.on('all_players_list', (list) => {
       setAllPlayersList(list || []);
     });

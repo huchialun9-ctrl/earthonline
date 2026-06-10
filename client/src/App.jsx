@@ -12,9 +12,6 @@ import { GameProvider, useGame } from './context/GameContext';
 import './index.css';
 
 const VITE_API = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';
-const BASE_URL = VITE_API;
-const API_URL = VITE_API;
-const SOCKET_URL = VITE_API;
 
 
 function LoginGateway({ onLogin }) {
@@ -2216,6 +2213,7 @@ function App() {
   const { t, language, setLanguage } = useLanguage();
   const [token, setToken] = useState(localStorage.getItem('eo_token'));
   const [region, setRegion] = useState(localStorage.getItem('eo_region') || 'asia');
+  const APP_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://earthonline.onrender.com';
 
   const handleLogin = (newToken, username, selectedRegion) => {
     localStorage.setItem('eo_token', newToken);

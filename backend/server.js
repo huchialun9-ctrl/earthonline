@@ -242,6 +242,7 @@ const io = new Server(server, {
 
 discordBot.setIoInstance(io);
 
+const { isPaused } = require('./state/tickState');
 const regions = REGIONS;
 const regionStates = {
   asia: { connectedUsers: new Map(), currentGlobalEvent: null, multiplier: 1.0, activeUsers: 0, globalProduction: 0, socialCompression: '1.000' },
@@ -311,6 +312,8 @@ regions.forEach(regionName => {
   const state = regionStates[regionName];
 
   setInterval(async () => {
+    if (isPaused()) return;
+
     state.activeUsers = state.connectedUsers.size;
     state.multiplier = state.connectedUsers.size >= 5 ? 1.2 : 1.0;
 

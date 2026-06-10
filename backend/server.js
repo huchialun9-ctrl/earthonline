@@ -135,11 +135,12 @@ async function sendDiscordWebhook(message) {
 }
 
 const app = express();
-app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use('/downloads', express.static(path.join(__dirname, 'public/downloads')));
 app.use(morgan('short'));
+// Helmet disabled temporarily — its CSP blocks Socket.io WebSocket handshake
+// app.use(helmet());
 
 // Health check for Render
 app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() }));

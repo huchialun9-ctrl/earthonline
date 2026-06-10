@@ -311,8 +311,15 @@ regions.forEach(regionName => {
   const nsp = io.of(`/${regionName}`);
   const state = regionStates[regionName];
 
+  let lastPausedState = false;
+
   setInterval(async () => {
-    if (isPaused()) return;
+    const nowPaused = isPaused();
+    if (nowPaused !== lastPausedState) {
+      lastPausedState = nowPaused;
+      nsp.emit(nowPaused ? 'tick_paused' : 'tick_resumed');
+    }
+    if (nowPaused) return;
 
     state.activeUsers = state.connectedUsers.size;
     state.multiplier = state.connectedUsers.size >= 5 ? 1.2 : 1.0;

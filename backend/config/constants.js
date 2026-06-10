@@ -1,13 +1,15 @@
 const FILTERED_WORDS = ['fuck', 'shit', 'asshole', 'bitch', 'damn', 'cao', '幹', '靠北', '操你媽', 'fucking', 'stupid', 'idiot', 'nigger', 'bastard', 'piss off', 'suck my', 'motherfucker'];
 
 const SHOP_ITEMS = {
-  liquid_nitrogen:  { cost: 200,  effect: 'buff',     type: 'cooling',     duration: 1800000 },
-  quantum_cooler:   { cost: 500,  effect: 'health',   value: 100 },
-  overclock_chip:   { cost: 1500, effect: 'buff',     type: 'overclock',  duration: 3600000 },
-  firewall:         { cost: 1000, effect: 'buff',     type: 'firewall',   duration: 1800000 },
-  generator:        { cost: 800,  effect: 'revive',   value: 20 },
-  neon_strip:       { cost: 3000, effect: 'cosmetic' },
-  flash_drive:      { cost: 500,  effect: 'random' }
+  liquid_nitrogen:  { cost: 150,  effect: 'buff',     type: 'cooling',     duration: 2400000 },
+  quantum_cooler:   { cost: 400,  effect: 'health',   value: 60 },
+  overclock_chip:   { cost: 800,  effect: 'buff',     type: 'overclock',  duration: 1800000 },
+  firewall:         { cost: 600,  effect: 'buff',     type: 'firewall',   duration: 2700000 },
+  generator:        { cost: 600,  effect: 'revive',   value: 35 },
+  neon_strip:       { cost: 800,  effect: 'cosmetic' },
+  flash_drive:      { cost: 500,  effect: 'random' },
+  speed_drive:      { cost: 1200, effect: 'buff',     type: 'speed',      duration: 3600000 },
+  backup_node:      { cost: 1500, effect: 'passive',  type: 'backup',     value: 30 }
 };
 
 const ITEM_NAMES = {
@@ -17,7 +19,9 @@ const ITEM_NAMES = {
   firewall: '防火牆',
   generator: '備用發電機',
   neon_strip: '霓虹燈管',
-  flash_drive: '隨身碟'
+  flash_drive: '隨身碟',
+  speed_drive: '網路加速器',
+  backup_node: '備份節點'
 };
 
 const COUNTRY_REGION = {

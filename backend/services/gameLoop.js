@@ -30,7 +30,19 @@ async function processTick(state, connectedUsers) {
         decay = BASE_DECAY_PER_TICK * curveMultiplier * loadMultiplier;
       }
     }
-    if (user.health <= 0) isDead = true;
+    if (user.health <= 0) {
+      isDead = true;
+      // Auto-revive with backup node
+      const hasBackup = user.cosmetics?.get('backup_node');
+      if (hasBackup) {
+        await User.updateOne(
+          { username: user.username },
+          { $set: { health: 30 }, $unset: { 'cosmetics.backup_node': '' } }
+        );
+        isDead = false;
+        user.health = 30;
+      }
+    }
 
     let ptPerTick = 0;
     let timeEarned = 0;

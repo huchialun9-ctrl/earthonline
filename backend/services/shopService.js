@@ -72,10 +72,12 @@ async function useItem(username, itemId) {
     extraUpdate = { $set: { [`activeBuffs.${item.type}`]: expiry } };
     const minLabel = Math.floor(item.duration / 60000);
     message = item.type === 'overclock'
-      ? `⚡ PT 收益 ×2.0 倍，持續 ${minLabel} 分鐘！`
+      ? `⚡ PT 收益 ×3.0 倍，持續 ${minLabel} 分鐘！`
       : item.type === 'cooling'
-        ? `❄️ 液態氮冷卻啟動，維護期間降頻免疫，持續 ${minLabel} 分鐘！`
-        : `🛡️ 防火牆啟動，${minLabel} 分鐘內免疫衰減！`;
+        ? `❄️ 液態氮冷卻啟動，衰減 -50% 且免疫維護懲罰，持續 ${minLabel} 分鐘！`
+        : item.type === 'firewall'
+          ? `🛡️ 防火牆啟動，${minLabel} 分鐘內免疫衰減、太陽風暴與禁言！`
+          : `⚡ 網路加速器啟動，${minLabel} 分鐘內 tick 加速 +66%！`;
 
   } else if (item.effect === 'revive') {
     const dbUser = await User.findOne({ username });
@@ -105,6 +107,9 @@ async function useItem(username, itemId) {
       extraUpdate = { $inc: { health: -50 }, $max: { health: 1 } };
       message = '💀 大凶！電腦病毒爆發，健康度 -50%（強制保留 1% 存活）！';
     }
+  } else if (item.effect === 'passive') {
+    extraUpdate = { $set: { [`cosmetics.${itemId}`]: true } };
+    message = '🔁 備份節點已部署！死亡時自動消耗以 30% HP 復活。';
   }
 
   let finalUser;

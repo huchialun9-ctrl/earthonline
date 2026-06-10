@@ -976,6 +976,10 @@ function Dashboard({ token, onLogout, region }) {
         addLog(`[SYSTEM] ${data.message}`);
         setToast({ message: data.message, type: 'success' });
         setTimeout(() => setToast(null), 2500);
+        // Immediately update inventory so backpack reflects purchase
+        if (data.inventory) {
+          setMyNode(prev => prev ? { ...prev, inventory: data.inventory } : prev);
+        }
       } else {
         addLog(`[SYSTEM] ⚠️ ${data.message}`);
       }
@@ -1361,7 +1365,13 @@ function Dashboard({ token, onLogout, region }) {
       {!myNode ? (
         <FourPetalSpiral text="正在連線至全球節點網路..." />
       ) : (
-    <div className="app-container" style={{ boxShadow: getEventGlow(), transition: 'box-shadow 1s ease-in-out' }}>
+    <div className="app-container" style={{
+      boxShadow: [
+        getEventGlow(),
+        myNode?.cosmetics?.neon_strip ? 'inset 0 0 60px rgba(255,0,255,0.12), 0 0 30px rgba(255,0,255,0.08)' : ''
+      ].filter(Boolean).join(', ') || 'none',
+      transition: 'box-shadow 1s ease-in-out'
+    }}>
       {show100Celebration && (
         <div className="celebration-overlay">
           <div className="celebration-emoji">🎉</div>

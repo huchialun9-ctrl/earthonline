@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema({
   health: { type: Number, default: 100 },
   inventory: { type: Map, of: Number, default: {} },
   activeBuffs: { type: Map, of: Number, default: {} },
-  activeSession: { type: String, default: null }
+  activeSession: { type: String, default: null },
+  cosmetics: { type: Map, of: Boolean, default: {} }
 });
 
 userSchema.index({ 'discord.id': 1 });

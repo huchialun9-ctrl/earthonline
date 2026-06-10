@@ -596,6 +596,11 @@ regions.forEach(regionName => {
         currentGlobalEvent: currentGlobalEvent // Send current event to newly connected users
       });
 
+      // Sync tick paused state to newly connected clients
+      if (isPaused()) {
+        socket.emit('tick_paused');
+      }
+
       // Sync Discord role to in-app role — check admin list or Discord guild role
       if (dbUser?.discord?.id) {
         const adminIds = (process.env.ADMIN_DISCORD_IDS || '').split(',').map(id => id.trim()).filter(Boolean);

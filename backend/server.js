@@ -1045,8 +1045,9 @@ regions.forEach(regionName => {
           extraUpdate = { $inc: { accumulatedBonusPoints: 500 } };
           message = '🎁 小吉！回本 500 PT！';
         } else {
-          extraUpdate = { $inc: { health: -50 } };
-          message = '💀 大凶！電腦病毒爆發，健康度 -50%！';
+          // $max floors health at 1 so bad luck alone can't kill
+          extraUpdate = { $inc: { health: -50 }, $max: { health: 1 } };
+          message = '💀 大凶！電腦病毒爆發，健康度 -50%（強制保留 1% 存活）！';
         }
       }
 

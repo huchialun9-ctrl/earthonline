@@ -1544,10 +1544,18 @@ function Dashboard({ token, onLogout, region }) {
             </div>
             <div className="metric-group" style={{flex: 1, padding: '10px 12px'}}>
               <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>倍率</div>
-              <div style={{fontSize: '1.3rem', fontWeight: 'bold', color: globalStats.multiplier > 1.0 ? 'var(--accent-color)' : 'var(--text-main)'}}>{globalStats.multiplier?.toFixed(1) || '1.0'}x</div>
-              {myNode?.activeBuffs?.overclock > Date.now() && (
-                <div style={{fontSize: '0.65rem', color: '#a855f7', marginTop: '2px'}}>⚡超頻 ×2.0</div>
-              )}
+              {(() => {
+                const isOverclock = myNode?.activeBuffs?.overclock > Date.now();
+                const baseMult = globalStats.multiplier || 1.0;
+                const effMult = isOverclock ? baseMult * 2 : baseMult;
+                const color = effMult > 1.0 ? 'var(--accent-color)' : 'var(--text-main)';
+                const personal = isOverclock ? '⚡' : '';
+                return (
+                  <div style={{fontSize: '1.3rem', fontWeight: 'bold', color}}>
+                    {personal}{effMult.toFixed(1)}x
+                  </div>
+                );
+              })()}
             </div>
             <div className="metric-group" style={{flex: 1, padding: '10px 12px'}}>
               <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>生命</div>

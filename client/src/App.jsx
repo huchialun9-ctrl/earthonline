@@ -8,9 +8,7 @@ import ShopModal from './ShopModal';
 import BackpackModal from './BackpackModal';
 import LeaderboardModal from './components/Modals/LeaderboardModal';
 import Console from './components/Dashboard/Console';
-import useTimer from './hooks/useTimer';
-import useSocket from './hooks/useSocket';
-import useGameState from './hooks/useGameState';
+import { GameProvider } from './context/GameContext';
 import './index.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';
@@ -553,9 +551,8 @@ function Dashboard({ token, onLogout, region }) {
   const BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://earthonline.onrender.com';
   const API_URL = `${BASE_URL}/api/${region}`;
   const SOCKET_URL = BASE_URL;
-  const { socket, isConnected, ping } = useSocket(SOCKET_URL, region, token, onLogout);
-
-  const { nodes, myNode, setMyNode, myRole, globalStats, hubStats, leaderboard, currentEvent } = useGameState(socket, API_URL, BASE_URL);
+  const game = useGame();
+  const { socket, isConnected, ping, nodes, myNode, setMyNode, myRole, globalStats, hubStats, leaderboard, currentEvent, lifespan, sessionTime, logs, addLog } = game;
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [adminTarget, setAdminTarget] = useState('');
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -575,12 +572,7 @@ function Dashboard({ token, onLogout, region }) {
     }
   }, [showAdminPanel, socket]);
 
-  const { lifespan, sessionTime } = useTimer(myNode, socket, region);
   const [show100Celebration, setShow100Celebration] = useState(false);
-  const [logs, setLogs] = useState([
-    { text: '[SYS] 地球在線連線建立中...', time: new Date().toISOString().substring(11, 19) },
-    { text: '[SYS] 進入全球節點網路...', time: new Date().toISOString().substring(11, 19) }
-  ]);
   const [showDiscordModal, setShowDiscordModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showManualBind, setShowManualBind] = useState(false);
@@ -778,19 +770,6 @@ function Dashboard({ token, onLogout, region }) {
     } catch (err) {
       alert('綁定失敗');
     }
-  };
-
-  const addLog = (msg, extra = {}) => {
-    setLogs(prev => {
-      const time = new Date().toISOString().substring(11, 19);
-      let logObj = { time, text: typeof msg === 'string' ? msg : msg.text, ...extra };
-      if (typeof msg === 'string') {
-        logObj.isChat = msg.includes('[CHAT]');
-        logObj.isDiscordChat = msg.includes('[DC_CHAT]');
-        logObj.isWarning = msg.includes('警告');
-      }
-      return [...prev, logObj].slice(-150);
-    });
   };
 
   // Register socket event listeners (connection + auth handled by useSocket)
@@ -2255,7 +2234,11 @@ function App() {
     return <LoginGateway onLogin={handleLogin} />;
   }
 
-  return <Dashboard token={token} onLogout={handleLogout} region={region} />;
+  return (
+    <GameProvider token={token} onLogout={handleLogout} region={region} SOCKET_URL={SOCKET_URL} API_URL={API_URL} BASE_URL={BASE_URL}>
+      <Dashboard token={token} onLogout={handleLogout} region={region} />
+    </GameProvider>
+  );
 }
 
 function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myNode, onPmUser }) {

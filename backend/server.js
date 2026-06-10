@@ -683,13 +683,16 @@ app.get('/api/global/stats', async (req, res, next) => {
 
 app.use('/api/:region', apiRouter);
 
-// Frontend is hosted on Cloudflare Pages — redirect non-API requests there
-app.use((req, res, next) => {
-  if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/socket.io') && !req.path.startsWith('/downloads')) {
-    return res.redirect(301, FRONTEND_URL);
-  }
-  next();
-});
+// Only redirect non-API GET requests in production (skip for local dev)
+const IS_DEV = process.env.NODE_ENV === 'development' || process.env.FRONTEND_URL?.includes('localhost');
+if (!IS_DEV) {
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/socket.io') && !req.path.startsWith('/downloads')) {
+      return res.redirect(301, FRONTEND_URL);
+    }
+    next();
+  });
+}
 
 app.use((err, req, res, next) => {
   console.error('[SYS] Express Error:', err);

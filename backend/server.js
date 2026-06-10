@@ -140,6 +140,70 @@ app.use('/api/:region', apiRouter);
 
 // Health check for Render
 app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() }));
+
+// Discord OAuth
+app.get('/api/auth/discord', (req, res) => {
+  const state = req.query.state;
+  if (!state) return res.status(400).send('Missing state');
+  const redirectUri = `${BACKEND_URL}/api/auth/discord/callback`;
+  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify&state=${state}`;
+  res.redirect(discordAuthUrl);
+});
+
+app.get('/api/auth/discord/callback', async (req, res) => {
+  const { code, state, error } = req.query;
+  const redirectUri = `${BACKEND_URL}/api/auth/discord/callback`;
+  if (error || !code || !state) return res.status(400).send(`Discord Authentication Failed. <a href="/">Return to app</a>`);
+  let action = 'bind', decoded = null, returnTo = null;
+  try {
+    const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
+    action = stateData.action || 'bind';
+    returnTo = stateData.returnTo;
+    if (returnTo) {
+      try {
+        const returnUrl = new URL(returnTo);
+        const isDev = process.env.NODE_ENV === 'development' || process.env.BACKEND_URL?.includes('localhost');
+        const allowedHosts = isDev
+          ? ['localhost', '127.0.0.1', 'earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline-2m7.pages.dev', 'earthonline.qzz.io']
+          : ['earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline-2m7.pages.dev', 'earthonline.qzz.io'];
+        if (!allowedHosts.includes(returnUrl.hostname)) returnTo = null;
+      } catch { returnTo = null; }
+    }
+    if (!returnTo) returnTo = '/';
+    if (action === 'bind') decoded = jwt.verify(stateData.token, JWT_SECRET);
+  } catch (err) { return res.status(401).send('Invalid state payload or expired token.'); }
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST', body: new URLSearchParams({ client_id: DISCORD_CLIENT_ID, client_secret: DISCORD_CLIENT_SECRET, code, grant_type: 'authorization_code', redirect_uri: redirectUri, scope: 'identify' }),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, signal: AbortSignal.timeout(10000)
+    });
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) return res.status(400).send('Failed to obtain access token from Discord');
+    const userRes = await fetch('https://discord.com/api/users/@me', {
+      headers: { authorization: `${tokenData.token_type} ${tokenData.access_token}` }, signal: AbortSignal.timeout(10000)
+    });
+    const userData = await userRes.json();
+    const avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png?size=128` : `https://cdn.discordapp.com/embed/avatars/${(BigInt(userData.id) >> 22n) % 6n}.png`;
+    const profile = { id: userData.id, username: userData.global_name || userData.username, avatar: avatarUrl };
+    if (action === 'login') {
+      let user = await User.findOne({ 'discord.id': profile.id });
+      if (!user) {
+        let baseName = profile.username.replace(/\s+/g, '_'), finalName = baseName, counter = 1;
+        while (await db.findUserByUsername(finalName)) finalName = `${baseName}_${counter++}`;
+        await db.createUser({ id: 'user_' + Date.now() + '_' + Math.floor(Math.random() * 1000), username: finalName, password: 'discord_oauth_' + Math.random().toString(36).slice(2), discord: profile, country: 'UNKNOWN' });
+        user = await db.findUserByUsername(finalName);
+      }
+      const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '30d' });
+      return res.redirect(`${returnTo || '/'}#token=${token}`);
+    } else {
+      const success = await db.updateUserDiscord(decoded.username, profile);
+      if (success) res.redirect(returnTo || '/');
+      else res.status(404).send('User not found in Earth Online database');
+    }
+  } catch (err) { console.error(err); res.status(500).send('Internal Server Error during Discord OAuth2 callback'); }
+});
+
 app.use('/api/:region', authRoutes);
 app.use('/api/:region', leaderboardRoutes);
 app.use('/api', globalRoutes);

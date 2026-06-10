@@ -297,6 +297,17 @@
   animation: globeEventPulse 2s ease-in-out infinite;
 }
 
+.globe-mode-badge {
+  background: rgba(0, 255, 170, 0.08);
+  border: 1px dashed rgba(0, 255, 170, 0.3);
+  padding: 5px 10px;
+  font-size: 0.7rem;
+  color: #00ffaa;
+  font-family: monospace;
+  letter-spacing: 1px;
+  margin-top: 6px;
+}
+
 @keyframes globeEventPulse {
   0%, 100% { box-shadow: 0 0 4px rgba(255, 215, 0, 0.1); }
   50% { box-shadow: 0 0 16px rgba(255, 215, 0, 0.25); }

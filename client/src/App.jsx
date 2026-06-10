@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
-import { Globe2, Server, Activity, User, Network, Link as LinkIcon, ShieldCheck, Shield, Info, BookOpen, FileText, Database, Code, X, Navigation, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Tornado, Coins, Satellite, Settings, AlertTriangle, CheckCircle, MapPin, Monitor, ShoppingCart, Palette } from 'lucide-react';
+import { Globe2, Activity, User, Link as LinkIcon, ShieldCheck, Shield, Info, Database, X, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Tornado, Coins, Satellite, Settings, AlertTriangle, CheckCircle, MapPin, Monitor, ShoppingCart, Palette } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import { useTheme } from './ThemeContext';
 import Draggable from 'react-draggable';
@@ -175,36 +175,23 @@ function LoginGateway({ onLogin }) {
 
   return (
     <div className="login-gateway">
-      <div className={`login-bg ${isDaytime ? 'bg-day' : 'bg-night'}`}>
-        <div className="login-bg-deco">
-          {isDaytime ? (
-            <>
-              <div className="bg-sun"></div>
-              <div className="bg-clouds">
-                <div className="bcloud bcloud-1"></div>
-                <div className="bcloud bcloud-2"></div>
-                <div className="bcloud bcloud-3"></div>
-              </div>
-              <div className="bg-grass"></div>
-            </>
-          ) : (
-            <>
-              <div className="bg-moon"></div>
-              <div className="bg-stars">
-                {Array.from({ length: 30 }, (_, i) => (
-                  <div key={i} className="bstar" style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 40}%`,
-                    animationDelay: `${Math.random() * 3}s`,
-                    width: `${1 + Math.random() * 3}px`,
-                    height: `${1 + Math.random() * 3}px`,
-                  }} />
-                ))}
-              </div>
-              <div className="bg-ground"></div>
-            </>
-          )}
+      <div className="login-bg">
+        <div className="nasa-bg"></div>
+        <div className="nasa-stars">
+          {Array.from({ length: 80 }, (_, i) => (
+            <div key={i} className="nasa-star" style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${1 + Math.random() * 2}px`,
+              height: `${1 + Math.random() * 2}px`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${2 + Math.random() * 4}s`,
+            }} />
+          ))}
         </div>
+        <div className="nasa-earth"></div>
+        <div className="nasa-earth-night"></div>
+        <div className="nasa-glow"></div>
       </div>
 
       <div className="login-box">
@@ -592,19 +579,6 @@ function Dashboard({ token, onLogout, region }) {
     '/ads/zixi_app.png': 'https://zixi-casino.vercel.app/landing',
   };
   const [globalStats, setGlobalStats] = useState({ activeUsers: 0, totalPopulation: 0, globalProduction: 0, socialCompression: '1.000' });
-  const [hubStats, setHubStats] = useState(null);
-
-  useEffect(() => {
-    const fetchHub = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/api/global/stats`);
-        if(res.ok) setHubStats(await res.json());
-      } catch(e) { console.error('[HUB] Failed to fetch hub stats:', e); }
-    };
-    fetchHub();
-    const inv = setInterval(fetchHub, 5000);
-    return () => clearInterval(inv);
-  }, [BASE_URL]);
 
   // 管理員面板開啟時自動載入全部玩家名單
   useEffect(() => {
@@ -628,12 +602,9 @@ function Dashboard({ token, onLogout, region }) {
   const [isConnected, setIsConnected] = useState(false);
   const [showDiscordModal, setShowDiscordModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
-  const [mapTheme, setMapTheme] = useState('satellite');
-  // Remove showMapModal
   const [showManualBind, setShowManualBind] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAccountInfo, setShowAccountInfo] = useState(false);
-  const [locateTrigger, setLocateTrigger] = useState(0);
   const [showSocialModal, setShowSocialModal] = useState(false);
   const [showShopModal, setShowShopModal] = useState(false);
   const [showBackpack, setShowBackpack] = useState(false);
@@ -648,8 +619,6 @@ function Dashboard({ token, onLogout, region }) {
   const [leaderboard, setLeaderboard] = useState([]);
   const [sortMode, setSortMode] = useState('points');
   const [currentEvent, setCurrentEvent] = useState(null);
-
-  const [logEndVisible, setLogEndVisible] = useState(true);
 
   // Ref for react-draggable
   const logRef = useRef(null);
@@ -1618,6 +1587,10 @@ function Dashboard({ token, onLogout, region }) {
             cpuUsage={globalStats.systemHardware?.cpu || 0}
             region={region}
             onOpenSocial={() => setShowSocialModal(true)}
+            activeEvent={currentEvent?.type || null}
+            multiplier={globalStats.multiplier || 1}
+            nodes={nodes}
+            myNodeId={myNode?.userId}
           />
 
           {/* Bottom Console Log Module */}

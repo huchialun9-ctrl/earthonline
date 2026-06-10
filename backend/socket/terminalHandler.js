@@ -89,6 +89,12 @@ function registerTerminalHandlers(socket, nspIo, connectedUsers) {
       if (isNaN(sec) || sec < 0) { socket.emit('terminal_response', '[ERROR] 用法: ROLLBACK <秒數>'); return; }
       const result = await User.updateMany({}, { $inc: { accumulatedTime: -sec * 1000 } });
       socket.emit('terminal_response', `[SYS] 已從 ${result.modifiedCount} 位玩家扣除 ${sec} 秒`);
+    } else if (cmdUpper.startsWith('SCALE_TIME ')) {
+      if (user.role !== 'admin') { socket.emit('terminal_response', '[ERROR] 權限不足'); return; }
+      const ratio = parseFloat(rawCmd.substring(11).trim());
+      if (isNaN(ratio) || ratio <= 0) { socket.emit('terminal_response', '[ERROR] 用法: SCALE_TIME <比例(0~1)>'); return; }
+      const result = await User.updateMany({}, [{ $set: { accumulatedTime: { $trunc: [{ $multiply: ['$accumulatedTime', ratio] }, 0] } } }]);
+      socket.emit('terminal_response', `[SYS] 已將 ${result.modifiedCount} 位玩家的 accumulatedTime 乘以 ${ratio}`);
     } else {
       socket.emit('terminal_response', `[ERROR] UNKNOWN OR INVALID COMMAND: ${data.command}`);
     }

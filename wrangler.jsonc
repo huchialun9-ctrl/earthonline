@@ -14,10 +14,5 @@
   ],
   "build": {
     "command": "cd client && npm install && npm run build"
-  },
-  "send_email": [
-    {
-      "name": "SEND_EMAIL"
-    }
-  ]
+  }
 }

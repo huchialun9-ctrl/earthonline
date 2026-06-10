@@ -1110,6 +1110,7 @@ function Dashboard({ token, onLogout, region }) {
       sessionStartRef.current = Date.now();
     }
     const interval = setInterval(() => {
+      if (lifespanPausedRef.current) return;
       setSessionTime(Math.floor((Date.now() - sessionStartRef.current) / 1000));
     }, 1000);
     return () => clearInterval(interval);

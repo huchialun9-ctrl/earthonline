@@ -590,9 +590,7 @@ function Dashboard({ token, onLogout, region }) {
   const [lifespan, setLifespan] = useState(0);
   const [sessionTime, setSessionTime] = useState(0);
   const sessionStartRef = useRef(null);
-  const lifespanBaseRef = useRef(null);
   const lifespanIntervalRef = useRef(null);
-  const timerStartRef = useRef(null);
   const [show100Celebration, setShow100Celebration] = useState(false);
   const [logs, setLogs] = useState([
     { text: '[SYS] 地球在線連線建立中...', time: new Date().toISOString().substring(11, 19) },
@@ -1066,25 +1064,22 @@ function Dashboard({ token, onLogout, region }) {
     };
   }, [token, onLogout]);
 
-  // Lifespan timer — set base once, never reset
+  // Lifespan display — derived from server accumulatedTime, tick every 1s for UI smoothness
   useEffect(() => {
     if (!myNode || myNode.accumulatedTime === undefined) return;
-    if (lifespanIntervalRef.current) return;
-    lifespanBaseRef.current = (myNode.accumulatedTime || 0) / 1000;
-
-    setLifespan(Math.floor(lifespanBaseRef.current));
+    setLifespan(Math.floor((myNode.accumulatedTime || 0) / 1000));
     lifespanIntervalRef.current = setInterval(() => {
-      setLifespan(prev => prev + 1);
+      setLifespan(Math.floor((myNode?.accumulatedTime || 0) / 1000));
       if (window.electronAPI) {
         window.electronAPI.updatePresence({
-          details: `生存時間: ${formatTime(lifespanBaseRef.current + (Date.now() - timerStartRef.current) / 1000)}`,
-          state: `區域: ${region === 'asia' ? 'Asia' : region === 'us' ? 'US' : 'EU'} | 積分: ${Math.floor(lifespanBaseRef.current + (Date.now() - timerStartRef.current) / 1000)} PT`,
+          details: `生存時間: ${formatTime((myNode?.accumulatedTime || 0) / 1000)}`,
+          state: `區域: ${region === 'asia' ? 'Asia' : region === 'us' ? 'US' : 'EU'} | 積分: ${Math.floor((myNode?.accumulatedBonusPoints || 0))} PT`,
           username: myNode.username
         });
       }
     }, 1000);
-    timerStartRef.current = Date.now();
-  }, [myNode]);
+    return () => clearInterval(lifespanIntervalRef.current);
+  }, [myNode, region]);
 
   // Session timer — counts from the moment user connects
   useEffect(() => {

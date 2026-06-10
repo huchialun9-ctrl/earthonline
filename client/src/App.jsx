@@ -2237,7 +2237,7 @@ function App() {
   }
 
   return (
-    <GameProvider token={token} onLogout={handleLogout} region={region} SOCKET_URL={SOCKET_URL} API_URL={API_URL} BASE_URL={BASE_URL}>
+    <GameProvider token={token} onLogout={handleLogout} region={region} SOCKET_URL={APP_BASE_URL} API_URL={APP_BASE_URL + "/api/" + region} BASE_URL={APP_BASE_URL}>
       <Dashboard token={token} onLogout={handleLogout} region={region} />
     </GameProvider>
   );

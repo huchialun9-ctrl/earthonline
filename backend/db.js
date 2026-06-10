@@ -70,16 +70,30 @@ async function getGlobalProduction() {
 }
 
 async function getRegionProduction(region) {
-  const result = await User.aggregate([
-    { $match: { homeRegion: region } },
-    {
-      $group: {
-        _id: null,
-        totalProduction: { $sum: "$accumulatedTime" }
+  try {
+    const result = await User.aggregate([
+      { $match: { homeRegion: region } },
+      {
+        $group: {
+          _id: null,
+          totalProduction: { $sum: "$accumulatedTime" }
+        }
       }
+    ]);
+    if (result.length > 0 && result[0].totalProduction > 0) {
+      return Math.floor(result[0].totalProduction / 1000);
     }
-  ]);
-  return result.length > 0 ? Math.floor(result[0].totalProduction / 1000) : 0;
+    // If aggregation returned 0 but users exist, try summing directly
+    const count = await User.countDocuments({ homeRegion: region });
+    if (count > 0) {
+      const users = await User.find({ homeRegion: region }, 'accumulatedTime').lean();
+      const total = users.reduce((sum, u) => sum + (u.accumulatedTime || 0), 0);
+      return Math.floor(total / 1000);
+    }
+  } catch (err) {
+    console.error('[DB] getRegionProduction error:', err);
+  }
+  return 0;
 }
 
 async function migrateOfflineTime() {

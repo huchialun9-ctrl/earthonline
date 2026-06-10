@@ -90,9 +90,10 @@ function registerTerminalHandlers(socket, nspIo, connectedUsers, io, regionState
       if (user.role !== 'admin') { socket.emit('terminal_response', '[ERROR] 權限不足'); return; }
       const targetUser = rawCmd.substring(13).trim();
       if (!targetUser) { socket.emit('terminal_response', '[ERROR] 用法: RESET_PLAYER <username>'); return; }
-      const r = await User.updateOne({ username: targetUser }, { $set: { accumulatedTime: 0, accumulatedBonusPoints: 0, health: 100 }, $unset: { inventory: '', activeBuffs: '', cosmetics: '' } });
-      if (r.modifiedCount === 0) { socket.emit('terminal_response', '[ERROR] 找不到使用者 ' + targetUser); return; }
-      socket.emit('terminal_response', '[SYS] 已重置 ' + targetUser + ' 的所有資料');
+      const userDoc = await User.findOne({ username: { $regex: '^' + targetUser.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', $options: 'i' } });
+      if (!userDoc) { socket.emit('terminal_response', '[ERROR] 找不到使用者 ' + targetUser); return; }
+      await User.updateOne({ _id: userDoc._id }, { $set: { accumulatedTime: 0, accumulatedBonusPoints: 0, health: 100 }, $unset: { inventory: '', activeBuffs: '', cosmetics: '' } });
+      socket.emit('terminal_response', '[SYS] 已重置 ' + targetUser + ' (' + userDoc.username + ') 的所有資料');
     } else if (cmdUpper.startsWith('SCALE_TIME ')) {
       if (user.role !== 'admin') { socket.emit('terminal_response', '[ERROR] 權限不足'); return; }
       const ratio = parseFloat(rawCmd.substring(11).trim());

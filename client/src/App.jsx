@@ -972,10 +972,9 @@ function Dashboard({ token, onLogout, region }) {
 
     s.on('buy_result', (data) => {
       if (data.success) {
-        alert('購買成功！' + data.message);
         addLog(`[SYSTEM] ${data.message}`);
       } else {
-        alert('購買失敗: ' + data.message);
+        addLog(`[SYSTEM] ⚠️ ${data.message}`);
       }
     });
 
@@ -983,7 +982,7 @@ function Dashboard({ token, onLogout, region }) {
       if (data.success) {
         addLog(`[SYSTEM] ${data.message}`);
       } else {
-        alert(data.message);
+        addLog(`[SYSTEM] ⚠️ ${data.message}`);
       }
     });
 

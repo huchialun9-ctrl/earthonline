@@ -7,6 +7,7 @@ import Draggable from 'react-draggable';
 import DataCenterVisualizer from './DataCenterVisualizer';
 import ShopModal from './ShopModal';
 import BackpackModal from './BackpackModal';
+import useTimer from './hooks/useTimer';
 import './index.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';
@@ -587,10 +588,7 @@ function Dashboard({ token, onLogout, region }) {
     }
   }, [showAdminPanel, socket]);
 
-  const [lifespan, setLifespan] = useState(0);
-  const [sessionTime, setSessionTime] = useState(0);
-  const sessionStartRef = useRef(null);
-  const lifespanIntervalRef = useRef(null);
+  const { lifespan, sessionTime } = useTimer(myNode, socket, region);
   const [show100Celebration, setShow100Celebration] = useState(false);
   const [logs, setLogs] = useState([
     { text: '[SYS] 地球在線連線建立中...', time: new Date().toISOString().substring(11, 19) },
@@ -1075,51 +1073,6 @@ function Dashboard({ token, onLogout, region }) {
       s.disconnect();
     };
   }, [token, onLogout]);
-
-  // Lifespan display: pauseable, resettable via socket events
-  const [lifespanTick, setLifespanTick] = useState(0);
-  const lifespanPausedRef = useRef(false);
-
-  useEffect(() => {
-    if (!socket) return;
-    const onPause = () => { lifespanPausedRef.current = true; };
-    const onResume = () => { lifespanPausedRef.current = false; };
-    const onForceSync = () => {
-      setLifespanTick(t => t + 1);
-      sessionStartRef.current = Date.now();
-      setSessionTime(0);
-      if (socket) socket.emit('sync_user');
-    };
-    socket.on('tick_paused', onPause);
-    socket.on('tick_resumed', onResume);
-    socket.on('force_sync', onForceSync);
-    return () => { socket.off('tick_paused', onPause); socket.off('tick_resumed', onResume); socket.off('force_sync', onForceSync); };
-  }, [socket]);
-
-  useEffect(() => {
-    if (!myNode || myNode.accumulatedTime === undefined) return;
-    const base = Math.floor((myNode.accumulatedTime || 0) / 1000);
-    const startAt = Date.now();
-    setLifespan(base);
-    const id = setInterval(() => {
-      if (lifespanPausedRef.current) return;
-      setLifespan(base + Math.floor((Date.now() - startAt) / 1000));
-    }, 1000);
-    return () => clearInterval(id);
-  }, [myNode, lifespanTick]);
-
-  // Session timer — counts from the moment user connects
-  useEffect(() => {
-    if (!myNode) return;
-    if (!sessionStartRef.current) {
-      sessionStartRef.current = Date.now();
-    }
-    const interval = setInterval(() => {
-      if (lifespanPausedRef.current) return;
-      setSessionTime(Math.floor((Date.now() - sessionStartRef.current) / 1000));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [myNode]);
 
   // Format time HH:MM:SS
   const formatTime = (seconds) => {

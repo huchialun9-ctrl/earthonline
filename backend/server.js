@@ -511,8 +511,9 @@ app.get('/api/auth/discord/callback', async (req, res) => {
     if (returnTo) {
       try {
         const returnUrl = new URL(returnTo);
-        const allowedHosts = process.env.NODE_ENV === 'development'
-          ? ['localhost', 'earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline-2m7.pages.dev', 'earthonline.qzz.io']
+        const isDev = process.env.NODE_ENV === 'development' || process.env.BACKEND_URL?.includes('localhost');
+        const allowedHosts = isDev
+          ? ['localhost', '127.0.0.1', 'earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline-2m7.pages.dev', 'earthonline.qzz.io']
           : ['earthonline.onrender.com', 'earthonline1.pages.dev', 'earthonline-2m7.pages.dev', 'earthonline.qzz.io'];
         if (!allowedHosts.includes(returnUrl.hostname)) {
           returnTo = null;

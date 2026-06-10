@@ -923,7 +923,8 @@ regions.forEach(regionName => {
         health: dbUser.health,
         pts: dbUser.accumulatedBonusPoints,
         activeBuffs: dbUser.activeBuffs ? Object.fromEntries(dbUser.activeBuffs) : {},
-        inventory: dbUser.inventory ? Object.fromEntries(dbUser.inventory) : {}
+        inventory: dbUser.inventory ? Object.fromEntries(dbUser.inventory) : {},
+        cosmetics: dbUser.cosmetics ? Object.fromEntries(dbUser.cosmetics) : {}
       });
       if (connectedUsers.has(socket.id)) {
         const cu = connectedUsers.get(socket.id);
@@ -956,7 +957,8 @@ regions.forEach(regionName => {
         return;
       }
 
-      socket.emit('buy_result', { success: true, message: `✅ 已購買「${ITEM_NAMES[itemId] || itemId}」並存入背包！` });
+      const updatedInventory = result.inventory ? Object.fromEntries(result.inventory) : {};
+      socket.emit('buy_result', { success: true, message: `✅ 已購買「${ITEM_NAMES[itemId] || itemId}」並存入背包！`, inventory: updatedInventory });
       socket.emit('user_state_update', {
         pts: result.accumulatedBonusPoints,
         inventory: result.inventory ? Object.fromEntries(result.inventory) : {}
@@ -1031,6 +1033,7 @@ regions.forEach(regionName => {
         message = `🔋 伺服器強制重啟！健康度恢復至 ${item.value}%`;
 
       } else if (item.effect === 'cosmetic') {
+        extraUpdate = { $set: { [`cosmetics.${itemId}`]: true } };
         message = '🌈 霓虹燈管已安裝，裝飾效果已套用！';
 
       } else if (item.effect === 'random') {
@@ -1061,7 +1064,8 @@ regions.forEach(regionName => {
         health: finalUser.health,
         pts: finalUser.accumulatedBonusPoints,
         activeBuffs: finalUser.activeBuffs ? Object.fromEntries(finalUser.activeBuffs) : {},
-        inventory: finalUser.inventory ? Object.fromEntries(finalUser.inventory) : {}
+        inventory: finalUser.inventory ? Object.fromEntries(finalUser.inventory) : {},
+        cosmetics: finalUser.cosmetics ? Object.fromEntries(finalUser.cosmetics) : {}
       });
       if (connectedUsers.has(socket.id)) {
         const cu = connectedUsers.get(socket.id);
@@ -1224,6 +1228,7 @@ regions.forEach(regionName => {
         health: user.health,
         inventory: user.inventory,
         activeBuffs: user.activeBuffs,
+        cosmetics: dbUser?.cosmetics ? Object.fromEntries(dbUser.cosmetics) : {},
         createdAt: user.createdAt,
         connectedAt: user.connectedAt,
         activeUsers: connectedUsers.size,

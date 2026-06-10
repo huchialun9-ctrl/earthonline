@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const discordBot = require('../discordBot');
+const { setPaused } = require('../state/tickState');
 
 async function sendDiscordWebhook(message) {
   const { DISCORD_WEBHOOK_URL } = require('../config/env');
@@ -90,6 +91,19 @@ function registerTerminalHandlers(socket, nspIo, connectedUsers) {
       if (isNaN(ratio) || ratio <= 0) { socket.emit('terminal_response', '[ERROR] 用法: SCALE_TIME <比例(0~1)>'); return; }
       const result = await User.updateMany({}, [{ $set: { accumulatedTime: { $trunc: [{ $multiply: ['$accumulatedTime', ratio] }, 0] } } }]);
       socket.emit('terminal_response', `[SYS] 已將 ${result.modifiedCount} 位玩家的 accumulatedTime 乘以 ${ratio}`);
+    } else if (cmdUpper === 'RESET_ALL') {
+      if (user.role !== 'admin') { socket.emit('terminal_response', '[ERROR] 權限不足'); return; }
+      await User.updateMany({}, { $set: { accumulatedTime: 0, accumulatedBonusPoints: 0, health: 100, inventory: {}, activeBuffs: {}, cosmetics: {}, mutedUntil: null, bannedUntil: null } });
+      socket.emit('terminal_response', `[SYS] 所有玩家資料已重置`);
+      nspIo.emit('social_data_updated');
+    } else if (cmdUpper === 'PAUSE_TICK') {
+      if (user.role !== 'admin') { socket.emit('terminal_response', '[ERROR] 權限不足'); return; }
+      setPaused(true);
+      socket.emit('terminal_response', `[SYS] 伺服器 tick 已暫停`);
+    } else if (cmdUpper === 'RESUME_TICK') {
+      if (user.role !== 'admin') { socket.emit('terminal_response', '[ERROR] 權限不足'); return; }
+      setPaused(false);
+      socket.emit('terminal_response', `[SYS] 伺服器 tick 已恢復`);
     } else {
       socket.emit('terminal_response', `[ERROR] UNKNOWN OR INVALID COMMAND: ${data.command}`);
     }

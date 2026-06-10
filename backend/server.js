@@ -24,6 +24,9 @@ const { FILTERED_WORDS, SHOP_ITEMS, ITEM_NAMES, COUNTRY_REGION, REGIONS } = requ
 const { JWT_SECRET, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, BACKEND_URL, DISCORD_REDIRECT_URI, DISCORD_WEBHOOK_URL, FRONTEND_URL } = require('./config/env');
 const { startCleanupInterval } = require('./jobs/cleanup');
 const { runStartupMigrations } = require('./jobs/migration');
+const { processTick } = require('./services/gameLoop');
+const { getRandomEvent, getEventDuration, getEventMultiplier, applyEventEndRewards } = require('./services/eventSystem');
+const { buyItem, useItem } = require('./services/shopService');
 
 const REINCARNATE_COUNTRIES = [
   { code: 'US', name: '美國', lat: 39.8, lon: -98.6, spread: 15 },
@@ -770,108 +773,24 @@ regions.forEach(regionName => {
   const nsp = io.of(`/${regionName}`);
   const state = regionStates[regionName];
 
-  // #7: global_stats 廣播頻率降為 5 秒
   setInterval(async () => {
     state.activeUsers = state.connectedUsers.size;
-    try {
-      const isBoosted = state.connectedUsers.size >= 5;
-    state.multiplier = isBoosted ? 1.2 : 1.0;
-    
+    state.multiplier = state.connectedUsers.size >= 5 ? 1.2 : 1.0;
+
+    // Check and apply active global event
     if (state.currentGlobalEvent) {
       if (Date.now() >= state.currentGlobalEvent.endTime) {
-        if (state.currentGlobalEvent.type === 'SOLAR_STORM' && state.connectedUsers.size > 0) {
-          const usernames = Array.from(state.connectedUsers.values()).map(u => u.username);
-          await User.updateMany({ username: { $in: usernames } }, { $inc: { accumulatedBonusPoints: 200 } }).catch(console.error);
-        } else if (state.currentGlobalEvent.type === 'SYSTEM_MAINTENANCE' && state.connectedUsers.size > 0) {
-          const usernames = Array.from(state.connectedUsers.values()).map(u => u.username);
-          await User.updateMany({ username: { $in: usernames } }, { $inc: { accumulatedBonusPoints: 500 } }).catch(console.error);
-        }
+        await applyEventEndRewards(state.currentGlobalEvent.type, state.connectedUsers);
         nsp.emit('global_event_ended', { type: state.currentGlobalEvent.type });
         state.currentGlobalEvent = null;
       } else {
-        switch (state.currentGlobalEvent.type) {
-          case 'QUANTUM_BURST': state.multiplier = 3.0; break;
-          case 'DATA_GOLD_RUSH': state.multiplier = 5.0; break;
-          case 'SYSTEM_MAINTENANCE': state.multiplier = 0.5; break;
-          case 'SATELLITE_ALIGNMENT': state.multiplier = 1.0 + (state.connectedUsers.size * 0.1); break;
-        }
+        state.multiplier = getEventMultiplier(state.currentGlobalEvent.type, state.connectedUsers.size);
       }
     }
 
-    if (state.connectedUsers.size > 0) {
-      const usernames = Array.from(state.connectedUsers.values()).map(u => u.username);
-      // Event multiplier bonus (on top of base)
-      const eventBonus = state.multiplier > 1.0 ? (state.multiplier - 1.0) : 0;
-      
-      const users = await User.find({ username: { $in: usernames } });
-      const updates = [];
-      for (let user of users) {
-        let isDead = false;
-        let decay = 0;
-
-        // Health decay: ~0.2% per minute total (8+ hours full health)
-        // Tick is every 2s => 30 ticks/min => decay per tick = 0.2/30 ≈ 0.00667
-        if (user.health > 0) {
-          if (user.activeBuffs && user.activeBuffs.get('firewall') > Date.now()) {
-            // Protected by firewall
-          } else {
-            decay = 0.2 / 30;
-          }
-        }
-        
-        if (user.health <= 0) isDead = true;
-
-        let ptPerTick = 0;
-        let timeEarned = 0;
-
-        if (!isDead) {
-          ptPerTick = (user.health / 100) * 0.1;
-
-          // Event multiplier bonus
-          ptPerTick += eventBonus * 0.05;
-
-          // Overclock doubles PT
-          if (user.activeBuffs && user.activeBuffs.get('overclock') > Date.now()) {
-            ptPerTick *= 2;
-          }
-
-          // Cooling buff: counter SYSTEM_MAINTENANCE penalty + prevent decay
-          const hasCooling = user.activeBuffs && user.activeBuffs.get('cooling') > Date.now();
-          if (hasCooling && state.currentGlobalEvent?.type === 'SYSTEM_MAINTENANCE') {
-            decay = 0;
-            ptPerTick += 0.05;
-          }
-
-          timeEarned = 2000;
-        }
-
-        const incFields = {};
-        if (decay > 0) incFields.health = -decay;
-        if (ptPerTick > 0) incFields.accumulatedBonusPoints = ptPerTick;
-        if (timeEarned > 0) incFields.accumulatedTime = timeEarned;
-
-        if (Object.keys(incFields).length > 0) {
-          updates.push({
-            updateOne: {
-              filter: { username: user.username },
-              update: { $inc: incFields }
-            }
-          });
-          for (const [sid, cu] of connectedUsers) {
-            if (cu.username === user.username) {
-              if (decay > 0) cu.health = (cu.health || 0) - decay;
-              if (ptPerTick > 0) cu.accumulatedBonusPoints = (cu.accumulatedBonusPoints || 0) + ptPerTick;
-              if (timeEarned > 0) cu.accumulatedTime = (cu.accumulatedTime || 0) + timeEarned;
-              break;
-            }
-          }
-        }
-      }
-      
-      if (updates.length > 0) {
-        await User.bulkWrite(updates);
-      }
-    }
+    // Process game tick for connected users
+    try {
+      await processTick(state, state.connectedUsers);
     } catch (err) {
       console.error('[SYS] Game logic error:', err);
     }
@@ -938,33 +857,13 @@ regions.forEach(regionName => {
   socket.on('buy_item', async (itemId) => {
     if (!socket.user) return;
     try {
-      const item = SHOP_ITEMS[itemId];
-      if (!item) {
-        socket.emit('buy_result', { success: false, message: '道具不存在！' });
-        return;
-      }
-      
-      // ── 購買後統一存入背包，不立即套用 ──────────────────────────────
-      // Atomic deduct PT
-      const result = await User.findOneAndUpdate(
-        { username: socket.user.username, accumulatedBonusPoints: { $gte: item.cost } },
-        { $inc: { accumulatedBonusPoints: -item.cost, [`inventory.${itemId}`]: 1 } },
-        { new: true }
-      );
-
-      if (!result) {
-        socket.emit('buy_result', { success: false, message: 'PT 不足！' });
-        return;
-      }
-
-      const updatedInventory = result.inventory ? Object.fromEntries(result.inventory) : {};
-      socket.emit('buy_result', { success: true, message: `✅ 已購買「${ITEM_NAMES[itemId] || itemId}」並存入背包！`, inventory: updatedInventory });
-      socket.emit('user_state_update', {
-        pts: result.accumulatedBonusPoints,
-        inventory: result.inventory ? Object.fromEntries(result.inventory) : {}
-      });
-      if (connectedUsers.has(socket.id)) {
-        connectedUsers.get(socket.id).accumulatedBonusPoints = result.accumulatedBonusPoints;
+      const result = await buyItem(socket.user.username, itemId);
+      socket.emit('buy_result', result);
+      if (result.success) {
+        socket.emit('user_state_update', { pts: result.pts, inventory: result.inventory });
+        if (connectedUsers.has(socket.id)) {
+          connectedUsers.get(socket.id).accumulatedBonusPoints = result.pts;
+        }
       }
     } catch (err) {
       console.error(err);
@@ -972,105 +871,18 @@ regions.forEach(regionName => {
     }
   });
 
-  // ── 使用背包道具 ──────────────────────────────────────────────────────────
   socket.on('use_item', async (itemId) => {
     if (!socket.user) return;
     try {
-      const item = SHOP_ITEMS[itemId];
-      if (!item) { socket.emit('use_item_result', { success: false, message: '道具不存在！' }); return; }
-
-      // 原子扣除背包數量
-      const userBefore = await User.findOneAndUpdate(
-        { username: socket.user.username, [`inventory.${itemId}`]: { $gte: 1 } },
-        { $inc: { [`inventory.${itemId}`]: -1 } },
-        { new: false } // 拿舊值判斷
-      );
-      if (!userBefore) {
-        socket.emit('use_item_result', { success: false, message: '背包中沒有此道具！' });
-        return;
-      }
-
-      // 清除數量歸零的 key
-      const oldCount = userBefore.inventory?.get(itemId) || 0;
-      if (oldCount <= 1) {
-        await User.updateOne({ username: socket.user.username }, { $unset: { [`inventory.${itemId}`]: '' } });
-      }
-
-      // 套用效果
-      let message = '';
-      let extraUpdate = null;
-
-      if (item.effect === 'health') {
-        const dbUser = await User.findOne({ username: socket.user.username });
-        if (dbUser.health <= 0) {
-          // 退回背包
-          await User.updateOne({ username: socket.user.username }, { $inc: { [`inventory.${itemId}`]: 1 } });
-          socket.emit('use_item_result', { success: false, message: '伺服器已死機，無法使用散熱道具！請先用備用發電機。' });
-          return;
+      const result = await useItem(socket.user.username, itemId);
+      socket.emit('use_item_result', result);
+      if (result.success && result.userState) {
+        socket.emit('user_state_update', result.userState);
+        if (connectedUsers.has(socket.id)) {
+          const cu = connectedUsers.get(socket.id);
+          cu.health = result.userState.health;
+          cu.accumulatedBonusPoints = result.userState.pts;
         }
-        const newHealth = Math.min(100, dbUser.health + item.value);
-        extraUpdate = { $set: { health: newHealth } };
-        message = `❤️ 健康度恢復 +${item.value}%（現在 ${Math.floor(newHealth)}%）`;
-
-      } else if (item.effect === 'buff') {
-        const expiry = Date.now() + item.duration;
-        extraUpdate = { $set: { [`activeBuffs.${item.type}`]: expiry } };
-        const minLabel = Math.floor(item.duration / 60000);
-        message = item.type === 'overclock'
-          ? `⚡ PT 收益 ×2.0 倍，持續 ${minLabel} 分鐘！`
-          : item.type === 'cooling'
-            ? `❄️ 液態氮冷卻啟動，維護期間降頻免疫，持續 ${minLabel} 分鐘！`
-            : `🛡️ 防火牆啟動，${minLabel} 分鐘內免疫衰減！`;
-
-      } else if (item.effect === 'revive') {
-        const dbUser = await User.findOne({ username: socket.user.username });
-        if (dbUser.health > 0) {
-          await User.updateOne({ username: socket.user.username }, { $inc: { [`inventory.${itemId}`]: 1 } });
-          socket.emit('use_item_result', { success: false, message: '伺服器仍在運作，不需要發電機！' });
-          return;
-        }
-        extraUpdate = { $set: { health: item.value } };
-        message = `🔋 伺服器強制重啟！健康度恢復至 ${item.value}%`;
-
-      } else if (item.effect === 'cosmetic') {
-        extraUpdate = { $set: { [`cosmetics.${itemId}`]: true } };
-        message = '🌈 霓虹燈管已安裝，裝飾效果已套用！';
-
-      } else if (item.effect === 'random') {
-        const rand = Math.random();
-        if (rand < 0.3) {
-          extraUpdate = { $inc: { accumulatedTime: 86400 * 1000 } };
-          message = '🏆 大吉！獲得 1 天生存時間！';
-        } else if (rand < 0.6) {
-          extraUpdate = { $inc: { accumulatedBonusPoints: 2000 } };
-          message = '💰 中吉！獲得 2000 PT！';
-        } else if (rand < 0.9) {
-          extraUpdate = { $inc: { accumulatedBonusPoints: 500 } };
-          message = '🎁 小吉！回本 500 PT！';
-        } else {
-          // $max floors health at 1 so bad luck alone can't kill
-          extraUpdate = { $inc: { health: -50 }, $max: { health: 1 } };
-          message = '💀 大凶！電腦病毒爆發，健康度 -50%（強制保留 1% 存活）！';
-        }
-      }
-
-      if (extraUpdate) {
-        await User.updateOne({ username: socket.user.username }, extraUpdate);
-      }
-
-      const finalUser = await User.findOne({ username: socket.user.username });
-      socket.emit('use_item_result', { success: true, message });
-      socket.emit('user_state_update', {
-        health: finalUser.health,
-        pts: finalUser.accumulatedBonusPoints,
-        activeBuffs: finalUser.activeBuffs ? Object.fromEntries(finalUser.activeBuffs) : {},
-        inventory: finalUser.inventory ? Object.fromEntries(finalUser.inventory) : {},
-        cosmetics: finalUser.cosmetics ? Object.fromEntries(finalUser.cosmetics) : {}
-      });
-      if (connectedUsers.has(socket.id)) {
-        const cu = connectedUsers.get(socket.id);
-        cu.health = finalUser.health;
-        cu.accumulatedBonusPoints = finalUser.accumulatedBonusPoints;
       }
     } catch (err) {
       console.error('[SYS] use_item error:', err);

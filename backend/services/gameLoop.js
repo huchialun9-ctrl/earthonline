@@ -1,14 +1,19 @@
 const User = require('../models/User');
 
-const HEALTH_DECAY_PER_TICK = 0.2 / 30;
+const BASE_DECAY_PER_TICK = 0.2 / 30; // ~0.00667
 const TIME_EARNED_PER_TICK = 2000;
 const BASE_PT_MULTIPLIER = 0.1;
+const COLLECTIVE_LOAD_THRESHOLD = 20;
 
 async function processTick(state, connectedUsers) {
   if (connectedUsers.size === 0) return { updates: [], usernamesProcessed: 0 };
 
   const usernames = Array.from(connectedUsers.values()).map(u => u.username);
   const eventBonus = state.multiplier > 1.0 ? (state.multiplier - 1.0) : 0;
+  const onlineCount = connectedUsers.size;
+
+  // Collective load: +1% decay per user above threshold
+  const loadMultiplier = onlineCount > COLLECTIVE_LOAD_THRESHOLD ? 1 + (onlineCount - COLLECTIVE_LOAD_THRESHOLD) * 0.01 : 1;
 
   const users = await User.find({ username: { $in: usernames } });
   const updates = [];
@@ -19,7 +24,10 @@ async function processTick(state, connectedUsers) {
 
     if (user.health > 0) {
       if (!(user.activeBuffs && user.activeBuffs.get('firewall') > Date.now())) {
-        decay = HEALTH_DECAY_PER_TICK;
+        // Survival-based decay curve: longer survival = slower decay
+        const survivalHours = (user.accumulatedTime || 0) / 3600000;
+        const curveMultiplier = 1 / Math.sqrt(Math.max(survivalHours, 0.1));
+        decay = BASE_DECAY_PER_TICK * curveMultiplier * loadMultiplier;
       }
     }
     if (user.health <= 0) isDead = true;

@@ -571,6 +571,15 @@ regions.forEach(regionName => {
           );
           console.log(`[SYS] Disconnect compensation for ${decoded.username}: ${Math.round(compensatedTime/60000)} minutes`);
         }
+        // Offline health recovery: +5% per hour offline, max 60%
+        if (offlineDuration > 30000) {
+          const healthRecovery = Math.min(Math.floor(offlineDuration / 3600000) * 5, 60);
+          if (healthRecovery > 0 && dbUser?.health !== undefined && dbUser.health < 100) {
+            const newHealth = Math.min(100, dbUser.health + healthRecovery);
+            await User.updateOne({ username: decoded.username }, { $set: { health: newHealth } });
+            console.log(`[SYS] Health recovery for ${decoded.username}: +${healthRecovery}% (${dbUser.health} → ${newHealth})`);
+          }
+        }
       }
       heartbeatTimestamps.set(decoded.username, Date.now());
 

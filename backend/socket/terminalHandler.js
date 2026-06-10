@@ -83,6 +83,11 @@ function registerTerminalHandlers(socket, nspIo, connectedUsers) {
       if (!targetUser || isNaN(timeSec)) { socket.emit('terminal_response', '[ERROR] 用法: SET_TIME <username> <seconds>'); return; }
       await User.updateOne({ username: targetUser }, { $set: { accumulatedTime: timeSec * 1000 } });
       socket.emit('terminal_response', `[SYS] 已將 ${targetUser} 的 accumulatedTime 設為 ${timeSec} 秒`);
+    } else if (cmdUpper === 'FIX_TIME') {
+      if (user.role !== 'admin') { socket.emit('terminal_response', '[ERROR] 權限不足'); return; }
+      // Undo 2.5x inflation: divide all accumulatedTime by 2.5
+      const result = await User.updateMany({}, [{ $set: { accumulatedTime: { $trunc: [{ $divide: ['$accumulatedTime', 2.5] }, 0] } } }]);
+      socket.emit('terminal_response', `[SYS] 已修正 ${result.modifiedCount} 位玩家的 accumulatedTime（÷2.5）`);
     } else {
       socket.emit('terminal_response', `[ERROR] UNKNOWN OR INVALID COMMAND: ${data.command}`);
     }

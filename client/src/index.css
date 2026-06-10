@@ -278,259 +278,69 @@ body {
   background-image: radial-gradient(circle at center, var(--surface-color) 0%, var(--bg-color) 100%);
 }
 
-/* Login Background - Pixel Style */
+/* Login Background - NASA Space */
 .login-bg {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  transition: background 1.5s ease;
 }
 
-.bg-day {
-  background: repeating-linear-gradient(180deg,
-    #6BB5FF 0px, #6BB5FF 60px,
-    #87CEEB 60px, #87CEEB 120px,
-    #B0E0E6 120px, #B0E0E6 180px,
-    #E0F7FA 180px, #E0F7FA 240px,
-    #90EE90 240px, #90EE90 290px,
-    #228B22 290px, #228B22 340px
-  );
-  image-rendering: pixelated;
-}
-
-.bg-night {
-  background: repeating-linear-gradient(180deg,
-    #0a0e2a 0px, #0a0e2a 60px,
-    #1a1a4e 60px, #1a1a4e 120px,
-    #0d0d2b 120px, #0d0d2b 180px,
-    #1a1a2e 180px, #1a1a2e 240px,
-    #1a2a1a 240px, #1a2a1a 290px,
-    #0a0a15 290px, #0a0a15 340px
-  );
-  image-rendering: pixelated;
-}
-
-.login-bg-deco {
+.nasa-bg {
   position: absolute;
   inset: 0;
-  pointer-events: none;
+  background: radial-gradient(ellipse at 30% 50%, #0d1b2a 0%, #0a0e1a 40%, #050810 100%);
 }
 
-/* Pixel Grid Overlay */
-.pixel-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 6px, rgba(0,0,0,0.04) 6px, rgba(0,0,0,0.04) 7px),
-    repeating-linear-gradient(90deg, transparent, transparent 6px, rgba(0,0,0,0.04) 6px, rgba(0,0,0,0.04) 7px);
-  z-index: 5;
-  image-rendering: pixelated;
-}
-
-/* Pixel Sun */
-.pixel-sun {
-  position: absolute;
-  width: 28px;
-  height: 28px;
-  top: 6%;
-  right: 14%;
-  background: #FFF176;
-  image-rendering: pixelated;
-  box-shadow:
-    28px 0 0 0 #FFF176,
-    0 28px 0 0 #FFF176,
-    28px 28px 0 0 #FFF176,
-    -28px -28px 0 0 #FFB300,
-    -28px 0 0 0 #FFB300,
-    -28px 28px 0 0 #FFB300,
-    0 -28px 0 0 #FFB300,
-    56px -28px 0 0 #FFB300,
-    56px 0 0 0 #FFB300,
-    56px 28px 0 0 #FFB300,
-    0 56px 0 0 #FFB300,
-    28px 56px 0 0 #FFB300,
-    -28px 56px 0 0 #FFB300;
-  animation: pixelSunPulse 2s steps(3) infinite;
-}
-
-@keyframes pixelSunPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
-}
-
-/* Pixel Moon */
-.pixel-moon {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  top: 7%;
-  right: 17%;
-  background: #FFF9C4;
-  image-rendering: pixelated;
-  box-shadow:
-    24px 0 0 0 #FFF9C4,
-    0 24px 0 0 #FFF9C4,
-    24px 24px 0 0 #FFF9C4,
-    -24px 0 0 0 #FFF9C4,
-    0 -24px 0 0 #FFF9C4;
-  animation: pixelMoonPulse 3s steps(3) infinite;
-}
-
-.pixel-moon::after {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  top: -4px;
-  left: 10px;
-  background: #0d0d2b;
-}
-
-@keyframes pixelMoonPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
-}
-
-/* Pixel Stars */
-.pixel-stars {
+.nasa-stars {
   position: absolute;
   inset: 0;
 }
 
-.pixel-star {
+.nasa-star {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  border-radius: 50%;
   background: #fff;
-  image-rendering: pixelated;
-  animation: pixelStarTwinkle 1.5s steps(2) infinite alternate;
+  animation: nasaStarTwinkle 3s ease-in-out infinite alternate;
 }
 
-@keyframes pixelStarTwinkle {
-  0% { opacity: 0.2; }
+@keyframes nasaStarTwinkle {
+  0% { opacity: 0.15; }
   100% { opacity: 1; }
 }
 
-/* Pixel Clouds */
-.pixel-clouds {
+.nasa-earth {
   position: absolute;
-  inset: 0;
-}
-
-.pixel-cloud {
-  position: absolute;
-  image-rendering: pixelated;
-  animation: pixelCloudDrift 25s linear infinite;
-}
-
-@keyframes pixelCloudDrift {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(120vw); }
-}
-
-.pixel-cloud-1 {
-  width: 12px; height: 12px;
-  top: 14%; left: -10%;
-  background: rgba(255,255,255,0.8);
+  width: 700px;
+  height: 700px;
+  bottom: -250px;
+  right: -150px;
+  border-radius: 50%;
   box-shadow:
-    12px 0 0 0 rgba(255,255,255,0.8),
-    24px 0 0 0 rgba(255,255,255,0.8),
-    6px -6px 0 0 rgba(255,255,255,0.8),
-    18px -6px 0 0 rgba(255,255,255,0.8);
-  animation-duration: 30s;
+    inset 12px 0 30px 6px rgba(0,0,0,0.85),
+    inset -3px 0 6px 2px rgba(255,255,255,0.15),
+    0 0 80px rgba(0, 150, 255, 0.15);
+  background-color: #051428;
+  background-image: url('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg');
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  animation: nasaEarthSpin 60s linear infinite;
 }
 
-.pixel-cloud-2 {
-  width: 12px; height: 12px;
-  top: 22%; left: -10%;
-  background: rgba(255,255,255,0.7);
-  box-shadow:
-    12px 0 0 0 rgba(255,255,255,0.7),
-    6px -6px 0 0 rgba(255,255,255,0.7),
-    18px -6px 0 0 rgba(255,255,255,0.7);
-  animation-duration: 38s;
-  animation-delay: 5s;
+@keyframes nasaEarthSpin {
+  0% { background-position: 0 0; }
+  100% { background-position: 200% 0; }
 }
 
-.pixel-cloud-3 {
-  width: 12px; height: 12px;
-  top: 30%; left: -10%;
-  background: rgba(255,255,255,0.75);
-  box-shadow:
-    12px 0 0 0 rgba(255,255,255,0.75),
-    24px 0 0 0 rgba(255,255,255,0.75),
-    36px 0 0 0 rgba(255,255,255,0.75),
-    6px -6px 0 0 rgba(255,255,255,0.75),
-    18px -6px 0 0 rgba(255,255,255,0.75),
-    30px -6px 0 0 rgba(255,255,255,0.75);
-  animation-duration: 45s;
-  animation-delay: 10s;
-}
-
-/* Pixel Mountains */
-.pixel-mountains {
+.nasa-glow {
   position: absolute;
-  bottom: 12%;
-  left: 0;
-  width: 100%;
-  height: 90px;
-  image-rendering: pixelated;
-  background:
-    linear-gradient(104deg, transparent 12%, #4a9a4a 12%, #4a9a4a 16%, transparent 16%),
-    linear-gradient(76deg, transparent 16%, #4a9a4a 16%, #4a9a4a 20%, transparent 20%),
-    linear-gradient(103deg, transparent 28%, #3a8a3a 28%, #3a8a3a 32%, transparent 32%),
-    linear-gradient(77deg, transparent 32%, #3a8a3a 32%, #3a8a3a 36%, transparent 36%),
-    linear-gradient(105deg, transparent 44%, #2d7a2d 44%, #2d7a2d 48%, transparent 48%),
-    linear-gradient(75deg, transparent 48%, #2d7a2d 48%, #2d7a2d 52%, transparent 52%),
-    linear-gradient(102deg, transparent 60%, #1a6a1a 60%, #1a6a1a 64%, transparent 64%),
-    linear-gradient(78deg, transparent 64%, #1a6a1a 64%, #1a6a1a 68%, transparent 68%),
-    linear-gradient(106deg, transparent 76%, #0a5a0a 76%, #0a5a0a 80%, transparent 80%),
-    linear-gradient(74deg, transparent 80%, #0a5a0a 80%, #0a5a0a 84%, transparent 84%);
-}
-
-.pixel-mountains-night {
-  position: absolute;
-  bottom: 12%;
-  left: 0;
-  width: 100%;
-  height: 90px;
-  image-rendering: pixelated;
-  background:
-    linear-gradient(104deg, transparent 12%, #1a2a3a 12%, #1a2a3a 16%, transparent 16%),
-    linear-gradient(76deg, transparent 16%, #1a2a3a 16%, #1a2a3a 20%, transparent 20%),
-    linear-gradient(103deg, transparent 28%, #152535 28%, #152535 32%, transparent 32%),
-    linear-gradient(77deg, transparent 32%, #152535 32%, #152535 36%, transparent 36%),
-    linear-gradient(105deg, transparent 44%, #102030 44%, #102030 48%, transparent 48%),
-    linear-gradient(75deg, transparent 48%, #102030 48%, #102030 52%, transparent 52%),
-    linear-gradient(102deg, transparent 60%, #0c1c2c 60%, #0c1c2c 64%, transparent 64%),
-    linear-gradient(78deg, transparent 64%, #0c1c2c 64%, #0c1c2c 68%, transparent 68%),
-    linear-gradient(106deg, transparent 76%, #081828 76%, #081828 80%, transparent 80%),
-    linear-gradient(74deg, transparent 80%, #081828 80%, #081828 84%, transparent 84%);
-}
-
-/* Pixel Grass (Day) */
-.pixel-grass {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 12%;
-  image-rendering: pixelated;
-  background: repeating-conic-gradient(#2d8a2d 0% 25%, #1a7a1a 0% 50%) 0 0 / 16px 16px;
-  opacity: 0.6;
-}
-
-/* Pixel Ground (Night) */
-.pixel-ground {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 12%;
-  image-rendering: pixelated;
-  background: repeating-conic-gradient(#1a2a1a 0% 25%, #0d1d0d 0% 50%) 0 0 / 16px 16px;
-  opacity: 0.5;
+  width: 750px;
+  height: 750px;
+  bottom: -275px;
+  right: -175px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 50%, rgba(100, 180, 255, 0.06) 0%, transparent 60%);
+  pointer-events: none;
 }
 
 /* Rotating Earth on Login */

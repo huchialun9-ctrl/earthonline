@@ -175,37 +175,22 @@ function LoginGateway({ onLogin }) {
 
   return (
     <div className="login-gateway">
-      <div className={`login-bg ${isDaytime ? 'bg-day' : 'bg-night'}`}>
-        <div className="login-bg-deco">
-          <div className="pixel-grid"></div>
-          {isDaytime ? (
-            <>
-              <div className="pixel-sun"></div>
-              <div className="pixel-clouds">
-                <div className="pixel-cloud pixel-cloud-1"></div>
-                <div className="pixel-cloud pixel-cloud-2"></div>
-                <div className="pixel-cloud pixel-cloud-3"></div>
-              </div>
-              <div className="pixel-mountains"></div>
-              <div className="pixel-grass"></div>
-            </>
-          ) : (
-            <>
-              <div className="pixel-moon"></div>
-              <div className="pixel-stars">
-                {Array.from({ length: 40 }, (_, i) => (
-                  <div key={i} className="pixel-star" style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 45}%`,
-                    animationDelay: `${Math.random() * 3}s`,
-                  }} />
-                ))}
-              </div>
-              <div className="pixel-mountains-night"></div>
-              <div className="pixel-ground"></div>
-            </>
-          )}
+      <div className="login-bg">
+        <div className="nasa-bg"></div>
+        <div className="nasa-stars">
+          {Array.from({ length: 80 }, (_, i) => (
+            <div key={i} className="nasa-star" style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${1 + Math.random() * 2}px`,
+              height: `${1 + Math.random() * 2}px`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${2 + Math.random() * 4}s`,
+            }} />
+          ))}
         </div>
+        <div className="nasa-earth"></div>
+        <div className="nasa-glow"></div>
       </div>
 
       <div className="login-box">

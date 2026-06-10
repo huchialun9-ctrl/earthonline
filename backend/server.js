@@ -20,6 +20,63 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const os = require('os');
 
+const REINCARNATE_COUNTRIES = [
+  { code: 'US', name: '美國', lat: 39.8, lon: -98.6, spread: 15 },
+  { code: 'TW', name: '台灣', lat: 23.7, lon: 121.0, spread: 1.5 },
+  { code: 'JP', name: '日本', lat: 36.2, lon: 138.3, spread: 4 },
+  { code: 'KR', name: '韓國', lat: 36.0, lon: 128.0, spread: 2.5 },
+  { code: 'CN', name: '中國', lat: 35.0, lon: 105.0, spread: 12 },
+  { code: 'HK', name: '香港', lat: 22.3, lon: 114.2, spread: 0.8 },
+  { code: 'SG', name: '新加坡', lat: 1.3, lon: 103.8, spread: 0.4 },
+  { code: 'MY', name: '馬來西亞', lat: 4.2, lon: 108.0, spread: 5 },
+  { code: 'TH', name: '泰國', lat: 15.5, lon: 101.0, spread: 3.5 },
+  { code: 'VN', name: '越南', lat: 16.0, lon: 106.0, spread: 3 },
+  { code: 'PH', name: '菲律賓', lat: 12.0, lon: 122.0, spread: 3 },
+  { code: 'ID', name: '印尼', lat: -2.0, lon: 118.0, spread: 8 },
+  { code: 'IN', name: '印度', lat: 22.0, lon: 79.0, spread: 10 },
+  { code: 'GB', name: '英國', lat: 55.4, lon: -3.4, spread: 3 },
+  { code: 'FR', name: '法國', lat: 46.6, lon: 2.2, spread: 4 },
+  { code: 'DE', name: '德國', lat: 51.2, lon: 10.4, spread: 3 },
+  { code: 'IT', name: '義大利', lat: 41.9, lon: 12.5, spread: 3 },
+  { code: 'ES', name: '西班牙', lat: 40.2, lon: -3.7, spread: 3.5 },
+  { code: 'NL', name: '荷蘭', lat: 52.1, lon: 5.3, spread: 1.5 },
+  { code: 'SE', name: '瑞典', lat: 62.0, lon: 16.0, spread: 4 },
+  { code: 'NO', name: '挪威', lat: 64.0, lon: 12.0, spread: 4 },
+  { code: 'FI', name: '芬蘭', lat: 64.0, lon: 26.0, spread: 4 },
+  { code: 'RU', name: '俄羅斯', lat: 60.0, lon: 100.0, spread: 20 },
+  { code: 'AU', name: '澳洲', lat: -25.0, lon: 135.0, spread: 10 },
+  { code: 'NZ', name: '紐西蘭', lat: -42.0, lon: 173.0, spread: 3 },
+  { code: 'BR', name: '巴西', lat: -14.0, lon: -53.0, spread: 10 },
+  { code: 'AR', name: '阿根廷', lat: -36.0, lon: -64.0, spread: 6 },
+  { code: 'CL', name: '智利', lat: -36.0, lon: -71.0, spread: 4 },
+  { code: 'MX', name: '墨西哥', lat: 24.0, lon: -102.0, spread: 5 },
+  { code: 'CA', name: '加拿大', lat: 56.0, lon: -106.0, spread: 12 },
+  { code: 'ZA', name: '南非', lat: -29.0, lon: 24.0, spread: 5 },
+  { code: 'EG', name: '埃及', lat: 27.0, lon: 30.0, spread: 4 },
+  { code: 'NG', name: '奈及利亞', lat: 9.0, lon: 8.0, spread: 4 },
+  { code: 'KE', name: '肯亞', lat: 0.0, lon: 38.0, spread: 3 },
+  { code: 'TR', name: '土耳其', lat: 39.0, lon: 35.0, spread: 4 },
+  { code: 'SA', name: '沙烏地阿拉伯', lat: 24.0, lon: 45.0, spread: 6 },
+  { code: 'AE', name: '阿拉伯聯合大公國', lat: 24.0, lon: 54.0, spread: 1.5 },
+  { code: 'IL', name: '以色列', lat: 31.0, lon: 35.0, spread: 1.5 },
+].map(c => ({ ...c, region: getRegionFromLon(c.lon) }));
+
+function getRegionFromLon(lon) {
+  if (lon >= 60 && lon <= 180) return 'asia';
+  if (lon >= -30 && lon < 60) return 'eu';
+  return 'us';
+}
+
+function randomReincarnation() {
+  const country = REINCARNATE_COUNTRIES[Math.floor(Math.random() * REINCARNATE_COUNTRIES.length)];
+  return {
+    lat: country.lat + (Math.random() - 0.5) * country.spread,
+    lon: country.lon + (Math.random() - 0.5) * country.spread,
+    country: country.code,
+    region: country.region,
+  };
+}
+
 // Filtered words for chat moderation
 const FILTERED_WORDS = ['fuck', 'shit', 'asshole', 'bitch', 'damn', 'cao', '幹', '靠北', '操你媽', 'fucking', 'stupid', 'idiot', 'nigger', 'bastard', 'piss off', 'suck my', 'motherfucker'];
 
@@ -68,14 +125,7 @@ db.migrateOfflineTime().catch(err => console.error('[SYS] Migration failed:', er
 const app = express();
 const apiRouter = express.Router({ mergeParams: true });
 app.use(helmet());
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000,https://earthonline1.pages.dev,https://earthonline-2m7.pages.dev,https://earthonline.qzz.io,https://earthonline.onrender.com').split(',').map(s => s.trim());
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
-  }
-};
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use('/downloads', express.static(path.join(__dirname, 'public/downloads')));
 app.use(morgan('short'));
@@ -201,6 +251,25 @@ apiRouter.post('/register', registerLimiter, async (req, res, next) => {
   
   const hashedPassword = await bcrypt.hash(password, 10);
   const recoveryKey = 'EO-' + crypto.randomBytes(4).toString('hex').toUpperCase();
+
+  let birthLocation;
+  try {
+    const geo = geoip.lookup(ip);
+    if (geo && geo.ll && geo.ll.length >= 2 && geo.country && geo.country !== 'UNKNOWN') {
+      const countryEntry = REINCARNATE_COUNTRIES.find(c => c.code === geo.country);
+      birthLocation = {
+        lat: geo.ll[0] + (Math.random() - 0.5) * 0.1,
+        lon: geo.ll[1] + (Math.random() - 0.5) * 0.1,
+        country: geo.country,
+        region: countryEntry?.region || getRegionFromLon(geo.ll[1]),
+      };
+    } else {
+      birthLocation = randomReincarnation();
+    }
+  } catch (e) {
+    birthLocation = randomReincarnation();
+  }
+
   const newUser = {
     id: 'EO-' + Date.now(),
     username: trimmedUser,
@@ -208,7 +277,10 @@ apiRouter.post('/register', registerLimiter, async (req, res, next) => {
     registeredAt: Date.now(),
     recoveryKey,
     registerIp: ip,
-    homeRegion: req.params.region
+    homeRegion: birthLocation.region,
+    initialLat: birthLocation.lat,
+    initialLon: birthLocation.lon,
+    initialCountry: birthLocation.country,
   };
   
   await db.createUser(newUser);
@@ -660,7 +732,7 @@ app.use((err, req, res, next) => {
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: ALLOWED_ORIGINS, methods: ['GET', 'POST'] }
+  cors: { origin: '*', methods: ['GET', 'POST'] }
 });
 
 discordBot.setIoInstance(io);
@@ -819,8 +891,15 @@ regions.forEach(regionName => {
               filter: { username: user.username },
               update: { $inc: incFields }
             }
-  });
-
+          });
+          for (const [sid, cu] of connectedUsers) {
+            if (cu.username === user.username) {
+              if (decay > 0) cu.health = (cu.health || 0) - decay;
+              if (ptPerTick > 0) cu.accumulatedBonusPoints = (cu.accumulatedBonusPoints || 0) + ptPerTick;
+              if (timeEarned > 0) cu.accumulatedTime = (cu.accumulatedTime || 0) + timeEarned;
+              break;
+            }
+          }
         }
       }
       
@@ -880,6 +959,12 @@ regions.forEach(regionName => {
         activeBuffs: dbUser.activeBuffs ? Object.fromEntries(dbUser.activeBuffs) : {},
         inventory: dbUser.inventory ? Object.fromEntries(dbUser.inventory) : {}
       });
+      if (connectedUsers.has(socket.id)) {
+        const cu = connectedUsers.get(socket.id);
+        cu.health = dbUser.health;
+        cu.accumulatedBonusPoints = dbUser.accumulatedBonusPoints;
+        cu.accumulatedTime = dbUser.accumulatedTime;
+      }
     }
   });
 
@@ -921,6 +1006,9 @@ regions.forEach(regionName => {
         pts: result.accumulatedBonusPoints,
         inventory: result.inventory ? Object.fromEntries(result.inventory) : {}
       });
+      if (connectedUsers.has(socket.id)) {
+        connectedUsers.get(socket.id).accumulatedBonusPoints = result.accumulatedBonusPoints;
+      }
     } catch (err) {
       console.error(err);
       socket.emit('buy_result', { success: false, message: '系統錯誤' });
@@ -1029,6 +1117,11 @@ regions.forEach(regionName => {
         activeBuffs: finalUser.activeBuffs ? Object.fromEntries(finalUser.activeBuffs) : {},
         inventory: finalUser.inventory ? Object.fromEntries(finalUser.inventory) : {}
       });
+      if (connectedUsers.has(socket.id)) {
+        const cu = connectedUsers.get(socket.id);
+        cu.health = finalUser.health;
+        cu.accumulatedBonusPoints = finalUser.accumulatedBonusPoints;
+      }
     } catch (err) {
       console.error('[SYS] use_item error:', err);
       socket.emit('use_item_result', { success: false, message: '系統錯誤，請稍後再試。' });
@@ -1058,6 +1151,9 @@ regions.forEach(regionName => {
     reviveCounts.set(adCountKey, count + 1);
     socket.emit('ad_revive_result', { success: true, health: newHealth, remaining: 2 - count });
     socket.emit('user_state_update', { health: newHealth });
+    if (connectedUsers.has(socket.id)) {
+      connectedUsers.get(socket.id).health = newHealth;
+    }
   });
 
   socket.on('authenticate', async (data) => {
@@ -1066,16 +1162,6 @@ regions.forEach(regionName => {
       
       let ip = socket.handshake.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
       if (ip && ip.includes(',')) ip = ip.split(',')[0].trim();
-      let geo = geoip.lookup(ip);
-      
-      // Fallback for local IPs or if geoip fails
-      if (!geo || !geo.ll || geo.ll.length < 2) {
-        if (ip.includes('127.0.0.1') || ip.includes('::1') || ip.startsWith('192.168.') || ip.startsWith('10.')) {
-          geo = { country: 'TW', ll: [23.6978, 120.9605] };
-        } else {
-          geo = { country: geo?.country || 'TW', ll: [0, 0] }; // Force TW as default instead of UNKNOWN for better UI
-        }
-      }
       const dbUser = await db.findUserByUsername(decoded.username);
       
       // Ban check — reject banned users
@@ -1085,8 +1171,31 @@ regions.forEach(regionName => {
         return;
       }
       
-      if (geo.country !== 'UNKNOWN') {
-        await User.updateOne({ username: decoded.username }, { $set: { country: geo.country } });
+      // Use stored reincarnation location, or determine if first-time
+      let userCountry = dbUser?.initialCountry || dbUser?.country || 'TW';
+      let userLat, userLon;
+      if (dbUser?.initialLat != null && dbUser?.initialLon != null) {
+        userLat = dbUser.initialLat;
+        userLon = dbUser.initialLon;
+      } else {
+        // First connection — determine location from IP
+        let geo = geoip.lookup(ip);
+        if (!geo || !geo.ll || geo.ll.length < 2) {
+          if (ip.includes('127.0.0.1') || ip.includes('::1') || ip.startsWith('192.168.') || ip.startsWith('10.')) {
+            geo = { country: 'TW', ll: [23.6978, 120.9605] };
+          } else {
+            geo = { country: 'TW', ll: [23.6978, 120.9605] };
+          }
+        }
+        userLat = geo.ll[0] + (Math.random() - 0.5) * 0.1;
+        userLon = geo.ll[1] + (Math.random() - 0.5) * 0.1;
+        userCountry = geo.country;
+        await User.updateOne({ username: decoded.username }, {
+          $set: { initialLat: userLat, initialLon: userLon, initialCountry: userCountry, country: userCountry }
+        });
+      }
+      if (dbUser) {
+        await User.updateOne({ username: decoded.username }, { $set: { country: userCountry } });
       }
       
       const user = {
@@ -1097,9 +1206,9 @@ regions.forEach(regionName => {
         discordProfile: dbUser?.discord?.id ? dbUser.discord : null,
         ip: ip,
         ipObfuscated: obfuscateIp(ip),
-        country: geo.country,
-        lat: geo.ll[0] + (Math.random() - 0.5) * 0.1,
-        lon: geo.ll[1] + (Math.random() - 0.5) * 0.1,
+        country: userCountry,
+        lat: userLat,
+        lon: userLon,
         accumulatedTime: dbUser?.accumulatedTime || 0,
         accumulatedBonusPoints: dbUser?.accumulatedBonusPoints || 0,
         health: dbUser?.health !== undefined ? dbUser.health : 100,
@@ -1198,17 +1307,31 @@ regions.forEach(regionName => {
       }
 
       // #4: 改用 nspIo.emit，只廣播給當前命名空間（不跨區域洩漏）
-      nspIo.emit('node_connected', {
-        id: user.id,
-        lat: user.lat,
-        lon: user.lon
-      });
-
-      const allNodes = Array.from(connectedUsers.values()).map(u => ({
+      const countryRegion = { TW: 'asia', CN: 'asia', JP: 'asia', KR: 'asia', HK: 'asia', SG: 'asia', IN: 'asia', MY: 'asia', TH: 'asia', VN: 'asia', PH: 'asia', ID: 'asia', US: 'us', CA: 'us', MX: 'us', GB: 'eu', DE: 'eu', FR: 'eu', IT: 'eu', ES: 'eu', NL: 'eu', SE: 'eu', NO: 'eu', DK: 'eu', FI: 'eu', PL: 'eu', PT: 'eu', BE: 'eu', AT: 'eu', CH: 'eu', IE: 'eu', CZ: 'eu', TR: 'eu', IL: 'eu', AE: 'asia', SA: 'asia', EG: 'eu', NG: 'eu', KE: 'eu', ZA: 'eu', AU: 'other', BR: 'other', RU: 'other', AR: 'other', CL: 'other', NZ: 'other' };
+      const calcNodeLevel = (accTime, accPts) => {
+        const hours = (accTime || 0) / 3600000;
+        const pt = accPts || 0;
+        if (hours >= 720 || pt >= 50000) return 5;
+        if (hours >= 168 || pt >= 10000) return 4;
+        if (hours >= 24 || pt >= 2000) return 3;
+        if (hours >= 1 || pt >= 100) return 2;
+        return 1;
+      };
+      const buildNodeData = (u) => ({
         id: u.id,
+        username: u.username,
         lat: u.lat,
-        lon: u.lon
-      }));
+        lon: u.lon,
+        country: u.country,
+        region: countryRegion[u.country] || 'other',
+        accumulatedTime: u.accumulatedTime,
+        accumulatedBonusPoints: u.accumulatedBonusPoints,
+        health: u.health,
+        level: calcNodeLevel(u.accumulatedTime, u.accumulatedBonusPoints)
+      });
+      nspIo.emit('node_connected', buildNodeData(user));
+
+      const allNodes = Array.from(connectedUsers.values()).map(buildNodeData);
       socket.emit('all_nodes', allNodes);
     } catch (err) {
       console.error('[SYS] Auth error details:', err);
@@ -1412,6 +1535,7 @@ regions.forEach(regionName => {
       for (const [sid, u] of connectedUsers.entries()) {
         if (u.username === data.targetUsername) {
           nspIo.to(sid).emit('user_state_update', { pts: target.accumulatedBonusPoints });
+          u.accumulatedBonusPoints = target.accumulatedBonusPoints;
           break;
         }
       }

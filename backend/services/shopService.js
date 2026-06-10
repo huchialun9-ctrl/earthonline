@@ -113,6 +113,7 @@ async function useItem(username, itemId) {
     message,
     userState: {
       health: finalUser.health,
+      accumulatedTime: finalUser.accumulatedTime,
       pts: finalUser.accumulatedBonusPoints,
       activeBuffs: finalUser.activeBuffs ? Object.fromEntries(finalUser.activeBuffs) : {},
       inventory: finalUser.inventory ? Object.fromEntries(finalUser.inventory) : {},

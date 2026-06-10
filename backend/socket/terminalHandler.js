@@ -93,9 +93,13 @@ function registerTerminalHandlers(socket, nspIo, connectedUsers) {
       socket.emit('terminal_response', `[SYS] 已將 ${result.modifiedCount} 位玩家的 accumulatedTime 乘以 ${ratio}`);
     } else if (cmdUpper === 'RESET_ALL') {
       if (user.role !== 'admin') { socket.emit('terminal_response', '[ERROR] 權限不足'); return; }
-      await User.updateMany({}, { $set: { accumulatedTime: 0, accumulatedBonusPoints: 0, health: 100, mutedUntil: null, bannedUntil: null }, $unset: { inventory: '', activeBuffs: '', cosmetics: '' } });
-      socket.emit('terminal_response', `[SYS] 所有玩家資料已重置`);
-      nspIo.emit('social_data_updated');
+      try {
+        const count = await User.countDocuments({});
+        const r1 = await User.updateMany({}, { $set: { accumulatedTime: 0, accumulatedBonusPoints: 0, health: 100 } });
+        const r2 = await User.updateMany({}, { $unset: { inventory: '', activeBuffs: '', cosmetics: '' } });
+        socket.emit('terminal_response', `[SYS] 已重置 ${count} 位玩家（time/PT/血量歸零，背包/buff 清除）`);
+        nspIo.emit('social_data_updated');
+      } catch (err) { socket.emit('terminal_response', `[ERROR] 重置失敗: ${err.message}`); }
     } else if (cmdUpper === 'PAUSE_TICK') {
       if (user.role !== 'admin') { socket.emit('terminal_response', '[ERROR] 權限不足'); return; }
       setPaused(true);

@@ -377,6 +377,7 @@ regions.forEach(regionName => {
     if (dbUser) {
       socket.emit('user_state_update', {
         health: dbUser.health,
+        accumulatedTime: dbUser.accumulatedTime,
         pts: dbUser.accumulatedBonusPoints,
         activeBuffs: dbUser.activeBuffs ? Object.fromEntries(dbUser.activeBuffs) : {},
         inventory: dbUser.inventory ? Object.fromEntries(dbUser.inventory) : {},

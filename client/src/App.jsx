@@ -1445,6 +1445,18 @@ function Dashboard({ token, onLogout, region }) {
 
           <div className="metric-group" style={{padding: '10px 12px', marginBottom: '8px'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px'}}>
+              <span style={{fontSize: '0.8rem', color: '#888'}}>節點等級</span>
+              <span style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--accent-color)'}}>
+                Lv.{myNode?.level || 1}
+                {myNode?.levelProgress?.nextSec && <span style={{fontSize:'0.75rem', color:'#888', marginLeft:'5px'}}>(+{(myNode.levelProgress.progress * 100).toFixed(0)}%)</span>}
+              </span>
+            </div>
+            {myNode?.levelProgress?.nextSec > 0 && (
+              <div style={{width:'100%', height:'4px', background:'rgba(255,255,255,0.1)', borderRadius:'2px', marginTop:'4px', overflow:'hidden'}}>
+                <div style={{width:`${(myNode.levelProgress.progress * 100).toFixed(1)}%`, height:'100%', background:'var(--accent-color)', borderRadius:'2px', transition:'width 0.3s'}} />
+              </div>
+            )}
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px'}}>
               <span style={{fontSize: '0.8rem', color: '#888'}}>總生存時間</span>
               <span style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--accent-color)'}}>{formatTime(lifespan)}</span>
             </div>

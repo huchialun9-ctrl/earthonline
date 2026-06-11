@@ -5,7 +5,7 @@ import EarthGlobe from './EarthGlobe';
 import { useLanguage } from './LanguageContext';
 import './datacenter.css';
 
-export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onlineCount, cpuUsage, region, onOpenSocial, onOpenAchievements, honor, weeklyScore, activeEvent, multiplier, nodes, myNodeId }) {
+export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onlineCount, cpuUsage, region, onOpenSocial, onOpenAchievements, honor, weeklyScore, bgStyle, activeEvent, multiplier, nodes, myNodeId }) {
   const { t } = useLanguage();
   const cardRef = useRef(null);
 
@@ -146,14 +146,11 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
 
         {/* Right Side: NASA Earth Globe */}
         <div className="dc-visual-area">
-          <EarthGlobe
-            onlineCount={onlineCount}
-            region={region}
-            activeEvent={activeEvent}
-            multiplier={multiplier}
-            nodes={nodes}
-            myNodeId={myNodeId}
-          />
+          {bgStyle && bgStyle !== 'globe' ? (
+            <div style={{ width: '100%', height: '100%', background: '#0a0e17', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333', fontFamily: 'monospace', fontSize: '1.5rem' }}>{bgStyle.toUpperCase()} MODE</div>
+          ) : (
+            <EarthGlobe onlineCount={onlineCount} region={region} activeEvent={activeEvent} multiplier={multiplier} nodes={nodes} myNodeId={myNodeId} />
+          )}
         </div>
 
       </div>

@@ -13,7 +13,6 @@ import CountdownBanner from './components/CountdownBanner';
 import DonateBanner from './components/DonateBanner';
 import LoginGateway from './components/LoginGateway';
 import FourPetalSpiral from './components/FourPetalSpiral';
-import BackgroundRouter from './components/Backgrounds/BackgroundRouter';
 import './index.css';
 
 const VITE_API = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';
@@ -1044,7 +1043,6 @@ function Dashboard({ token, onLogout, region }) {
       )}
 
 
-      <BackgroundRouter style={bgStyle} nodes={nodes} myNodeId={myNode?.userId} stats={globalStats} />
       <CountdownBanner />
       <GlobalEventBanner />
       {/* Header Panel */}
@@ -1269,6 +1267,7 @@ function Dashboard({ token, onLogout, region }) {
             onOpenAchievements={() => setShowAchievements(true)}
             honor={myNode?.honor || 0}
             weeklyScore={myNode?.weeklyScore || 0}
+            bgStyle={bgStyle}
             activeEvent={currentEvent?.type || null}
             multiplier={globalStats.multiplier || 1}
             nodes={nodes}

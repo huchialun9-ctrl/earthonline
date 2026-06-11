@@ -4,7 +4,7 @@ import { useLanguage } from './LanguageContext';
 import { useTheme } from './ThemeContext';
 import Draggable from 'react-draggable';
 import DataCenterVisualizer from './DataCenterVisualizer';
-import { STYLES, STORAGE_KEY as BG_STORAGE_KEY } from './components/Backgrounds';
+import BackgroundRouter from './components/Backgrounds';
 import ShopModal from './ShopModal';
 import BackpackModal from './BackpackModal';
 import LeaderboardModal from './components/Modals/LeaderboardModal';
@@ -732,6 +732,7 @@ function Dashboard({ token, onLogout, region }) {
   const terminalEndRef = useRef(null);
   const logEndRef = useRef(null);
   const dropdownRef = useRef(null);
+  const [activePage, setActivePage] = useState('dashboard');
   // #11: 廣告計時器 ref，用於 cleanup
   const adTimerRef = useRef(null);
   const adSloganTimerRef = useRef(null);
@@ -1375,7 +1376,46 @@ function Dashboard({ token, onLogout, region }) {
           <span style={{fontWeight: '900', fontSize: '1.3rem', letterSpacing: '0'}}>{t('地球在線')}</span> 
           <span style={{color: '#64748b', fontSize: '0.9rem', marginLeft: '10px'}}>{t('伺服器')}: {region.toUpperCase()} | {t('你的位置')}: {myNode?.country || t('連線中..')}</span>
         </div>
-        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          {/* Page Tabs */}
+          <div style={{ display: 'flex', gap: '2px', marginRight: '12px' }}>
+            <button onClick={() => setActivePage('dashboard')} style={{
+              padding: '6px 14px', borderRadius: '6px', border: 'none',
+              background: activePage === 'dashboard' ? 'var(--accent-color)' : 'transparent',
+              color: activePage === 'dashboard' ? '#fff' : 'var(--text-secondary)',
+              fontWeight: activePage === 'dashboard' ? 600 : 400,
+              cursor: 'pointer', fontSize: '0.85rem', transition: 'all 0.15s',
+            }}>{t('儀錶板')}</button>
+            <button onClick={() => setActivePage('map')} style={{
+              padding: '6px 14px', borderRadius: '6px', border: 'none',
+              background: activePage === 'map' ? 'var(--accent-color)' : 'transparent',
+              color: activePage === 'map' ? '#fff' : 'var(--text-secondary)',
+              fontWeight: activePage === 'map' ? 600 : 400,
+              cursor: 'pointer', fontSize: '0.85rem', transition: 'all 0.15s',
+            }}>{t('地圖')}</button>
+            <button onClick={() => setShowSocialModal(true)} style={{
+              padding: '6px 14px', borderRadius: '6px', border: 'none',
+              background: 'transparent', color: 'var(--text-secondary)',
+              cursor: 'pointer', fontSize: '0.85rem',
+            }}>{t('社交')}</button>
+            <button onClick={() => setShowShopModal(true)} style={{
+              padding: '6px 14px', borderRadius: '6px', border: 'none',
+              background: 'transparent', color: 'var(--text-secondary)',
+              cursor: 'pointer', fontSize: '0.85rem',
+            }}>{t('商城')}</button>
+            <button onClick={() => setShowBackpack(true)} style={{
+              padding: '6px 14px', borderRadius: '6px', border: 'none',
+              background: 'transparent', color: 'var(--text-secondary)',
+              cursor: 'pointer', fontSize: '0.85rem',
+            }}>{t('背包')}</button>
+            <button onClick={() => setShowSettings(true)} style={{
+              padding: '6px 14px', borderRadius: '6px', border: 'none',
+              background: 'transparent', color: 'var(--text-secondary)',
+              cursor: 'pointer', fontSize: '0.85rem',
+            }}><Settings size={14} /></button>
+          </div>
+
+          <div className="system-stats" style={{display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--bg-color)', padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem'}}>
           {!window.electronAPI && (
             <a href="https://drive.google.com/uc?export=download&id=1Xji_z7dB5Q16FfSyRvnm2mXqn3n0cAQ2" target="_blank" rel="noopener noreferrer" style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 16px', background: 'var(--success-color)', color: 'white', border: 'none', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)', fontSize: '0.9rem'}}>
               <Monitor size={16} /> {t('下載專屬電腦版')}
@@ -1391,53 +1431,7 @@ function Dashboard({ token, onLogout, region }) {
             {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[{t('已斷線')}]</span>}
           </div>
 
-          <div className={`header-dropdown${dropdownOpen ? ' open' : ''}`} ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen(prev => !prev)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 15px', borderRadius: '8px',
-                background: dropdownOpen ? 'var(--bg-light)' : 'var(--surface-color)',
-                border: '1px solid var(--border-color)', color: 'var(--text-color)',
-                cursor: 'pointer', fontWeight: 'bold', transition: 'all 0.2s', fontFamily: 'var(--font-sans)'
-              }}
-            >
-              {t('選單 (Menu)')} <ChevronDown size={16} style={{ transition: 'transform 0.2s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-            </button>
-            <div className="header-dropdown-content">
-
-              <div style={{width: '100%', height: '1px', background: 'rgba(255,255,255,0.1)', margin: '5px 0'}}></div>
-              <button onClick={() => { setShowSocialModal(true); setDropdownOpen(false); }} className="dropdown-item">
-                <Users size={16} /> {t('社交網路 (Social)')}
-              </button>
-              <button onClick={() => { setShowShopModal(true); setDropdownOpen(false); }} className="dropdown-item" style={{color: '#38bdf8'}}>
-                <ShoppingCart size={16} /> {t('黑市商城 (Shop)')}
-              </button>
-              <button onClick={() => { setShowBackpack(true); setDropdownOpen(false); }} className="dropdown-item" style={{color: '#22c55e'}}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 10a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><polyline points="8 8 8 5 16 5 16 8"/><line x1="12" y1="14" x2="12" y2="17"/><line x1="9" y1="14" x2="9" y2="17"/><line x1="15" y1="14" x2="15" y2="17"/></svg>
-                {t('裝備背包 (Backpack)')}
-              </button>
-              <button className="dropdown-item" onClick={() => { setShowThemeMenu(!showThemeMenu); setDropdownOpen(false); }}>
-                <Palette size={16} /> {t('主題配色 (Themes)')}
-              </button>
-              <button className="dropdown-item" onClick={() => { setShowSettings(true); setDropdownOpen(false); }}>
-                <Settings size={16} /> {t('設定 (Settings)')}
-              </button>
-              {(myRole === 'admin' || myRole === 'moderator') && (
-                <button className="dropdown-item" style={{color: 'var(--danger-color)'}} onClick={() => { setShowAdminPanel(true); setDropdownOpen(false); }}>
-                  <Shield size={16} /> {t('管理員功能 (Admin)')}
-                </button>
-              )}
-              <a href="https://discord.gg/6P6NG49Mus" target="_blank" rel="noreferrer" className="dropdown-item" style={{color: 'var(--info-color)'}} onClick={() => setDropdownOpen(false)}>
-                <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.58,67.58,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
-                {t('官方 Discord')}
-              </a>
-              <a href="https://buymeacoffee.com/lucas1126" target="_blank" rel="noreferrer" className="dropdown-item" style={{color: '#FFDD00'}} onClick={() => setDropdownOpen(false)}>
-                <Coffee size={16} /> {t('贊助支持 (Donate)')}
-              </a>
-            </div>
-          </div>
-
-           <button onClick={toggleBgm} style={{padding: '5px 12px', borderRadius: '6px', background: bgmEnabled ? 'rgba(37,99,235,0.08)' : 'rgba(224,62,62,0.08)', border: bgmEnabled ? '1px solid rgba(37,99,235,0.2)' : '1px solid rgba(224,62,62,0.2)', color: bgmEnabled ? 'var(--accent-color)' : 'var(--danger-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'var(--font-sans)'}} title={bgmEnabled ? t('關閉背景音樂') : t('開啟背景音樂')}>
+           <button onClick={toggleBgm} style={{padding: '5px 10px', borderRadius: '6px', background: bgmEnabled ? 'rgba(37,99,235,0.08)' : 'rgba(224,62,62,0.08)', border: bgmEnabled ? '1px solid rgba(37,99,235,0.2)' : '1px solid rgba(224,62,62,0.2)', color: bgmEnabled ? 'var(--accent-color)' : 'var(--danger-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'var(--font-sans)', fontSize: '0.8rem'}} title={bgmEnabled ? t('關閉背景音樂') : t('開啟背景音樂')}>
 {bgmEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
 {bgmEnabled ? 'BGM ON' : 'BGM OFF'}
 </button>
@@ -1446,8 +1440,8 @@ function Dashboard({ token, onLogout, region }) {
       </header>
 
       <div className="main-content">
-        {/* Left Metrics Terminal */}
-        <aside className="metrics-terminal floating-panel">
+        {activePage === 'dashboard' && (
+        <aside className="metrics-terminal" style={{width: '100%', maxWidth: '420px', margin: '0 auto', borderRight: 'none'}}>
           <div className="brand-banner" style={{ textAlign: 'center', paddingBottom: '12px', borderBottom: '1px solid var(--border-color)', marginBottom: '12px' }}>
             <div style={{display: 'flex', justifyContent: 'center', marginBottom: '6px'}}>
               <Globe2 size={40} color="var(--accent-color)" />
@@ -1566,8 +1560,9 @@ function Dashboard({ token, onLogout, region }) {
             </button>
           </div>
         </aside>
+        )}
 
-        {/* Right Geographic Matrix */}
+        {activePage === 'map' && (
         <main className="geographic-matrix">
           <div className="map-overlays" style={{display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'flex-start'}}>
             <div className="floating-panel" style={{padding: '15px 25px'}}>
@@ -1597,7 +1592,8 @@ function Dashboard({ token, onLogout, region }) {
           />
 
                       <Console logs={logs} chatInput={chatInput} setChatInput={setChatInput} socket={socket} pmData={{showPm,pmTarget,pmInput,setPmInput,pmLog}} onClosePm={()=>setShowPm(false)} />
-</main>
+          </main>
+        )}
       </div>
 
             {/* Leaderboard Modal */}
@@ -2095,27 +2091,10 @@ function Dashboard({ token, onLogout, region }) {
             </div>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '8px' }}>
-                {t('背景風格 (Background)')}
+                {t('背景風格')}
               </label>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {STYLES.map(s => {
-                  const currentBg = localStorage.getItem(BG_STORAGE_KEY) || 'earth';
-                  return (
-                    <button key={s.id} onClick={() => {
-                      localStorage.setItem(BG_STORAGE_KEY, s.id);
-                      window.dispatchEvent(new Event('storage'));
-                    }} style={{
-                      padding: '8px 12px', borderRadius: '6px', cursor: 'pointer',
-                      background: currentBg === s.id ? 'var(--accent-color)' : 'var(--bg-light)',
-                      color: currentBg === s.id ? '#000' : 'var(--text-color)',
-                      border: currentBg === s.id ? '2px solid var(--accent-color)' : '1px solid var(--border-color)',
-                      fontWeight: currentBg === s.id ? 'bold' : 'normal',
-                      fontSize: '0.85rem', transition: 'all 0.2s',
-                    }}>
-                      {s.icon} {t(s.name)}
-                    </button>
-                  );
-                })}
+              <div style={{ padding: '8px 12px', background: 'var(--bg-color)', borderRadius: '6px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                🌍 3D 地球
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

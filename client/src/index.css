@@ -80,11 +80,13 @@ body {
   display: flex;
   flex: 1;
   height: calc(100dvh - 52px);
+  overflow: hidden;
 }
 
-/* Left Sidebar */
+/* Dashboard Sidebar */
 .metrics-terminal {
   width: 300px;
+  min-width: 300px;
   background: var(--bg-light);
   border-right: 1px solid var(--border-color);
   display: flex;

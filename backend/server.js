@@ -228,6 +228,11 @@ app.get('/api/auth/discord/callback', async (req, res) => {
 app.use('/api/:region', authRoutes);
 app.use('/api/:region', leaderboardRoutes);
 app.use('/api', globalRoutes);
+// Catch-all: redirect unknown routes to frontend
+app.use((req, res) => {
+  res.redirect(FRONTEND_URL || 'https://earthonline1.pages.dev');
+});
+
 app.use((err, req, res, next) => {
   console.error('[SYS] Express Error:', err);
   const statusCode = err.statusCode || err.status || 500;

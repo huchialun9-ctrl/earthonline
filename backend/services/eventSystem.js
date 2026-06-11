@@ -9,6 +9,7 @@ function getEventDuration(type) {
   switch (type) {
     case 'QUANTUM_BURST': return 2 * 60 * 60 * 1000;
     case 'SATELLITE_ALIGNMENT': return 2 * 60 * 60 * 1000;
+    case 'DATA_BLACK_MARKET': return 5 * 60 * 1000;
     case 'SYSTEM_MAINTENANCE': return 30 * 60 * 1000;
     case 'DATA_GOLD_RUSH': return 15 * 60 * 1000;
     default: return 60 * 60 * 1000;
@@ -19,9 +20,21 @@ function getEventMultiplier(type, connectedUserCount) {
   switch (type) {
     case 'QUANTUM_BURST': return 3.0;
     case 'DATA_GOLD_RUSH': return 5.0;
+    case 'DATA_BLACK_MARKET': return 3.0;
     case 'SYSTEM_MAINTENANCE': return 0.5;
     case 'SATELLITE_ALIGNMENT': return 1.0 + (connectedUserCount * 0.1);
     default: return 1.0;
+  }
+}
+
+function getEventDuration(type) {
+  switch (type) {
+    case 'QUANTUM_BURST': return 2 * 60 * 60 * 1000;
+    case 'SATELLITE_ALIGNMENT': return 2 * 60 * 60 * 1000;
+    case 'DATA_BLACK_MARKET': return 5 * 60 * 1000;
+    case 'SYSTEM_MAINTENANCE': return 30 * 60 * 1000;
+    case 'DATA_GOLD_RUSH': return 15 * 60 * 1000;
+    default: return 60 * 60 * 1000;
   }
 }
 

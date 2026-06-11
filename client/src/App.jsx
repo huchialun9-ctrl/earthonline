@@ -552,6 +552,7 @@ function Dashboard({ token, onLogout, region }) {
   const SOCKET_URL = BASE_URL;
   const game = useGame();
   const { socket, isConnected, ping, nodes, myNode, setMyNode, myRole, globalStats, hubStats, leaderboard, currentEvent, lifespan, sessionTime, logs, addLog } = game;
+  const [eventVote, setEventVote] = useState(null); // { options, endTime }
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [adminTarget, setAdminTarget] = useState('');
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -994,8 +995,28 @@ function Dashboard({ token, onLogout, region }) {
       return () => clearInterval(interval);
     }, [currentEvent]);
 
-    if (!currentEvent) return null;
-    
+    if (!currentEvent && !eventVote) return null;
+
+    // Show vote banner
+    if (eventVote && !currentEvent) {
+      const voteEnd = new Date(eventVote.endTime).toLocaleTimeString();
+      return (
+        <div style={{
+          width: '100%', background: 'linear-gradient(90deg, #667eea, #764ba2)',
+          color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '10px 20px', fontWeight: 'bold', fontSize: '1rem', flexShrink: 0, gap: '15px', flexWrap: 'wrap'
+        }}>
+          <span>🗳️ 事件投票進行中！剩餘時間 {(eventVote.options||[]).length} 選項</span>
+          {eventVote.options?.map(opt => (
+            <button key={opt} onClick={() => socket?.emit('event_vote', { event: opt })} style={{
+              padding: '6px 16px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.4)',
+              background: 'rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer', fontWeight: 'bold'
+            }}>{opt.replace(/_/g, ' ')}</button>
+          ))}
+        </div>
+      );
+    }
+
     let bgColor = '';
     let icon = '';
     let text = '';
@@ -1026,6 +1047,11 @@ function Dashboard({ token, onLogout, region }) {
         icon = <AlertTriangle size={18} />;
         text = '【系統維護模式】算力降頻(0.5倍)，維持連線不斷線可獲補償獎勵！';
         break;
+      case 'DATA_BLACK_MARKET':
+        bgColor = 'linear-gradient(90deg, #667eea, #764ba2)';
+        icon = <Coins size={18} />;
+        text = '【數據黑市】稀有事件！限時 5 分鐘，可用 PT 兌換稀有道具！';
+        break;
     }
       
     return (
@@ -1048,6 +1074,18 @@ function Dashboard({ token, onLogout, region }) {
       }}>
         <span style={{ marginRight: '10px', fontSize: '1.2rem' }}>{icon}</span> {text} 
         <span style={{ marginLeft: '10px', background: 'var(--bg-light)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.9rem', color: currentEvent.type === 'SYSTEM_MAINTENANCE' || currentEvent.type === 'DATA_GOLD_RUSH' ? '#000' : '#fff' }}>{timeLeft}</span>
+        {currentEvent.type === 'SOLAR_STORM' && (
+          <>
+            <button onClick={() => socket?.emit('event_choice', { choice: 'shelter' })} style={{marginLeft:'10px', padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(255,255,255,0.15)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>🏠 避難(-50PT)</button>
+            <button onClick={() => socket?.emit('event_choice', { choice: 'ride_out' })} style={{padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(255,100,100,0.3)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>⚡ 硬撐(+400PT -15%HP)</button>
+          </>
+        )}
+        {currentEvent.type === 'SYSTEM_MAINTENANCE' && (
+          <>
+            <button onClick={() => socket?.emit('event_choice', { choice: 'assist' })} style={{marginLeft:'10px', padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(100,200,255,0.2)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>🔧 協助(-100PT,縮短時間)</button>
+            <button onClick={() => socket?.emit('event_choice', { choice: 'ignore' })} style={{padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(255,255,255,0.1)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>👁️ 漠視(+500PT)</button>
+          </>
+        )}
       </div>
     );
   };
@@ -1060,6 +1098,7 @@ function Dashboard({ token, onLogout, region }) {
       case 'DATA_GOLD_RUSH': return 'inset 0 0 80px rgba(248, 181, 0, 0.4)';
       case 'SATELLITE_ALIGNMENT': return 'inset 0 0 80px rgba(56, 239, 125, 0.4)';
       case 'SYSTEM_MAINTENANCE': return 'inset 0 0 80px rgba(142, 158, 171, 0.4)';
+      case 'DATA_BLACK_MARKET': return 'inset 0 0 80px rgba(118, 75, 162, 0.4)';
       default: return 'none';
     }
   };

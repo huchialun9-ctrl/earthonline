@@ -29,7 +29,7 @@ const { JWT_SECRET, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, BACKEND_URL, DISCO
 const { startCleanupInterval } = require('./jobs/cleanup');
 const { runStartupMigrations } = require('./jobs/migration');
 const { processTick } = require('./services/gameLoop');
-const { getRandomEvent, getEventDuration, getEventMultiplier, applyEventEndRewards } = require('./services/eventSystem');
+  const { getRandomEvent, getEventDuration, getEventMultiplier, applyEventEndRewards, createVoteSession, tallyVote } = require('./services/eventSystem');
 const { buyItem, useItem } = require('./services/shopService');
 const { registerChatHandlers } = require('./socket/chatHandler');
 const { registerSocialHandlers } = require('./socket/socialHandler');
@@ -262,24 +262,22 @@ regions.forEach(regionName => {
   const nsp = io.of(`/${regionName}`);
   const state = regionStates[regionName];
   
-  function triggerRandomEvent() {
+  function triggerEvent(type) {
     if (state.currentGlobalEvent) return;
-    const events = ['QUANTUM_BURST', 'SOLAR_STORM', 'DATA_GOLD_RUSH', 'SATELLITE_ALIGNMENT', 'SYSTEM_MAINTENANCE'];
-    const type = events[Math.floor(Math.random() * events.length)];
-    let duration = 60 * 60 * 1000;
-    if (type === 'QUANTUM_BURST') duration = 2 * 60 * 60 * 1000;
-    if (type === 'SATELLITE_ALIGNMENT') duration = 2 * 60 * 60 * 1000;
-    if (type === 'SYSTEM_MAINTENANCE') duration = 30 * 60 * 1000;
-    if (type === 'DATA_GOLD_RUSH') duration = 15 * 60 * 1000;
-    
+    let duration = getEventDuration(type);
     state.currentGlobalEvent = { type, endTime: Date.now() + duration };
     nsp.emit('global_event_started', { type, endTime: state.currentGlobalEvent.endTime });
     console.log(`[SYS] ${regionName.toUpperCase()} Global Event Triggered: ${type}`);
   }
 
   setInterval(() => {
-    if (!state.currentGlobalEvent && Math.random() < 0.5) {
-      triggerRandomEvent();
+    if (state.currentGlobalEvent) return;
+    // Start vote if enough players online
+    if (state.connectedUsers.size >= 5 && !state.eventVote) {
+      createVoteSession(state, nsp);
+    } else if (state.connectedUsers.size < 5 && Math.random() < 0.5) {
+      // Direct trigger for low population
+      triggerEvent(getRandomEvent());
     }
   }, 2 * 60 * 60 * 1000);
 });
@@ -329,11 +327,28 @@ regions.forEach(regionName => {
     // Check and apply active global event
     if (state.currentGlobalEvent) {
       if (Date.now() >= state.currentGlobalEvent.endTime) {
-        await applyEventEndRewards(state.currentGlobalEvent.type, state.connectedUsers);
-        nsp.emit('global_event_ended', { type: state.currentGlobalEvent.type });
+        const endedType = state.currentGlobalEvent.type;
+        await applyEventEndRewards(endedType, state.connectedUsers, state.eventChoices);
+        nsp.emit('global_event_ended', { type: endedType });
         state.currentGlobalEvent = null;
+        state.eventChoices = null;
+        // Chain: 5% chance of data black market after gold rush
+        if (endedType === 'DATA_GOLD_RUSH' && Math.random() < 0.05) {
+          state.currentGlobalEvent = { type: 'DATA_BLACK_MARKET', endTime: Date.now() + 300000 };
+          nsp.emit('global_event_started', { type: 'DATA_BLACK_MARKET', endTime: state.currentGlobalEvent.endTime });
+          console.log(`[SYS] ${regionName.toUpperCase()} Rare Chain: Data Black Market!`);
+        }
       } else {
         state.multiplier = getEventMultiplier(state.currentGlobalEvent.type, state.connectedUsers.size);
+      }
+    }
+
+    // Check event vote expiry
+    if (state.eventVote && Date.now() >= state.eventVote.endTime && !state.eventVote.triggered) {
+      state.eventVote.triggered = true;
+      const winner = tallyVote(state);
+      if (winner) {
+        triggerEvent(winner);
       }
     }
 
@@ -679,6 +694,7 @@ regions.forEach(regionName => {
   registerChatHandlers(socket, nspIo, state, connectedUsers, chatCooldowns);
   registerSocialHandlers(socket, nspIo, connectedUsers);
   registerTerminalHandlers(socket, nspIo, connectedUsers, io, regionStates);
+  registerEventHandlers(socket, nspIo, state);
 // Handle Disconnect
   socket.on('disconnect', async () => {
     const disconnectedUser = connectedUsers.get(socket.id);

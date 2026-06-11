@@ -938,17 +938,6 @@ function Dashboard({ token, onLogout, region }) {
       alert('⚠️ ' + data.message);
     });
 
-    s.on('pong', () => {
-      setPing(Date.now() - pingStartRef.current);
-    });
-
-    const pingInterval = setInterval(() => {
-      if (s.connected) {
-        pingStartRef.current = Date.now();
-        s.emit('ping');
-      }
-    }, 10000);
-
     return () => {
       clearInterval(syncInterval);
       if (adTimerRef.current) clearInterval(adTimerRef.current);

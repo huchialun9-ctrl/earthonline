@@ -265,9 +265,8 @@ startCleanupInterval(heartbeatTimestamps, reviveCounts, chatCooldowns, roleCache
 
 const server = http.createServer(app);
 
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,https://earthonline1.pages.dev,https://earthonline.qzz.io').split(',');
 const io = new Server(server, {
-  cors: { origin: ALLOWED_ORIGINS, methods: ['GET', 'POST'] }
+  cors: { origin: ['http://localhost:5173', 'http://localhost:3001', 'https://earthonline1.pages.dev', 'https://earthonline.qzz.io', 'https://earthonline-2m7.pages.dev', 'https://earthonline-proxy'], methods: ['GET', 'POST'] }
 });
 
 discordBot.setIoInstance(io);

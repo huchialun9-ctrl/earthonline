@@ -1511,6 +1511,8 @@ function Dashboard({ token, onLogout, region }) {
             region={region}
             onOpenSocial={() => setShowSocialModal(true)}
             onOpenAchievements={() => setShowAchievements(true)}
+            honor={myNode?.honor || 0}
+            weeklyScore={myNode?.weeklyScore || 0}
             activeEvent={currentEvent?.type || null}
             multiplier={globalStats.multiplier || 1}
             nodes={nodes}

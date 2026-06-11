@@ -5,7 +5,7 @@ import EarthGlobe from './EarthGlobe';
 import { useLanguage } from './LanguageContext';
 import './datacenter.css';
 
-export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onlineCount, cpuUsage, region, onOpenSocial, onOpenAchievements, activeEvent, multiplier, nodes, myNodeId }) {
+export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onlineCount, cpuUsage, region, onOpenSocial, onOpenAchievements, honor, weeklyScore, activeEvent, multiplier, nodes, myNodeId }) {
   const { t } = useLanguage();
   const cardRef = useRef(null);
 
@@ -79,6 +79,11 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
               <ShieldCheck size={16} color="#64748b" />
               <span>{t('PT 信用積分')}</span>
               <strong className="data-value">{Number(bonusPoints || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })} PT</strong>
+            </div>
+            <div className="metric-row">
+              <ShieldCheck size={16} color="#FFD700" />
+              <span>{t('榮譽值')}</span>
+              <strong className="data-value" style={{color: '#FFD700'}}>{(honor || 0).toLocaleString()}</strong>
             </div>
             <div className="metric-row">
               <Cpu size={16} color="#64748b" />

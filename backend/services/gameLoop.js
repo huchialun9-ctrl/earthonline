@@ -70,7 +70,7 @@ async function processTick(state, connectedUsers) {
 
     const incFields = {};
     if (decay > 0) incFields.health = -decay;
-    if (ptPerTick > 0) incFields.accumulatedBonusPoints = ptPerTick;
+    if (ptPerTick > 0) { incFields.accumulatedBonusPoints = ptPerTick; incFields.weeklyScore = ptPerTick; }
     if (timeEarned > 0) incFields.accumulatedTime = timeEarned;
 
     if (Object.keys(incFields).length > 0) {

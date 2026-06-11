@@ -409,6 +409,7 @@ regions.forEach(regionName => {
         health: dbUser.health,
         accumulatedTime: dbUser.accumulatedTime,
         pts: dbUser.accumulatedBonusPoints,
+        weeklyScore: dbUser.weeklyScore || 0,
         activeBuffs: dbUser.activeBuffs ? Object.fromEntries(dbUser.activeBuffs) : {},
         inventory: dbUser.inventory ? Object.fromEntries(dbUser.inventory) : {},
         cosmetics: dbUser.cosmetics ? Object.fromEntries(dbUser.cosmetics) : {},

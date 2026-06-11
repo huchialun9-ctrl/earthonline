@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { updateQuestProgress } = require('./questService');
 
 const BASE_DECAY_PER_TICK = 0.2 / 30; // ~0.00667
 const TIME_EARNED_PER_TICK = 2000;

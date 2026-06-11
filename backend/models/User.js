@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema({
   initialLon: { type: Number, default: null },
   initialCountry: { type: String, default: null },
   health: { type: Number, default: 100 },
+  dailyQuests: { type: Map, of: {}, default: {} },
   inventory: { type: Map, of: Number, default: {} },
   activeBuffs: { type: Map, of: Number, default: {} },
   activeSession: { type: String, default: null },

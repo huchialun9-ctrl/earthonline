@@ -584,15 +584,32 @@ regions.forEach(regionName => {
 
       // Disconnect compensation: calculate missed time
       const lastHeartbeat = heartbeatTimestamps.get(decoded.username);
+      let offlineEarnings = null;
       if (lastHeartbeat) {
         const offlineDuration = Date.now() - lastHeartbeat;
         if (offlineDuration > 30000 && offlineDuration < 86400000) {
+          // Time compensation (existing, max 4h)
           const compensatedTime = Math.min(offlineDuration, 4 * 60 * 60 * 1000);
+          const incFields = { accumulatedTime: compensatedTime };
+
+          // v1.12.1: Offline PT earnings
+          const offlineMinutes = offlineDuration / 60000;
+          const earnedMinutes = Math.min(offlineMinutes / 3, 120);
+          if (earnedMinutes > 1) {
+            const healthPct = (dbUser?.health || 100) / 100;
+            const earnedPT = Math.floor(earnedMinutes * healthPct * 6);
+            if (earnedPT > 0) {
+              incFields.accumulatedBonusPoints = earnedPT;
+              incFields.weeklyScore = earnedPT;
+            }
+            offlineEarnings = { minutes: Math.round(earnedMinutes), pts: earnedPT };
+          }
+
           await User.updateOne(
             { username: decoded.username },
-            { $inc: { accumulatedTime: compensatedTime } }
+            { $inc: incFields }
           );
-          console.log(`[SYS] Disconnect compensation for ${decoded.username}: ${Math.round(compensatedTime/60000)} minutes`);
+          console.log(`[SYS] Disconnect compensation for ${decoded.username}: ${Math.round(compensatedTime/60000)} minutes${offlineEarnings ? `, +${offlineEarnings.pts} PT offline` : ''}`);
         }
         // Offline health recovery: +5% per hour offline, max 60%
         if (offlineDuration > 30000) {
@@ -625,6 +642,7 @@ regions.forEach(regionName => {
         levelProgress: calcLevelProgress(user.accumulatedTime),
         honor: user.honor || 0,
         weeklyScore: user.weeklyScore || 0,
+        offlineEarnings: offlineEarnings,
         createdAt: user.createdAt,
         connectedAt: user.connectedAt,
         activeUsers: connectedUsers.size,

@@ -755,6 +755,17 @@ regions.forEach(regionName => {
   socket.on('get_war_stats', () => {
     socket.emit('war_stats', getWarStats());
   });
+  socket.on('switch_region', async ({ newRegion }) => {
+    if (!socket.user || !newRegion || !['asia','us','eu'].includes(newRegion)) return;
+    if (newRegion === regionName) { socket.emit('region_switched', { success: false, message: '已在該區域' }); return; }
+    try {
+      await User.updateOne({ username: socket.user.username }, { $set: { homeRegion: newRegion } });
+      socket.emit('region_switched', { success: true, newRegion, message: `已切換至 ${newRegion.toUpperCase()}，重新連線中...` });
+      setTimeout(() => { try { socket.disconnect(true); } catch(e) {} }, 500);
+    } catch (err) {
+      socket.emit('region_switched', { success: false, message: '切換失敗' });
+    }
+  });
 // Handle Disconnect
   socket.on('disconnect', async () => {
     const disconnectedUser = connectedUsers.get(socket.id);

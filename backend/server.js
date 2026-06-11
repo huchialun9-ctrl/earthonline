@@ -146,8 +146,18 @@ app.use(cors());
 app.use(express.json());
 app.use('/downloads', express.static(path.join(__dirname, 'public/downloads')));
 app.use(morgan('short'));
-// Helmet disabled temporarily — its CSP blocks Socket.io WebSocket handshake
-// app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'", "https://earthonline.onrender.com", "https://earthonline1.pages.dev", "wss://*.onrender.com"],
+      imgSrc: ["'self'", "data:", "https:", "http:"],
+      fontSrc: ["'self'", "data:"],
+    },
+  },
+}));
 
 // Health check for Render
 app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() }));
@@ -243,8 +253,9 @@ startCleanupInterval(heartbeatTimestamps, reviveCounts, chatCooldowns, roleCache
 
 const server = http.createServer(app);
 
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,https://earthonline1.pages.dev').split(',');
 const io = new Server(server, {
-  cors: { origin: '*', methods: ['GET', 'POST'] }
+  cors: { origin: ALLOWED_ORIGINS, methods: ['GET', 'POST'] }
 });
 
 discordBot.setIoInstance(io);
@@ -590,7 +601,7 @@ regions.forEach(regionName => {
 
       connectedUsers.set(socket.id, user);
 
-      console.log(`[SYS] Node Authenticated: ${user.username} | IP: ${ip} | Region: ${user.country}`);
+      console.log(`[SYS] Node Authenticated: ${user.username} | Region: ${user.country}`);
 
       const pop = await db.getRegionPopulation(regionName);
 

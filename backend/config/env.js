@@ -20,6 +20,8 @@ const DISCORD_REDIRECT_URI = process.env.DISCORD_REDIRECT_URI || 'http://localho
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || null;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://earthonline1.pages.dev';
 
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,https://earthonline1.pages.dev').split(',');
+
 module.exports = {
   JWT_SECRET,
   DISCORD_CLIENT_ID,
@@ -27,5 +29,6 @@ module.exports = {
   BACKEND_URL,
   DISCORD_REDIRECT_URI,
   DISCORD_WEBHOOK_URL,
-  FRONTEND_URL
+  FRONTEND_URL,
+  ALLOWED_ORIGINS
 };

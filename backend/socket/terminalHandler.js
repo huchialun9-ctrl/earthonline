@@ -2,6 +2,9 @@ const User = require('../models/User');
 const discordBot = require('../discordBot');
 const db = require('../db');
 const { setPaused } = require('../state/tickState');
+const regionStates = require('../state/regionState');
+const INVEST_MAX_LEVEL = 5;
+const INVEST_COSTS = { 1: 500, 2: 800, 3: 1200, 4: 1800, 5: 2500 };
 
 async function sendDiscordWebhook(message) {
   const { DISCORD_WEBHOOK_URL } = require('../config/env');

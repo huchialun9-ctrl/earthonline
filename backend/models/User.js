@@ -49,5 +49,9 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.index({ 'discord.id': 1 });
+userSchema.index({ homeRegion: 1 });
+userSchema.index({ accumulatedTime: -1 });
+userSchema.index({ weeklyScore: -1 });
+userSchema.index({ registerIp: 1, createdAt: -1 });
 
 module.exports = mongoose.model('User', userSchema);

@@ -5,6 +5,8 @@ const discordBot = require('../discordBot');
 
 const roleCache = new Map();
 const ROLE_CACHE_TTL = 60 * 1000;
+let lbCache = { data: null, ts: 0 };
+const LB_CACHE_TTL = 5000; // 5 seconds
 
 async function getCachedRole(discordId) {
   const cached = roleCache.get(discordId);
@@ -15,6 +17,9 @@ async function getCachedRole(discordId) {
 }
 
 router.get('/leaderboard', async (req, res) => {
+  if (Date.now() - lbCache.ts < LB_CACHE_TTL && lbCache.data) {
+    return res.json(lbCache.data);
+  }
   try {
     const users = await User.find({}, 'username accumulatedTime accumulatedBonusPoints discord country')
       .sort({ accumulatedTime: -1 }).limit(100).lean();
@@ -26,6 +31,7 @@ router.get('/leaderboard', async (req, res) => {
       return { username: u.username, discordId, discordName: u.discord?.username || '未綁定', avatar: u.discord?.avatar || null, country: u.country || 'UNKNOWN', idleTime: idleTimeSeconds, points, role: realRole || '' };
     }));
     leaderboard.sort((a, b) => b.points - a.points);
+    lbCache = { data: leaderboard, ts: Date.now() };
     res.json(leaderboard);
   } catch (err) { console.error('[SYS] /leaderboard error:', err); res.status(500).json({ error: 'Failed to fetch leaderboard' }); }
 });

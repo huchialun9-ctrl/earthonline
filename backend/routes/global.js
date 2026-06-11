@@ -5,7 +5,7 @@ const regionStates = require('../state/regionState');
 
 router.get('/global/stats', async (req, res) => {
   try {
-    const region = 'asia';
+    const region = req.query.region || 'asia';
     const pop = await db.getRegionPopulation(region);
     const state = regionStates[region];
     res.json({

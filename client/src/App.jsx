@@ -846,7 +846,6 @@ function Dashboard({ token, onLogout, region }) {
       const msg = data?.message || '授權已過期，請重新登入';
       addLog(`[SYSTEM] ${msg}`);
       alert(msg);
-      setIsConnected(false);
       onLogout();
     });
 

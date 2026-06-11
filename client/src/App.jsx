@@ -1310,7 +1310,7 @@ function Dashboard({ token, onLogout, region }) {
           )}
           <div className="system-stats" style={{display: 'flex', alignItems: 'center', gap: '15px', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem'}}>
             <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
-              <span style={{color: '#64748b'}}>上線人數:</span> <strong style={{color: 'var(--success-color)'}}>{globalStats.activeUsers}</strong>
+              <span style={{color: '#64748b'}}>{t('上線人數')}:</span> <strong style={{color: 'var(--success-color)'}}>{globalStats.activeUsers}</strong>
             </div>
             <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
               <span style={{color: 'var(--text-dim)'}}>{t('總人口')}:</span> <strong style={{color: 'var(--text-color)'}}>{globalStats.totalPopulation}</strong>
@@ -1412,18 +1412,18 @@ function Dashboard({ token, onLogout, region }) {
             </div>
             <div style={{display: 'flex', gap: '12px', marginTop: '10px', fontSize: '0.8rem', color: 'var(--text-secondary)'}}>
               <div><span style={{color: '#888'}}>ping </span><strong style={{color: 'var(--text-main)'}}>{ping}ms</strong></div>
-              <div><span style={{color: '#888'}}>session </span><strong style={{color: '#00ffaa'}}>{formatTime(sessionTime)}</strong></div>
-              <div><span style={{color: '#888'}}>status </span><strong style={{color: isConnected ? 'var(--success-color)' : 'var(--danger-color)'}}>{isConnected ? 'on' : 'off'}</strong></div>
+              <div><span style={{color: '#888'}}>{t('session')} </span><strong style={{color: '#00ffaa'}}>{formatTime(sessionTime)}</strong></div>
+              <div><span style={{color: '#888'}}>{t('status')} </span><strong style={{color: isConnected ? 'var(--success-color)' : 'var(--danger-color)'}}>{isConnected ? t('on') : t('off')}</strong></div>
             </div>
           </div>
 
           <div style={{display: 'flex', gap: '10px', marginBottom: '8px'}}>
             <div className="metric-group" style={{flex: 1, padding: '10px 12px'}}>
-              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>上線人數</div>
+              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>{t('上線人數')}</div>
               <div style={{fontSize: '1.3rem', fontWeight: 'bold', color: 'var(--success-color)'}}>{globalStats.activeUsers}</div>
             </div>
             <div className="metric-group" style={{flex: 1, padding: '10px 12px'}}>
-              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>倍率</div>
+              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>{t('倍率')}</div>
               {(() => {
                 const isOverclock = myNode?.activeBuffs?.overclock > Date.now();
                 const baseMult = globalStats.multiplier || 1.0;
@@ -1438,14 +1438,14 @@ function Dashboard({ token, onLogout, region }) {
               })()}
             </div>
             <div className="metric-group" style={{flex: 1, padding: '10px 12px'}}>
-              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>生命</div>
+              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>{t('生命')}</div>
               <div style={{fontSize: '1.3rem', fontWeight: 'bold', color: calculateHealthPercentage(lifespan) > 30 ? 'var(--accent-color)' : 'var(--danger-color)'}}>{Math.floor(calculateHealthPercentage(lifespan))}%</div>
             </div>
           </div>
 
           <div className="metric-group" style={{padding: '10px 12px', marginBottom: '8px'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px'}}>
-              <span style={{fontSize: '0.8rem', color: '#888'}}>節點等級</span>
+              <span style={{fontSize: '0.8rem', color: '#888'}}>{t('節點等級')}</span>
               <span style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--accent-color)'}}>
                 Lv.{myNode?.level || 1}
                 {myNode?.levelProgress?.nextSec && <span style={{fontSize:'0.75rem', color:'#888', marginLeft:'5px'}}>(+{(myNode.levelProgress.progress * 100).toFixed(0)}%)</span>}
@@ -1457,11 +1457,11 @@ function Dashboard({ token, onLogout, region }) {
               </div>
             )}
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px'}}>
-              <span style={{fontSize: '0.8rem', color: '#888'}}>總生存時間</span>
+              <span style={{fontSize: '0.8rem', color: '#888'}}>{t('總生存時間')}</span>
               <span style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--accent-color)'}}>{formatTime(lifespan)}</span>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-              <span style={{fontSize: '0.8rem', color: '#888'}}>累積點數</span>
+              <span style={{fontSize: '0.8rem', color: '#888'}}>{t('累積點數')}</span>
               <span style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--text-main)'}}>{(myNode?.accumulatedBonusPoints || 0).toLocaleString()}</span>
             </div>
           </div>

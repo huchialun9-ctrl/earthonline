@@ -2349,7 +2349,7 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myN
                 <div>
                 <button onClick={() => onPmUser && onPmUser(f.username)} style={{ background: 'rgba(0,255,136,0.2)', border: '1px solid var(--accent-color)', color: 'var(--accent-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', marginRight: '5px' }}>{t('私訊')}</button>
                 <button onClick={() => {
-                  if (window.confirm(t('confirmDeleteFriend', { username: f.username }))) {
+                  if (window.confirm(`${t('刪除')} ${f.username}?`)) {
                     socket.emit('remove_friend', { targetUsername: f.username });
                   }
                 }} style={{ background: 'rgba(255,65,108,0.2)', border: '1px solid var(--danger-color)', color: 'var(--danger-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>{t('刪除')}</button>

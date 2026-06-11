@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const discordAuthLimiter = rateLimit({ windowMs: 60 * 1000, max: 10, message: { error: 'Too many requests, please try again later.' } });
 const geoip = require('geoip-lite');
 const path = require('path');
 const fs = require('fs');
@@ -162,6 +163,7 @@ app.use(helmet({
 // Health check for Render
 app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() }));
 
+app.use('/api/auth/discord', discordAuthLimiter);
 // Discord OAuth — must be BEFORE :region route mounts to avoid Express 5 path conflict
 app.get('/api/auth/discord', (req, res) => {
   const state = req.query.state;
@@ -249,6 +251,7 @@ process.on('unhandledRejection', (reason) => { writeCrashLog('UNHANDLED_REJECTIO
 // Runtime state
 const heartbeatTimestamps = new Map();
 let reviveCounts = new Map();
+const lastCompTime = new Map();
 startCleanupInterval(heartbeatTimestamps, reviveCounts, chatCooldowns, roleCache);
 
 const server = http.createServer(app);
@@ -644,6 +647,9 @@ regions.forEach(regionName => {
           }
         }
       }
+      const lastComp = lastCompTime.get(decoded.username) || 0;
+      if (Date.now() - lastComp < 300000) return; // 5 min cooldown
+      lastCompTime.set(decoded.username, Date.now());
       heartbeatTimestamps.set(decoded.username, Date.now());
 
       socket.emit('init_data', {

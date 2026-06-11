@@ -34,12 +34,13 @@ export default function useTimer(myNode, socket, region) {
 
   useEffect(() => {
     if (!myNode || myNode.accumulatedTime === undefined) return;
-    const base = Math.floor((myNode.accumulatedTime || 0) / 1000);
-    setLifespan(base);
+    const baseMs = myNode.accumulatedTime || 0;
+    const startAt = Date.now();
+    setLifespan(Math.floor(baseMs / 1000));
     const id = setInterval(() => {
       if (lifespanPausedRef.current) return;
-      setLifespan(prev => prev + 2);
-    }, 5000);
+      setLifespan(Math.floor((baseMs + (Date.now() - startAt) * 0.4) / 1000));
+    }, 250);
     return () => clearInterval(id);
   }, [myNode, lifespanTick]);
 

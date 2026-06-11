@@ -38,6 +38,8 @@ const { registerEventHandlers } = require('./socket/eventHandler');
 const { registerQuestHandlers } = require('./socket/questHandler');
 const { registerAchievementHandlers } = require('./socket/achievementHandler');
 const { registerSettlementHandlers } = require('./socket/settlementHandler');
+const { registerTalentHandlers } = require('./socket/talentHandler');
+const { checkTalentPointEarn } = require('./services/talentService');
 
 const REINCARNATE_COUNTRIES = [
   { code: 'US', name: '美國', lat: 39.8, lon: -98.6, spread: 15 },
@@ -405,11 +407,19 @@ regions.forEach(regionName => {
     if (!socket.user) return;
     const dbUser = await db.findUserByUsername(socket.user.username);
     if (dbUser) {
+      // Check talent point earning
+      if ((dbUser.level || 1) >= 10) {
+        const earned = await checkTalentPointEarn(socket.user.username, dbUser.accumulatedTime);
+        if (earned) {
+          socket.emit('talent_point_earned', { message: '獲得 1 天賦點！（連續在線 24h）' });
+        }
+      }
       socket.emit('user_state_update', {
         health: dbUser.health,
         accumulatedTime: dbUser.accumulatedTime,
         pts: dbUser.accumulatedBonusPoints,
         weeklyScore: dbUser.weeklyScore || 0,
+        talentPoints: dbUser.talentPoints || 0,
         activeBuffs: dbUser.activeBuffs ? Object.fromEntries(dbUser.activeBuffs) : {},
         inventory: dbUser.inventory ? Object.fromEntries(dbUser.inventory) : {},
         cosmetics: dbUser.cosmetics ? Object.fromEntries(dbUser.cosmetics) : {},
@@ -722,6 +732,7 @@ regions.forEach(regionName => {
   registerQuestHandlers(socket, connectedUsers);
   registerAchievementHandlers(socket, connectedUsers);
   registerSettlementHandlers(socket, connectedUsers);
+  registerTalentHandlers(socket, connectedUsers);
 // Handle Disconnect
   socket.on('disconnect', async () => {
     const disconnectedUser = connectedUsers.get(socket.id);

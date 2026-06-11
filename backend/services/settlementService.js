@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const discordBot = require('../discordBot');
+const { getWarStats, resetWarStats } = require('../state/regionState');
 
 const RESET_HOUR = 16; // UTC 16:00 = Taipei 00:00 Monday
 
@@ -86,7 +87,33 @@ async function processWeeklySettlement() {
   }));
   discordBot.assignWeeklyRoles(topForRoles).catch(console.error);
 
-  return results;
+  // Regional war settlement
+  const warRanking = getWarStats();
+  const sortedRegions = Object.entries(warRanking)
+    .sort(([, a], [, b]) => b.totalOnlineTime - a.totalOnlineTime);
+  const regionResults = [];
+  for (let i = 0; i < sortedRegions.length; i++) {
+    const [regionName, stats] = sortedRegions[i];
+    const regionBonus = i === 0 ? 200 : i === 1 ? 100 : 50;
+    const regionUsers = await User.find({ homeRegion: regionName, weeklyScore: { $gt: 0 } })
+      .select('username accumulatedBonusPoints');
+    for (const u of regionUsers) {
+      await User.updateOne({ username: u.username }, { $inc: { accumulatedBonusPoints: regionBonus } });
+    }
+    // Extra personal bonus for top 10 in winning region
+    if (i === 0) {
+      const topInRegion = regionUsers
+        .sort((a, b) => (b.accumulatedBonusPoints || 0) - (a.accumulatedBonusPoints || 0))
+        .slice(0, 10);
+      for (const u of topInRegion) {
+        await User.updateOne({ username: u.username }, { $inc: { accumulatedBonusPoints: 500, honor: 100 } });
+      }
+    }
+    regionResults.push({ region: regionName, rank: i + 1, bonus: regionBonus, totalOnlineTime: stats.totalOnlineTime });
+  }
+  resetWarStats();
+
+  return { results, regionResults };
 }
 
 module.exports = { checkWeeklyReset, getWeeklyRanking, getNextResetTime, processWeeklySettlement, getCurrentWeekStart };

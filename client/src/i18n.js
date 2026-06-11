@@ -363,7 +363,11 @@ const translations = {
     "累積生存時間或積分以解鎖擴建": "累積生存時間或積分以解鎖擴建",
     "社群討論": "社群討論",
     "討論區": "討論區",
-    "開發者貢獻紀錄": "開發者貢獻紀錄"
+    "開發者貢獻紀錄": "開發者貢獻紀錄",
+    "區域對抗": "區域對抗",
+    "在線時間": "在線時間",
+    "平均在線": "平均在線",
+    "事件完成率": "事件完成率"
   },
   "en": {
     "EARTH ONLINE": "EARTH ONLINE",
@@ -748,7 +752,11 @@ const translations = {
     "累積生存時間或積分以解鎖擴建": "Accumulate survival time or points to unlock expansion",
     "社群討論": "Community Forum",
     "討論區": "Forum",
-    "開發者貢獻紀錄": "Dev Contribution Log"
+    "開發者貢獻紀錄": "Dev Contribution Log",
+    "區域對抗": "Region War",
+    "在線時間": "Online Time",
+    "平均在線": "Avg Online",
+    "事件完成率": "Event Rate"
   }
 };
 

@@ -273,6 +273,8 @@ function DocumentationOverlay({ onClose }) {
             <li className={activeSection === 'discord' ? 'active' : ''} onClick={() => scrollTo('discord')}>04. DISCORD RPC</li>
             <li className={activeSection === 'author' ? 'active' : ''} onClick={() => scrollTo('author')}>05. AUTHOR</li>
             <li className={activeSection === 'events' ? 'active' : ''} onClick={() => scrollTo('events')}>06. GLOBAL EVENTS</li>
+            <li className={activeSection === 'changelog' ? 'active' : ''} onClick={() => scrollTo('changelog')}>07. CHANGELOG</li>
+            <li className={activeSection === 'admin' ? 'active' : ''} onClick={() => scrollTo('admin')}>08. ADMIN CMDS</li>
           </ul>
         </aside>
 
@@ -433,6 +435,63 @@ function DocumentationOverlay({ onClose }) {
               <div className="doc-grid-value">
                 <a href="mailto:huchialun97@gmail.com">huchialun97@gmail.com</a>
               </div>
+            </div>
+          </section>
+
+          <section id="changelog">
+            <div className="doc-tag">UPDATE_LOG</div>
+            <h1 className="doc-title">v1.10 ~ v1.12 更新摘要</h1>
+            <div className="doc-text" style={{ lineHeight: '1.8' }}>
+              <strong>v1.10 — 經濟重塑</strong><br/>
+              • 健康系統重設計：非線性 decay（生存越久 decay 越慢）<br/>
+              • 離線恢復：每小時 +5% HP，上限 60%<br/>
+              {'• 集體負載：同區 >20 人時 decay 遞增'}<br/>
+              • 道具全面重平衡（新價格/效果）+ 2 新道具（網路加速器、備份節點）<br/>
+              • 死亡狀態限制：死機只能買/用發電機<br/>
+              • 節點升級系統（Lv.1~10）<br/>
+              • 區域投資：冷卻/頻寬/防護罩<br/>
+              • 排行榜賭注 /BET<br/><br/>
+
+              <strong>v1.11 — 事件 & 目標</strong><br/>
+              • 全域事件互動化：投票、事件中選擇、連鎖事件<br/>
+              • 每日任務系統（在線/聊天/道具/bonus）<br/>
+              • 成就里程碑系統（18 項成就）<br/>
+              • 週結算 + 榮譽值系統<br/>
+              • Discord 身份組自動發放<br/><br/>
+
+              <strong>v1.12 — 深度新功能</strong><br/>
+              • 離線收益系統（離線 3min = 1min 等效收益，每日上限 120min）<br/>
+              • 天賦系統（3 系 × 4 天賦 × 3 級，Lv.10 解鎖）
+            </div>
+          </section>
+
+          <section id="admin">
+            <div className="doc-tag">TERMINAL_REFERENCE</div>
+            <h1 className="doc-title">管理員終端機指令</h1>
+            <div className="doc-text" style={{ lineHeight: '1.8' }}>
+              按下 <code>`</code> 開啟終端機，輸入以下指令：<br/><br/>
+
+              <strong>基本指令</strong><br/>
+              <code>/HELP</code> — 顯示所有可用指令<br/>
+              <code>/STATUS</code> — 顯示伺服器即時狀態<br/>
+              <code>/PLAYERS</code> — 列出在線人數<br/><br/>
+
+              <strong>管理員指令</strong><br/>
+              <code>/MUTE {'<username>'} {'<minutes>'}</code> — 禁言玩家<br/>
+              <code>/UNMUTE {'<username>'}</code> — 解除禁言<br/>
+              <code>/DELETE_MSG {'<username>'}</code> — 刪除指定玩家最近訊息<br/>
+              <code>/BAN {'<username>'} {'<minutes>'}</code> — 封鎖玩家<br/>
+              <code>/UNBAN {'<username>'}</code> — 解除封鎖<br/>
+              <code>/GIVE_PTS {'<username>'} {'<amount>'}</code> — 給予點數<br/>
+              <code>/MASS_GIVE {'<amount>'}</code> — 批量給予所有在線玩家點數<br/>
+              <code>/RESET_ALL</code> — 重置伺服器（謹慎使用）<br/>
+              <code>/PAUSE</code> — 暫停/恢復遊戲 tick<br/>
+              <code>/SET_MULTIPLIER {'<value>'}</code> — 設定全域倍率<br/>
+              <code>/TRIGGER_EVENT {'<type>'}</code> — 手動觸發全域事件<br/><br/>
+
+              <strong>一般玩家指令</strong><br/>
+              <code>/INVEST {'<type>'} {'<amount>'}</code> — 投資區域基礎設施（cooling/bandwidth/shield）<br/>
+              <code>/BET {'<amount>'}</code> — 下注本週區域排名<br/>
             </div>
           </section>
         </main>

@@ -36,6 +36,7 @@ const { registerSocialHandlers } = require('./socket/socialHandler');
 const { registerTerminalHandlers } = require('./socket/terminalHandler');
 const { registerEventHandlers } = require('./socket/eventHandler');
 const { registerQuestHandlers } = require('./socket/questHandler');
+const { registerAchievementHandlers } = require('./socket/achievementHandler');
 
 const REINCARNATE_COUNTRIES = [
   { code: 'US', name: '美國', lat: 39.8, lon: -98.6, spread: 15 },
@@ -697,6 +698,7 @@ regions.forEach(regionName => {
   registerTerminalHandlers(socket, nspIo, connectedUsers, io, regionStates);
   registerEventHandlers(socket, nspIo, state);
   registerQuestHandlers(socket, connectedUsers);
+  registerAchievementHandlers(socket, connectedUsers);
 // Handle Disconnect
   socket.on('disconnect', async () => {
     const disconnectedUser = connectedUsers.get(socket.id);

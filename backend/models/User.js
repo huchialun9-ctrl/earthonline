@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema({
   initialCountry: { type: String, default: null },
   health: { type: Number, default: 100 },
   dailyQuests: { type: Map, of: {}, default: {} },
+  achievements: { type: { unlocked: [String], total: Number }, default: { unlocked: [], total: 0 } },
   inventory: { type: Map, of: Number, default: {} },
   activeBuffs: { type: Map, of: Number, default: {} },
   activeSession: { type: String, default: null },

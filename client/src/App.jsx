@@ -281,13 +281,13 @@ function DocumentationOverlay({ onClose }) {
             <div className="doc-tag">CONCEPT_DOCUMENT</div>
             <h1 className="doc-title">Project Overview</h1>
             <p className="doc-lead">
-              「地球在線 (EARTH ONLINE)」是一個基於《三體》概念與賽博龐克美學啟發的實驗性全球網路觀測專案。
+              {t('「地球在線 (EARTH ONLINE)」是一個基於《三體》概念與賽博龐克美學啟發的實驗性全球網路觀測專案。')}
             </p>
             <div className="doc-text">
-              其核心理念在於將全球四散的網路節點（使用者）具象化為實體地理座標上的「觀測站」，並透過即時的雙向 WebSocket 通訊，建構出一個去中心化且具備高度同步性的虛擬拓樸網路。
+              {t('其核心理念在於將全球四散的網路節點（使用者）具象化為實體地理座標上的「觀測站」，並透過即時的雙向 WebSocket 通訊，建構出一個去中心化且具備高度同步性的虛擬拓樸網路。')}
             </div>
             <div className="doc-text">
-              本系統嘗試探討在高度資訊化的未來，人類個體如何作為巨型系統架構中的微小神經元運作。每一個登入的帳號，皆代表著為全球伺服器矩陣貢獻運算能力與觀測數據的終端節點。
+              {t('本系統嘗試探討在高度資訊化的未來，人類個體如何作為巨型系統架構中的微小神經元運作。每一個登入的帳號，皆代表著為全球伺服器矩陣貢獻運算能力與觀測數據的終端節點。')}
             </div>
           </section>
 
@@ -296,19 +296,19 @@ function DocumentationOverlay({ onClose }) {
             <h1 className="doc-title">Architecture & Data Files</h1>
             <div className="doc-grid">
               <div className="doc-grid-label">Client (前端)</div>
-              <div className="doc-grid-value">React 18, Vite, React-Leaflet (GIS即時渲染)</div>
+              <div className="doc-grid-value">{t('React 18, Vite, React-Leaflet (GIS即時渲染)')}</div>
             </div>
             <div className="doc-grid">
               <div className="doc-grid-label">Server (後端)</div>
-              <div className="doc-grid-value">Node.js, Express, Socket.IO (全雙工通訊廣播)</div>
+              <div className="doc-grid-value">{t('Node.js, Express, Socket.IO (全雙工通訊廣播)')}</div>
             </div>
             <div className="doc-grid">
               <div className="doc-grid-label">Infrastructure</div>
-              <div className="doc-grid-value">Render 雲端運算節點、Cloudflare CDN 全球邊緣加速</div>
+              <div className="doc-grid-value">{t('Render 雲端運算節點、Cloudflare CDN 全球邊緣加速')}</div>
             </div>
             <div className="doc-grid">
               <div className="doc-grid-label">Mechanics</div>
-              <div className="doc-grid-value">全局掛機時間 (Global Production)、社會總壓迫常數 (Social Compression)</div>
+              <div className="doc-grid-value">{t('全局掛機時間 (Global Production)、社會總壓迫常數 (Social Compression)')}</div>
             </div>
           </section>
 
@@ -316,7 +316,7 @@ function DocumentationOverlay({ onClose }) {
             <div className="doc-tag">SOURCES</div>
             <h1 className="doc-title">Reference Sources</h1>
             <div className="doc-grid">
-              <div className="doc-grid-label">GIS 圖資</div>
+              <div className="doc-grid-label">{t('GIS 圖資')}</div>
               <div className="doc-grid-value">
                 <a href="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer" target="_blank" rel="noreferrer">Esri World Imagery</a>,{' '}
                 <a href="https://www.openstreetmap.org/" target="_blank" rel="noreferrer">OpenStreetMap</a>,{' '}
@@ -324,38 +324,37 @@ function DocumentationOverlay({ onClose }) {
               </div>
             </div>
             <div className="doc-grid">
-              <div className="doc-grid-label">3D 貼圖</div>
+              <div className="doc-grid-label">{t('3D 貼圖')}</div>
               <div className="doc-grid-value">
                 <a href="https://globe.gl/" target="_blank" rel="noreferrer">ThreeGlobe</a> / NASA Blue Marble
               </div>
             </div>
             <div className="doc-grid">
-              <div className="doc-grid-label">API 代理</div>
-              <div className="doc-grid-value">dcdn.dstn.to (無認證 Discord 資料抓取)</div>
+              <div className="doc-grid-label">{t('API 代理')}</div>
+              <div className="doc-grid-value">{t('dcdn.dstn.to (無認證 Discord 資料抓取)')}</div>
             </div>
             <div className="doc-grid">
-              <div className="doc-grid-label">介面圖示</div>
+              <div className="doc-grid-label">{t('介面圖示')}</div>
               <div className="doc-grid-value">Lucide React</div>
             </div>
           </section>
 
           <section id="discord">
             <div className="doc-tag">FEATURE UPDATE</div>
-            <h1 className="doc-title">地球在線 - 桌面版客戶端 (Desktop App)</h1>
+            <h1 className="doc-title">{t('地球在線 - 桌面版客戶端 (Desktop App)')}</h1>
             <div className="doc-text">
-              為了突破網頁瀏覽器的安全限制，讓玩家能自動在 Discord 上秀出「正在玩 地球在線」並顯示掛機生存時間，我們正式推出了<strong>「地球在線專屬桌面版」</strong>！<br/><br/>
-              只要下載並開啟桌面版，系統就會在背景自動與您的 Discord 連動，無需任何手動設定！
+{t('為了突破網頁瀏覽器的安全限制，讓玩家能自動在 Discord 上秀出「正在玩 地球在線」並顯示掛機生存時間，我們正式推出了<strong>「地球在線專屬桌面版」</strong>！<br/><br/>只要下載並開啟桌面版，系統就會在背景自動與您的 Discord 連動，無需任何手動設定！')}
             </div>
             
             <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px', marginTop: '20px', borderLeft: '4px solid #5865F2' }}>
               <h3 style={{ color: 'var(--info-color)', marginTop: 0, marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                桌面版專屬功能
+                {t('桌面版專屬功能')}
               </h3>
               <ul style={{ color: 'var(--text-secondary)', lineHeight: '1.8', margin: 0, paddingLeft: '20px' }}>
-                <li>✅ <strong>全自動 RPC 連動</strong>：自動更改 Discord 狀態為「正在玩 地球在線」。</li>
-                <li>✅ <strong>生存時間計時器</strong>：Discord 狀態內建顯示您掛機了多久。</li>
-                <li>✅ <strong>沉浸式全螢幕體驗</strong>：無邊框、無瀏覽器網址列干擾。</li>
-                <li>✅ <strong>雙端資料互通</strong>：桌面版與網頁版資料完全同步，隨時切換無縫接軌。</li>
+                <li>{t('✅ <strong>全自動 RPC 連動</strong>：自動更改 Discord 狀態為「正在玩 地球在線」。')}</li>
+                <li>{t('✅ <strong>生存時間計時器</strong>：Discord 狀態內建顯示您掛機了多久。')}</li>
+                <li>{t('✅ <strong>沉浸式全螢幕體驗</strong>：無邊框、無瀏覽器網址列干擾。')}</li>
+                <li>{t('✅ <strong>雙端資料互通</strong>：桌面版與網頁版資料完全同步，隨時切換無縫接軌。')}</li>
               </ul>
               
               <div style={{ marginTop: '25px' }}>
@@ -377,10 +376,10 @@ function DocumentationOverlay({ onClose }) {
                     transition: 'all 0.3s'
                   }}
                 >
-                  前往 GitHub 下載桌面版
+                  {t('前往 GitHub 下載桌面版')}
                 </a>
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '10px' }}>
-                  開發者請在專案根目錄下執行 <code>cd desktop && npm start</code> 啟動。
+                  {t('開發者請在專案根目錄下執行 <code>cd desktop && npm start</code> 啟動。')}
                 </div>
               </div>
             </div>
@@ -390,31 +389,31 @@ function DocumentationOverlay({ onClose }) {
             <div className="doc-tag">MECHANICS</div>
             <h1 className="doc-title">Global Events (全域事件指南)</h1>
             <div className="doc-text">
-              《地球在線》系統會隨機觸發全域事件，影響全體在線節點的生存點數結算。請隨時注意頂部橫幅的警告與提示。
+              {t('《地球在線》系統會隨機觸發全域事件，影響全體在線節點的生存點數結算。請隨時注意頂部橫幅的警告與提示。')}
             </div>
             
             <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px', marginTop: '20px', borderLeft: '4px solid #00d2ff' }}>
-              <h3 style={{ color: '#00d2ff', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><Zap size={20} /> 量子爆發 (QUANTUM_BURST)</h3>
-              <p style={{ margin: 0, color: 'var(--text-secondary)' }}><strong>持續時間：</strong>2 小時<br/><strong>影響效果：</strong>網路傳輸效能達到極致，所有節點的生存時間與點數累積速度大幅提升為 <strong>3.0 倍</strong>！這是快速累積資源的最佳時機。</p>
+              <h3 style={{ color: '#00d2ff', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><Zap size={20} /> {t('量子爆發 (QUANTUM_BURST)')}</h3>
+               <p style={{ margin: 0, color: 'var(--text-secondary)' }}><strong>持續時間：</strong>2 小時<br/><strong>影響效果：</strong>網路傳輸效能達到極致，所有節點的生存時間與點數累積速度大幅提升為 <strong>3.0 倍</strong>！這是快速累積資源的最佳時機。</p>
             </div>
 
             <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px', marginTop: '20px', borderLeft: '4px solid #ff416c' }}>
-              <h3 style={{ color: '#ff416c', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><Tornado size={20} /> 太陽風暴 (SOLAR_STORM)</h3>
+              <h3 style={{ color: '#ff416c', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><Tornado size={20} /> {t('太陽風暴 (SOLAR_STORM)')}</h3>
               <p style={{ margin: 0, color: 'var(--text-secondary)' }}><strong>持續時間：</strong>1 小時<br/><strong>影響效果：</strong>嚴重的干擾事件。在此期間內斷線的節點將被懲罰扣除 <strong>100 點</strong>生存點數。若能成功維持連線直到風暴結束，所有倖存節點將一次性獲得 <strong>200 點</strong>的生存獎勵金。</p>
             </div>
 
             <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px', marginTop: '20px', borderLeft: '4px solid #f8b500' }}>
-              <h3 style={{ color: '#f8b500', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><Coins size={20} /> 數據淘金潮 (DATA_GOLD_RUSH)</h3>
+              <h3 style={{ color: '#f8b500', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><Coins size={20} /> {t('數據淘金潮 (DATA_GOLD_RUSH)')}</h3>
               <p style={{ margin: 0, color: 'var(--text-secondary)' }}><strong>持續時間：</strong>15 分鐘<br/><strong>影響效果：</strong>極其罕見的短暫爆發期！在此期間，全伺服器點數累積速度將狂飆至 <strong>5.0 倍</strong>！把握這黃金的 15 分鐘！</p>
             </div>
 
             <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px', marginTop: '20px', borderLeft: '4px solid #38ef7d' }}>
-              <h3 style={{ color: '#38ef7d', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><Satellite size={20} /> 衛星連線最佳化 (SATELLITE_ALIGNMENT)</h3>
+              <h3 style={{ color: '#38ef7d', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><Satellite size={20} /> {t('衛星連線最佳化 (SATELLITE_ALIGNMENT)')}</h3>
               <p style={{ margin: 0, color: 'var(--text-secondary)' }}><strong>持續時間：</strong>2 小時<br/><strong>影響效果：</strong>系統開啟動態負載倍率。基礎倍率為 1.0x，伺服器中<strong>每多 1 位玩家在線，倍率就會額外增加 0.1x</strong>！也就是說，如果有 20 人同時在線，倍率將達到 3.0 倍！號召您的朋友一起上線吧！</p>
             </div>
 
             <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '8px', marginTop: '20px', borderLeft: '4px solid #8e9eab' }}>
-              <h3 style={{ color: '#8e9eab', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={20} /> 系統維護模式 (SYSTEM_MAINTENANCE)</h3>
+              <h3 style={{ color: '#8e9eab', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={20} /> {t('系統維護模式 (SYSTEM_MAINTENANCE)')}</h3>
               <p style={{ margin: 0, color: 'var(--text-secondary)' }}><strong>持續時間：</strong>30 分鐘<br/><strong>影響效果：</strong>主控台進行冷卻降頻，點數累積速度降為 <strong>0.5 倍</strong>。這是一場耐力賽，如果您選擇不下線並陪伴伺服器度過維護期，結束時系統將發放高達 <strong>500 點</strong>的補償獎勵！</p>
             </div>
           </section>
@@ -423,11 +422,11 @@ function DocumentationOverlay({ onClose }) {
             <div className="doc-tag">CREDITS</div>
             <h1 className="doc-title">Developer Info</h1>
             <div className="doc-text">
-              本系統由獨立開發者進行架構設計、UI/UX 規劃與全端程式撰寫。
+              {t('本系統由獨立開發者進行架構設計、UI/UX 規劃與全端程式撰寫。')}
             </div>
             <div className="doc-grid">
               <div className="doc-grid-label">Author</div>
-              <div className="doc-grid-value">胡家綸</div>
+              <div className="doc-grid-value">{t('胡家綸')}</div>
             </div>
             <div className="doc-grid">
               <div className="doc-grid-label">Contact</div>
@@ -500,7 +499,7 @@ function CountdownBanner() {
     }}>
       <div style={{display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.95rem', fontWeight: '600'}}>
         <span style={{color: '#ffcc00'}}>✧</span> 
-        每週任務結算 — 獲取 <span style={{background: '#ed4245', padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'}}>{t('專屬身分組')}</span> | 距離結算剩餘:
+        {t('每週任務結算 — 獲取 ')}<span style={{background: '#ed4245', padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'}}>{t('專屬身分組')}</span>{t(' | 距離結算剩餘:')}
       </div>
       <div style={{display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold', fontSize: '1rem'}}>
         <div style={{background: '#f2f3f5', color: '#23272a', padding: '4px 8px', borderRadius: '6px', minWidth: '28px', textAlign: 'center'}}>{format(timeLeft.d)}</div>
@@ -1608,11 +1607,11 @@ function Dashboard({ token, onLogout, region }) {
               }}>
                 <Shield size={18} color="#ef4444" />
                 <span style={{ color: '#ef4444', fontWeight: '700', fontSize: '1rem', flex: 1 }}>
-                  管理員面板 · Admin Panel
+                  {t('管理員面板 · Admin Panel')}
                 </span>
                 <span style={{ color: '#64748b', fontSize: '0.8rem', marginRight: '12px' }}>
-                  總玩家數: <strong style={{ color: '#e2e8f0' }}>{allPlayersList.length}</strong>　
-                  在線: <strong style={{ color: '#22c55e' }}>{allPlayersList.filter(p => p.online).length}</strong>
+                  {t('總玩家數:')} <strong style={{ color: '#e2e8f0' }}>{allPlayersList.length}</strong>　
+                  {t('在線:')} <strong style={{ color: '#22c55e' }}>{allPlayersList.filter(p => p.online).length}</strong>
                 </span>
                 <button onClick={() => setShowAdminPanel(false)} style={{
                   background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
@@ -1631,7 +1630,7 @@ function Dashboard({ token, onLogout, region }) {
                   <div style={{ padding: '12px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
                     <input
                       type="text"
-                      placeholder="🔍 搜尋玩家名稱..."
+                      placeholder={t('🔍 搜尋玩家名稱...')}
                       value={playerSearch}
                       onChange={e => setPlayerSearch(e.target.value)}
                       style={{
@@ -1644,9 +1643,9 @@ function Dashboard({ token, onLogout, region }) {
                     <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
                       <label style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#94a3b8', fontSize: '0.72rem', cursor: 'pointer', marginRight: '4px' }}>
                         <input type="checkbox" checked={filtered.length > 0 && selectedPlayers.size === filtered.length} onChange={e => { if (e.target.checked) { setSelectedPlayers(new Set(filtered.map(p => p.username))); } else { setSelectedPlayers(new Set()); } }} style={{ accentColor: '#ef4444' }} />
-                        全選
+                        {t('全選')}
                       </label>
-                      {[['all','全部'],['online','在線'],['muted','禁言'],['banned','封鎖']].map(([val, label]) => (
+                      {[['all',t('全部')],['online',t('在線')],['muted',t('禁言')],['banned',t('封鎖')]].map(([val, label]) => (
                         <button key={val} onClick={() => setAdminPlayerFilter(val)} style={{
                           padding: '3px 9px', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer',
                           border: adminPlayerFilter === val ? '1px solid #ef4444' : '1px solid rgba(255,255,255,0.1)',
@@ -1659,7 +1658,7 @@ function Dashboard({ token, onLogout, region }) {
                         padding: '3px 9px', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer',
                         border: '1px solid rgba(255,255,255,0.1)', background: 'transparent',
                         color: '#64748b', marginLeft: 'auto',
-                      }}>↺ 刷新</button>
+                      }}>{t('↺ 刷新')}</button>
                     </div>
                   </div>
 
@@ -1667,7 +1666,7 @@ function Dashboard({ token, onLogout, region }) {
                   <div style={{ flex: 1, overflowY: 'auto' }}>
                     {filtered.length === 0 && (
                       <div style={{ color: '#475569', fontSize: '0.8rem', textAlign: 'center', padding: '24px 12px' }}>
-                        {allPlayersList.length === 0 ? '點擊「刷新」載入玩家名單' : '無符合結果'}
+                        {allPlayersList.length === 0 ? t('點擊「刷新」載入玩家名單') : t('無符合結果')}
                       </div>
                     )}
                     {filtered.map(p => (
@@ -1703,8 +1702,8 @@ function Dashboard({ token, onLogout, region }) {
                           </div>
                           <div style={{ display: 'flex', gap: '6px', marginTop: '2px', alignItems: 'center' }}>
                             <span style={{ color: '#475569', fontSize: '0.68rem' }}>{p.country}</span>
-                            {p.isMuted && <span style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24', fontSize: '0.62rem', padding: '1px 4px', borderRadius: '3px' }}>禁言</span>}
-                            {p.isBanned && <span style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444', fontSize: '0.62rem', padding: '1px 4px', borderRadius: '3px' }}>封鎖</span>}
+                            {p.isMuted && <span style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24', fontSize: '0.62rem', padding: '1px 4px', borderRadius: '3px' }}>{t('禁言')}</span>}
+                            {p.isBanned && <span style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444', fontSize: '0.62rem', padding: '1px 4px', borderRadius: '3px' }}>{t('封鎖')}</span>}
                           </div>
                         </div>
                         <span style={{ color: '#334155', fontSize: '0.68rem', flexShrink: 0 }}>
@@ -1720,7 +1719,7 @@ function Dashboard({ token, onLogout, region }) {
                   {!adminTarget && selectedPlayers.size === 0 ? (
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#334155', gap: '8px' }}>
                       <Shield size={40} color="#1e293b" />
-                      <span style={{ fontSize: '0.9rem' }}>← 從左側選取玩家</span>
+                      <span style={{ fontSize: '0.9rem' }}>{t('← 從左側選取玩家')}</span>
                     </div>
                   ) : selectedPlayers.size > 0 ? (
                     <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
@@ -1732,7 +1731,7 @@ function Dashboard({ token, onLogout, region }) {
                       }}>
                         <div style={{ flex: 1 }}>
                           <div style={{ color: '#4ade80', fontWeight: '700', fontSize: '1.1rem' }}>
-                            已選取 {selectedPlayers.size} 位成員
+                            {t('已選取')} {selectedPlayers.size} {t('位成員')}
                           </div>
                           <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '4px' }}>
                             {[...selectedPlayers].join(', ')}
@@ -1740,26 +1739,26 @@ function Dashboard({ token, onLogout, region }) {
                         </div>
                         <button onClick={() => setSelectedPlayers(new Set())} style={{
                           background: 'transparent', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.8rem',
-                        }}>清除選取</button>
+                        }}>{t('清除選取')}</button>
                       </div>
 
                       {/* Mass Give PT */}
                       <div style={{ marginBottom: '14px' }}>
-                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>批量發布點數 MASS GIVE PT</div>
+                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>{t('批量發布點數 MASS GIVE PT')}</div>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                          <input type="number" value={adminPtsAmount} onChange={e => setAdminPtsAmount(Math.max(0, parseInt(e.target.value) || 0))} min="1" max="100000" placeholder="數量" style={{ width: '100px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', padding: '6px 8px', borderRadius: '6px', outline: 'none', fontSize: '0.82rem' }} />
-                          <span style={{ color: '#64748b', fontSize: '0.78rem' }}>× {selectedPlayers.size} 人 = {(adminPtsAmount * selectedPlayers.size).toLocaleString()} PT</span>
+                          <input type="number" value={adminPtsAmount} onChange={e => setAdminPtsAmount(Math.max(0, parseInt(e.target.value) || 0))} min="1" max="100000" placeholder={t('數量')} style={{ width: '100px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', padding: '6px 8px', borderRadius: '6px', outline: 'none', fontSize: '0.82rem' }} />
+                          <span style={{ color: '#64748b', fontSize: '0.78rem' }}>{t('×')} {selectedPlayers.size} {t('人')} = {(adminPtsAmount * selectedPlayers.size).toLocaleString()} PT</span>
                           <button onClick={handleAdminMassAddPts} disabled={adminPtsAmount <= 0} style={{
                             background: adminPtsAmount > 0 ? '#22c55e' : '#334155',
                             color: adminPtsAmount > 0 ? '#000' : '#64748b',
                             border: 'none', padding: '6px 20px', borderRadius: '6px', cursor: adminPtsAmount > 0 ? 'pointer' : 'not-allowed',
                             fontSize: '0.82rem', fontWeight: '600', marginLeft: 'auto',
-                          }}>批量發送</button>
+                          }}>{t('批量發送')}</button>
                         </div>
                       </div>
 
                       <div style={{ marginTop: '24px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)', color: '#475569', fontSize: '0.75rem', lineHeight: 1.6 }}>
-                        ⚠ 將對全部 {selectedPlayers.size} 位已選取成員各發送 {adminPtsAmount} PT，請確認後再操作。
+                        ⚠ {t('將對全部')} {selectedPlayers.size} {t('位已選取成員各發送')} {adminPtsAmount} {t('PT，請確認後再操作。')}
                       </div>
                     </div>
                   ) : (
@@ -1780,73 +1779,73 @@ function Dashboard({ token, onLogout, region }) {
                           <div style={{ color: '#f87171', fontWeight: '700', fontSize: '1.1rem' }}>{adminTarget}</div>
                           <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '2px' }}>
                             {selected?.country} ·
-                            {selected?.online ? <span style={{ color: '#22c55e' }}> 在線</span> : ' 離線'} ·
+                            {selected?.online ? <span style={{ color: '#22c55e' }}> {t('在線')}</span> : ` ${t('離線')}`} ·
                             {' '}{(selected?.pts || 0).toLocaleString()} PT
-                            {selected?.isMuted && <span style={{ color: '#fbbf24', marginLeft: '8px' }}>⚠ 禁言中{selected?.mutedUntil ? ` (${Math.ceil((selected.mutedUntil - Date.now()) / 60000)}分)` : ''}</span>}
-                            {selected?.isBanned && <span style={{ color: '#ef4444', marginLeft: '8px' }}>🚫 封鎖中{selected?.bannedUntil ? ` (${Math.ceil((selected.bannedUntil - Date.now()) / 60000)}分)` : ''}</span>}
+                            {selected?.isMuted && <span style={{ color: '#fbbf24', marginLeft: '8px' }}>{t('⚠ 禁言中')}{selected?.mutedUntil ? ` (${Math.ceil((selected.mutedUntil - Date.now()) / 60000)}${t('分')})` : ''}</span>}
+                            {selected?.isBanned && <span style={{ color: '#ef4444', marginLeft: '8px' }}>{t('🚫 封鎖中')}{selected?.bannedUntil ? ` (${Math.ceil((selected.bannedUntil - Date.now()) / 60000)}${t('分')})` : ''}</span>}
                           </div>
                         </div>
                         <button onClick={() => setAdminTarget('')} style={{
                           background: 'transparent', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.8rem',
-                        }}>取消選取</button>
+                        }}>{t('取消選取')}</button>
                       </div>
 
                       {/* Mute */}
                       <div style={{ marginBottom: '14px' }}>
-                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>禁言 MUTE</div>
+                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>{t('禁言 MUTE')}</div>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                           <select id="muteDuration" defaultValue="5" style={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', padding: '6px 8px', borderRadius: '6px', fontSize: '0.82rem', outline: 'none' }}>
-                            <option value="1">1 分鐘</option>
-                            <option value="5">5 分鐘</option>
-                            <option value="10">10 分鐘</option>
-                            <option value="30">30 分鐘</option>
-                            <option value="60">1 小時</option>
-                            <option value="360">6 小時</option>
-                            <option value="1440">24 小時</option>
+                            <option value="1">{t('1 分鐘')}</option>
+                            <option value="5">{t('5 分鐘')}</option>
+                            <option value="10">{t('10 分鐘')}</option>
+                            <option value="30">{t('30 分鐘')}</option>
+                            <option value="60">{t('1 小時')}</option>
+                            <option value="360">{t('6 小時')}</option>
+                            <option value="1440">{t('24 小時')}</option>
                           </select>
-                          <button onClick={handleAdminMute} style={{ background: '#b45309', border: 'none', color: '#fff', padding: '6px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600' }}>禁言</button>
-                          <button onClick={handleAdminUnmute} style={{ background: '#15803d', border: 'none', color: '#fff', padding: '6px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600' }}>解除禁言</button>
+                          <button onClick={handleAdminMute} style={{ background: '#b45309', border: 'none', color: '#fff', padding: '6px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600' }}>{t('禁言')}</button>
+                          <button onClick={handleAdminUnmute} style={{ background: '#15803d', border: 'none', color: '#fff', padding: '6px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600' }}>{t('解除禁言')}</button>
                         </div>
                       </div>
 
                       {/* Ban */}
                       <div style={{ marginBottom: '14px' }}>
-                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>封鎖 BAN</div>
+                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>{t('封鎖 BAN')}</div>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                           <select id="banDuration" defaultValue="1440" style={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', padding: '6px 8px', borderRadius: '6px', fontSize: '0.82rem', outline: 'none' }}>
-                            <option value="60">1 小時</option>
-                            <option value="360">6 小時</option>
-                            <option value="1440">24 小時</option>
-                            <option value="4320">3 天</option>
-                            <option value="10080">7 天</option>
-                            <option value="43200">30 天</option>
+                            <option value="60">{t('1 小時')}</option>
+                            <option value="360">{t('6 小時')}</option>
+                            <option value="1440">{t('24 小時')}</option>
+                            <option value="4320">{t('3 天')}</option>
+                            <option value="10080">{t('7 天')}</option>
+                            <option value="43200">{t('30 天')}</option>
                           </select>
-                          <button onClick={handleAdminBan} style={{ background: '#991b1b', border: 'none', color: '#fff', padding: '6px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600' }}>封鎖</button>
-                          <button onClick={handleAdminUnban} style={{ background: '#15803d', border: 'none', color: '#fff', padding: '6px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600' }}>解除封鎖</button>
+                          <button onClick={handleAdminBan} style={{ background: '#991b1b', border: 'none', color: '#fff', padding: '6px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600' }}>{t('封鎖')}</button>
+                          <button onClick={handleAdminUnban} style={{ background: '#15803d', border: 'none', color: '#fff', padding: '6px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600' }}>{t('解除封鎖')}</button>
                         </div>
                       </div>
 
                       {/* Delete message */}
                       <div style={{ marginBottom: '14px' }}>
-                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>訊息管理 MESSAGES</div>
-                        <button onClick={handleAdminDelete} style={{ background: '#92400e', border: 'none', color: '#fff', padding: '6px 18px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600' }}>刪除該玩家所有訊息</button>
+                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>{t('訊息管理 MESSAGES')}</div>
+                        <button onClick={handleAdminDelete} style={{ background: '#92400e', border: 'none', color: '#fff', padding: '6px 18px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: '600' }}>{t('刪除該玩家所有訊息')}</button>
                       </div>
 
                       <div style={{ marginTop: '24px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)', color: '#475569', fontSize: '0.75rem', lineHeight: 1.6 }}>
-                        ⚠ 管理員操作不可復原，請謹慎使用。所有操作均會記錄於系統日誌。
+                        {t('⚠ 管理員操作不可復原，請謹慎使用。所有操作均會記錄於系統日誌。')}
                       </div>
 
                       {/* Give PT */}
                       <div style={{ marginBottom: '14px' }}>
-                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>給予點數 GIVE PT</div>
+                        <div style={{ color: '#94a3b8', fontSize: '0.72rem', letterSpacing: '1px', marginBottom: '8px' }}>{t('給予點數 GIVE PT')}</div>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                          <input type="number" value={adminPtsAmount} onChange={e => setAdminPtsAmount(Math.max(0, parseInt(e.target.value) || 0))} min="1" max="100000" placeholder="數量" style={{ width: '100px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', padding: '6px 8px', borderRadius: '6px', outline: 'none', fontSize: '0.82rem' }} />
+                          <input type="number" value={adminPtsAmount} onChange={e => setAdminPtsAmount(Math.max(0, parseInt(e.target.value) || 0))} min="1" max="100000" placeholder={t('數量')} style={{ width: '100px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', padding: '6px 8px', borderRadius: '6px', outline: 'none', fontSize: '0.82rem' }} />
                           <button onClick={handleAdminAddPts} disabled={!adminTarget.trim() || adminPtsAmount <= 0} style={{
                             background: adminTarget.trim() && adminPtsAmount > 0 ? '#22c55e' : '#334155',
                             color: adminTarget.trim() && adminPtsAmount > 0 ? '#000' : '#64748b',
                             border: 'none', padding: '6px 16px', borderRadius: '6px', cursor: adminTarget.trim() && adminPtsAmount > 0 ? 'pointer' : 'not-allowed',
                             fontSize: '0.82rem', fontWeight: '600'
-                          }}>發送 PT</button>
+                           }}>{t('發送 PT')}</button>
                         </div>
                       </div>
                     </div>
@@ -1886,18 +1885,18 @@ function Dashboard({ token, onLogout, region }) {
                   {adSlogan?.lines?.map((line, i) => <span key={i}>{line}</span>)}
                 </div>
                 <div style={{color: 'var(--accent-color)', fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '15px'}}>{adCountdown}s</div>
-                <div style={{color: 'var(--text-dim)', fontSize: '0.75rem', marginBottom: '10px'}}>贊助商：子熙生態系</div>
+                <div style={{color: 'var(--text-dim)', fontSize: '0.75rem', marginBottom: '10px'}}>{t('贊助商：子熙生態系')}</div>
                 <div style={{width: '100%', height: '4px', background: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden'}}>
                   <div style={{width: `${((15 - adCountdown) / 15) * 100}%`, height: '100%', background: 'var(--accent-color)', transition: 'width 1s linear'}} />
                 </div>
-                <div style={{color: 'var(--text-dim)', fontSize: '0.8rem', marginTop: '15px'}}>觀看完整廣告即可免費復活伺服器</div>
+                <div style={{color: 'var(--text-dim)', fontSize: '0.8rem', marginTop: '15px'}}>{t('觀看完整廣告即可免費復活伺服器')}</div>
               </>
             ) : (
               <>
                 <div style={{fontSize: '3rem', marginBottom: '15px'}}>⚡</div>
-                <div style={{color: 'var(--text-color)', fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '8px'}}>伺服器已死機！</div>
-                <div style={{color: 'var(--text-dim)', fontSize: '0.9rem', marginBottom: '20px'}}>觀看廣告即可免費復活（恢復 50% 健康度）</div>
-                <div style={{color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '20px'}}>今日剩餘次數：{adReviveRemaining} / 3</div>
+                <div style={{color: 'var(--text-color)', fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '8px'}}>{t('伺服器已死機！')}</div>
+                <div style={{color: 'var(--text-dim)', fontSize: '0.9rem', marginBottom: '20px'}}>{t('觀看廣告即可免費復活（恢復 50% 健康度）')}</div>
+                <div style={{color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '20px'}}>{t('今日剩餘次數：')}{adReviveRemaining} / 3</div>
                 <div style={{display: 'flex', gap: '10px', justifyContent: 'center'}}>
                   <button onClick={handleStartAdRevive} disabled={adReviveRemaining <= 0} style={{
                     background: adReviveRemaining > 0 ? 'var(--accent-color)' : 'var(--border-color)',
@@ -1906,13 +1905,13 @@ function Dashboard({ token, onLogout, region }) {
                     fontWeight: 'bold', cursor: adReviveRemaining > 0 ? 'pointer' : 'not-allowed',
                     fontSize: '1rem'
                   }}>
-                    {adReviveRemaining > 0 ? '▶ 觀看廣告復活' : '今日次數已用完'}
+                    {adReviveRemaining > 0 ? t('▶ 觀看廣告復活') : t('今日次數已用完')}
                   </button>
                   <button onClick={() => setShowAdRevive(false)} style={{
                     background: 'transparent', border: '1px solid var(--border-color)',
                     color: 'var(--text-dim)', padding: '12px 20px', borderRadius: '8px',
                     cursor: 'pointer', fontSize: '0.9rem'
-                  }}>關閉</button>
+                  }}>{t('關閉')}</button>
                 </div>
               </>
             )}
@@ -1933,7 +1932,7 @@ function Dashboard({ token, onLogout, region }) {
             color: 'var(--text-color, #e2e8f0)',
           }}>
             <h3 style={{ margin: '0 0 20px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Palette size={20} /> 選擇主題配色
+              <Palette size={20} /> {t('選擇主題配色')}
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               {Object.entries(themes).map(([key, t]) => (
@@ -1967,13 +1966,13 @@ function Dashboard({ token, onLogout, region }) {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
               <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Settings size={20} /> 設定 (Settings)
+                <Settings size={20} /> {t('設定 (Settings)')}
               </h3>
               <X size={20} style={{ cursor: 'pointer', color: 'var(--text-dim)' }} onClick={() => setShowSettings(false)} />
             </div>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '8px' }}>
-                字體大小 (Font Size): {document.documentElement.style.fontSize || '16px'}
+                {t('字體大小 (Font Size):')} {document.documentElement.style.fontSize || '16px'}
               </label>
               <input
                 type="range" min="12" max="24" step="1"
@@ -1990,7 +1989,7 @@ function Dashboard({ token, onLogout, region }) {
               </div>
             </div>
             <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>語言 (Language)</span>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{t('語言 (Language)')}</span>
               <button
                 onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
                 style={{
@@ -1999,11 +1998,11 @@ function Dashboard({ token, onLogout, region }) {
                   cursor: 'pointer', fontWeight: 'bold', fontFamily: 'var(--font-sans)'
                 }}
               >
-                {language === 'zh' ? 'English' : '中文'}
+                {language === 'zh' ? 'English' : t('中文')}
               </button>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>通知音效 (Sound Notifications)</span>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{t('通知音效 (Sound Notifications)')}</span>
               <input
                 type="checkbox"
                 checked={notificationEnabled}

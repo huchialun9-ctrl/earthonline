@@ -147,18 +147,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/downloads', express.static(path.join(__dirname, 'public/downloads')));
 app.use(morgan('short'));
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      connectSrc: ["'self'", "https://earthonline.onrender.com", "https://earthonline1.pages.dev", "wss://*.onrender.com"],
-      imgSrc: ["'self'", "data:", "https:", "http:"],
-      fontSrc: ["'self'", "data:"],
-    },
-  },
-}));
+app.use(helmet());
 
 // Health check for Render
 app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() }));

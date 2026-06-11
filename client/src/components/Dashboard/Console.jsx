@@ -28,7 +28,7 @@ export default function Console({ logs, chatInput, setChatInput, socket, pmData,
       <Draggable nodeRef={logRef} handle=".log-header">
         <div ref={logRef} className="bottom-log-console" style={{display: 'flex', flexDirection: 'column'}}>
           <div className="log-header" style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-color)', cursor: 'move'}}>
-            <Activity size={16} /> 世界頻道 / 系統日誌 (World Chat)
+            <Activity size={16} />             {t('世界頻道 / 系統日誌 (World Chat)')}
           </div>
           <div className="log-content" style={{flex: 1, overflowY: 'auto'}}>
             {logs.map((log, i) => {
@@ -54,7 +54,7 @@ export default function Console({ logs, chatInput, setChatInput, socket, pmData,
               placeholder={t("輸入訊息，與全球節點交流...")} maxLength={200}
               style={{flex: 1, background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '8px', borderRadius: '4px', outline: 'none', fontSize: '0.9rem'}} />
             <button type="submit" style={{background: 'var(--accent-color)', color: '#000', border: 'none', padding: '0 15px', borderRadius: '4px', marginLeft: '5px', fontWeight: 'bold', cursor: 'pointer'}}>
-              發送
+              {t('發送')}
             </button>
           </form>
         </div>
@@ -93,10 +93,10 @@ export default function Console({ logs, chatInput, setChatInput, socket, pmData,
             </div>
             <form onSubmit={handleSendPm} style={{ display: 'flex', borderTop: '1px solid var(--border-color)', padding: '8px' }}>
               <input type="text" value={pmInput} onChange={e => setPmInput(e.target.value)}
-                placeholder="輸入私訊..." maxLength={500}
+                placeholder={t('輸入私訊...')} maxLength={500}
                 style={{ flex: 1, background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '6px 10px', borderRadius: '4px', outline: 'none', fontSize: '0.85rem' }} />
               <button type="submit" style={{ background: 'var(--accent-color)', color: '#000', border: 'none', padding: '6px 12px', borderRadius: '4px', marginLeft: '5px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.85rem' }}>
-                送出
+                {t('送出')}
               </button>
             </form>
           </div>

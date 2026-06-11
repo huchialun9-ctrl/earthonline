@@ -199,9 +199,9 @@ function LoginGateway({ onLogin }) {
         <div style={{textAlign: 'center', marginBottom: '25px', zIndex: 10, position: 'relative'}}>
           <div className="login-earth"></div>
           <h2 style={{fontFamily: 'var(--font-sans)', color: 'var(--text-main)', fontSize: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}}>
-            <Globe2 className="icon-glow icon-spin" size={32} /> 地球在線
+            <Globe2 className="icon-glow icon-spin" size={32} /> {t('地球在線')}
           </h2>
-          <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '5px'}}>全球節點觀測與管理中心</p>
+          <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '5px'}}>{t('全球節點觀測與管理中心')}</p>
         </div>
         
         <form className="login-form">
@@ -209,16 +209,16 @@ function LoginGateway({ onLogin }) {
           {successMsg && <div style={{color: '#00ffaa', marginBottom: '10px', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold'}}>{successMsg}</div>}
           
           <div className="form-group" style={{marginBottom: '15px'}}>
-            <label style={{color: 'var(--accent-color)'}}>GLOBAL REGION (伺服器分區)</label>
+            <label style={{color: 'var(--accent-color)'}}>{t('GLOBAL REGION (伺服器分區)')}</label>
             <select value={region} onChange={e => setRegion(e.target.value)} className="terminal-input" style={{appearance: 'auto', background: 'var(--surface-color)', color: 'var(--accent-color)', fontWeight: 'bold'}}>
-              <option value="asia">[Asia-East] 亞洲樞紐</option>
-              <option value="us">[US-West] 美洲中樞</option>
-              <option value="eu">[EU-Central] 歐洲陣列</option>
+              <option value="asia">{t('[Asia-East] 亞洲樞紐')}</option>
+              <option value="us">{t('[US-West] 美洲中樞')}</option>
+              <option value="eu">{t('[EU-Central] 歐洲陣列')}</option>
             </select>
           </div>
 
           <div style={{textAlign: 'center', marginBottom: '15px', padding: '10px', background: 'rgba(0,255,170,0.08)', borderRadius: '6px', border: '1px solid rgba(0,255,170,0.2)'}}>
-            <span style={{color: '#00ffaa', fontSize: '0.85rem'}}>🌐 帳號/密碼 或 Discord 均可登入</span>
+            <span style={{color: '#00ffaa', fontSize: '0.85rem'}}>{t('帳號/密碼 或 Discord 均可登入')}</span>
           </div>
 
           <button 
@@ -235,7 +235,7 @@ function LoginGateway({ onLogin }) {
             onMouseOut={e => e.target.style.background = '#5865F2'}
           >
             <svg width="22" height="22" viewBox="0 0 127.14 96.36" fill="#fff"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.59,67.59,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
-            使用 Discord 快速登入
+            {t('使用 Discord 快速登入')}
           </button>
         </form>
       </div>
@@ -521,12 +521,12 @@ const DonateBanner = () => {
   return (
     <div className="floating-panel" style={{ padding: '15px 20px', background: 'rgba(255, 65, 108, 0.1)', border: '1px solid #ff416c', width: '100%', marginTop: '15px' }}>
       <div style={{ fontSize: '0.9rem', color: '#ff416c', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
-        <Database size={16} /> 伺服器微服務升級募資計畫
+        <Database size={16} /> {t('伺服器微服務升級募資計畫')}
       </div>
       <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)', marginBottom: '15px', lineHeight: '1.6' }}>
-        為了打造真正的全球無上限微服務架構，我們計畫在 Render 上建立硬體分流叢集（包含獨立的 Redis 與三大洲 Web Service）。<br/>
-        <span style={{color: '#38ef7d'}}>優點：</span>{t('真實硬體分流，乘載量無上限。')}<br/>
-        <span style={{color: '#ff416c'}}>缺點：</span>設定較複雜，且 Render 的 Redis 與多台伺服器將產生高昂月費。
+        {t('為了打造真正的全球無上限微服務架構，我們計畫在 Render 上建立硬體分流叢集（包含獨立的 Redis 與三大洲 Web Service）。')}<br/>
+        <span style={{color: '#38ef7d'}}>{t('優點')}：</span>{t('真實硬體分流，乘載量無上限。')}<br/>
+        <span style={{color: '#ff416c'}}>{t('缺點')}：</span>{t('設定較複雜，且 Render 的 Redis 與多台伺服器將產生高昂月費。')}
       </div>
       <a 
         href="https://buymeacoffee.com/lucas1126" 
@@ -539,7 +539,7 @@ const DonateBanner = () => {
           transition: 'all 0.3s ease'
         }}
       >
-        <Coffee size={14} /> 贊助伺服器升級 (Buy Me a Coffee)
+        <Coffee size={14} /> {t('贊助伺服器升級 (Buy Me a Coffee)')}
       </a>
     </div>
   );
@@ -975,7 +975,7 @@ function Dashboard({ token, onLogout, region }) {
         const now = Date.now();
         const diff = currentEvent.endTime - now;
         if (diff <= 0) {
-          setTimeLeft('即將結束...');
+          setTimeLeft(t('即將結束...'));
           return;
         }
         
@@ -984,9 +984,9 @@ function Dashboard({ token, onLogout, region }) {
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
         
         if (hours > 0) {
-          setTimeLeft(`(結束倒數: ${hours}小時 ${minutes}分 ${seconds}秒)`);
+          setTimeLeft(`${t('結束倒數: ')}${hours}${t('小時')}${minutes}${t('分')}${seconds}${t('秒')}`);
         } else {
-          setTimeLeft(`(結束倒數: ${minutes}分 ${seconds}秒)`);
+          setTimeLeft(`${t('結束倒數: ')}${minutes}${t('分')}${seconds}${t('秒')}`);
         }
       };
       
@@ -1006,7 +1006,7 @@ function Dashboard({ token, onLogout, region }) {
           color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '10px 20px', fontWeight: 'bold', fontSize: '1rem', flexShrink: 0, gap: '15px', flexWrap: 'wrap'
         }}>
-          <span>🗳️ 事件投票進行中！剩餘時間 {(eventVote.options||[]).length} 選項</span>
+          <span>{t('事件投票進行中！剩餘時間 ')}{(eventVote.options||[]).length}{t('選項')}</span>
           {eventVote.options?.map(opt => (
             <button key={opt} onClick={() => socket?.emit('event_vote', { event: opt })} style={{
               padding: '6px 16px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.4)',
@@ -1025,32 +1025,32 @@ function Dashboard({ token, onLogout, region }) {
       case 'QUANTUM_BURST':
         bgColor = 'linear-gradient(90deg, #00d2ff, #3a7bd5)';
         icon = <Zap size={18} />;
-        text = '【量子爆發】全伺服器點數累積速度 x 3.0 倍！';
+        text = t('【量子爆發】全伺服器點數累積速度 x 3.0 倍！');
         break;
       case 'SOLAR_STORM':
         bgColor = 'linear-gradient(90deg, #ff416c, #ff4b2b)';
         icon = <Tornado size={18} />;
-        text = '【太陽風暴】網路劇烈波動！期間斷線將扣除 100 點，撐過去可獲 200 點！';
+        text = t('【太陽風暴】網路劇烈波動！期間斷線將扣除 100 點，撐過去可獲 200 點！');
         break;
       case 'DATA_GOLD_RUSH':
         bgColor = 'linear-gradient(90deg, #fceabb, #f8b500)';
         icon = <Coins size={18} />;
-        text = '【數據淘金潮】短期爆發！全伺服器點數累積速度飆升至 5.0 倍！';
+        text = t('【數據淘金潮】短期爆發！全伺服器點數累積速度飆升至 5.0 倍！');
         break;
       case 'SATELLITE_ALIGNMENT':
         bgColor = 'linear-gradient(90deg, #11998e, #38ef7d)';
         icon = <Satellite size={18} />;
-        text = '【衛星連線最佳化】動態倍率啟動，在線人數越多產出越高！';
+        text = t('【衛星連線最佳化】動態倍率啟動，在線人數越多產出越高！');
         break;
       case 'SYSTEM_MAINTENANCE':
         bgColor = 'linear-gradient(90deg, #8e9eab, #eef2f3)';
         icon = <AlertTriangle size={18} />;
-        text = '【系統維護模式】算力降頻(0.5倍)，維持連線不斷線可獲補償獎勵！';
+        text = t('【系統維護模式】算力降頻(0.5倍)，維持連線不斷線可獲補償獎勵！');
         break;
       case 'DATA_BLACK_MARKET':
         bgColor = 'linear-gradient(90deg, #667eea, #764ba2)';
         icon = <Coins size={18} />;
-        text = '【數據黑市】稀有事件！限時 5 分鐘，可用 PT 兌換稀有道具！';
+        text = t('【數據黑市】稀有事件！限時 5 分鐘，可用 PT 兌換稀有道具！');
         break;
     }
       
@@ -1076,14 +1076,14 @@ function Dashboard({ token, onLogout, region }) {
         <span style={{ marginLeft: '10px', background: 'var(--bg-light)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.9rem', color: currentEvent.type === 'SYSTEM_MAINTENANCE' || currentEvent.type === 'DATA_GOLD_RUSH' ? '#000' : '#fff' }}>{timeLeft}</span>
         {currentEvent.type === 'SOLAR_STORM' && (
           <>
-            <button onClick={() => socket?.emit('event_choice', { choice: 'shelter' })} style={{marginLeft:'10px', padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(255,255,255,0.15)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>🏠 避難(-50PT)</button>
-            <button onClick={() => socket?.emit('event_choice', { choice: 'ride_out' })} style={{padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(255,100,100,0.3)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>⚡ 硬撐(+400PT -15%HP)</button>
+            <button onClick={() => socket?.emit('event_choice', { choice: 'shelter' })} style={{marginLeft:'10px', padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(255,255,255,0.15)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>{t('避難(-50PT)')}</button>
+            <button onClick={() => socket?.emit('event_choice', { choice: 'ride_out' })} style={{padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(255,100,100,0.3)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>{t('硬撐(+400PT -15%HP)')}</button>
           </>
         )}
         {currentEvent.type === 'SYSTEM_MAINTENANCE' && (
           <>
-            <button onClick={() => socket?.emit('event_choice', { choice: 'assist' })} style={{marginLeft:'10px', padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(100,200,255,0.2)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>🔧 協助(-100PT,縮短時間)</button>
-            <button onClick={() => socket?.emit('event_choice', { choice: 'ignore' })} style={{padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(255,255,255,0.1)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>👁️ 漠視(+500PT)</button>
+            <button onClick={() => socket?.emit('event_choice', { choice: 'assist' })} style={{marginLeft:'10px', padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(100,200,255,0.2)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>{t('協助(-100PT,縮短時間)')}</button>
+            <button onClick={() => socket?.emit('event_choice', { choice: 'ignore' })} style={{padding:'4px 12px', borderRadius:'6px', border:'1px solid rgba(255,255,255,0.4)', background:'rgba(255,255,255,0.1)', color:'#fff', cursor:'pointer', fontWeight:'bold', fontSize:'0.85rem'}}>{t('漠視(+500PT)')}</button>
           </>
         )}
       </div>
@@ -1247,7 +1247,7 @@ function Dashboard({ token, onLogout, region }) {
     <>
       <audio ref={audioRef} src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3" loop preload="auto" />
       {!myNode ? (
-        <FourPetalSpiral text="正在連線至全球節點網路..." />
+        <FourPetalSpiral text={t('正在連線至全球節點網路...')} />
       ) : (
     <div className="app-container" style={{
       boxShadow: [
@@ -1259,7 +1259,7 @@ function Dashboard({ token, onLogout, region }) {
       {show100Celebration && (
         <div className="celebration-overlay">
           <div className="celebration-emoji">🎉</div>
-          <div className="celebration-text">伺服器達成 100 人里程碑！</div>
+          <div className="celebration-text">{t('伺服器達成 100 人里程碑！')}</div>
         </div>
       )}
       {/* Terminal Overlay */}
@@ -1300,12 +1300,12 @@ function Dashboard({ token, onLogout, region }) {
         <div className="system-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Globe2 color="#3b82f6" size={24} /> 
           <span style={{fontWeight: '900', fontSize: '1.3rem', letterSpacing: '0'}}>{t('地球在線')}</span> 
-          <span style={{color: '#64748b', fontSize: '0.9rem', marginLeft: '10px'}}>伺服器: {region.toUpperCase()} | 你的位置: {myNode?.country || '連線中..'}</span>
+          <span style={{color: '#64748b', fontSize: '0.9rem', marginLeft: '10px'}}>{t('伺服器')}: {region.toUpperCase()} | {t('你的位置')}: {myNode?.country || t('連線中..')}</span>
         </div>
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {!window.electronAPI && (
             <a href="https://drive.google.com/uc?export=download&id=1Xji_z7dB5Q16FfSyRvnm2mXqn3n0cAQ2" target="_blank" rel="noopener noreferrer" style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 16px', background: 'var(--success-color)', color: 'white', border: 'none', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)', fontSize: '0.9rem'}}>
-              <Monitor size={16} /> 下載專屬電腦版
+              <Monitor size={16} /> {t('下載專屬電腦版')}
             </a>
           )}
           <div className="system-stats" style={{display: 'flex', alignItems: 'center', gap: '15px', background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.85rem'}}>
@@ -1315,7 +1315,7 @@ function Dashboard({ token, onLogout, region }) {
             <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
               <span style={{color: 'var(--text-dim)'}}>{t('總人口')}:</span> <strong style={{color: 'var(--text-color)'}}>{globalStats.totalPopulation}</strong>
             </div>
-            {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[已斷線]</span>}
+            {!isConnected && <span style={{color: 'var(--danger-color)', fontWeight: 'bold'}}>[{t('已斷線')}]</span>}
           </div>
 
           <div className={`header-dropdown${dropdownOpen ? ' open' : ''}`} ref={dropdownRef}>
@@ -1328,43 +1328,43 @@ function Dashboard({ token, onLogout, region }) {
                 cursor: 'pointer', fontWeight: 'bold', transition: 'all 0.2s', fontFamily: 'var(--font-sans)'
               }}
             >
-              選單 (Menu) <ChevronDown size={16} style={{ transition: 'transform 0.2s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+              {t('選單 (Menu)')} <ChevronDown size={16} style={{ transition: 'transform 0.2s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
             </button>
             <div className="header-dropdown-content">
 
               <div style={{width: '100%', height: '1px', background: 'rgba(255,255,255,0.1)', margin: '5px 0'}}></div>
               <button onClick={() => { setShowSocialModal(true); setDropdownOpen(false); }} className="dropdown-item">
-                <Users size={16} /> 社交網路 (Social)
+                <Users size={16} /> {t('社交網路 (Social)')}
               </button>
               <button onClick={() => { setShowShopModal(true); setDropdownOpen(false); }} className="dropdown-item" style={{color: '#38bdf8'}}>
-                <ShoppingCart size={16} /> 黑市商城 (Shop)
+                <ShoppingCart size={16} /> {t('黑市商城 (Shop)')}
               </button>
               <button onClick={() => { setShowBackpack(true); setDropdownOpen(false); }} className="dropdown-item" style={{color: '#22c55e'}}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 10a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><polyline points="8 8 8 5 16 5 16 8"/><line x1="12" y1="14" x2="12" y2="17"/><line x1="9" y1="14" x2="9" y2="17"/><line x1="15" y1="14" x2="15" y2="17"/></svg>
-                裝備背包 (Backpack)
+                {t('裝備背包 (Backpack)')}
               </button>
               <button className="dropdown-item" onClick={() => { setShowThemeMenu(!showThemeMenu); setDropdownOpen(false); }}>
-                <Palette size={16} /> 主題配色 (Themes)
+                <Palette size={16} /> {t('主題配色 (Themes)')}
               </button>
               <button className="dropdown-item" onClick={() => { setShowSettings(true); setDropdownOpen(false); }}>
-                <Settings size={16} /> 設定 (Settings)
+                <Settings size={16} /> {t('設定 (Settings)')}
               </button>
               {(myRole === 'admin' || myRole === 'moderator') && (
                 <button className="dropdown-item" style={{color: 'var(--danger-color)'}} onClick={() => { setShowAdminPanel(true); setDropdownOpen(false); }}>
-                  <Shield size={16} /> 管理員功能 (Admin)
+                  <Shield size={16} /> {t('管理員功能 (Admin)')}
                 </button>
               )}
               <a href="https://discord.gg/6P6NG49Mus" target="_blank" rel="noreferrer" className="dropdown-item" style={{color: 'var(--info-color)'}} onClick={() => setDropdownOpen(false)}>
                 <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.58,67.58,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
-                官方 Discord
+                {t('官方 Discord')}
               </a>
               <a href="https://buymeacoffee.com/lucas1126" target="_blank" rel="noreferrer" className="dropdown-item" style={{color: '#FFDD00'}} onClick={() => setDropdownOpen(false)}>
-                <Coffee size={16} /> 贊助支持 (Donate)
+                <Coffee size={16} /> {t('贊助支持 (Donate)')}
               </a>
             </div>
           </div>
 
-          <button onClick={toggleBgm} style={{padding: '5px 12px', borderRadius: '8px', background: bgmEnabled ? 'rgba(0,255,136,0.1)' : 'rgba(255,50,50,0.1)', border: bgmEnabled ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,50,50,0.3)', color: bgmEnabled ? 'var(--success-color)' : 'var(--danger-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'monospace'}} title={bgmEnabled ? '關閉背景音樂' : '開啟背景音樂'}>
+          <button onClick={toggleBgm} style={{padding: '5px 12px', borderRadius: '8px', background: bgmEnabled ? 'rgba(0,255,136,0.1)' : 'rgba(255,50,50,0.1)', border: bgmEnabled ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,50,50,0.3)', color: bgmEnabled ? 'var(--success-color)' : 'var(--danger-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'monospace'}} title={bgmEnabled ? t('關閉背景音樂') : t('開啟背景音樂')}>
 {bgmEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
 {bgmEnabled ? 'BGM ON' : 'BGM OFF'}
 </button>
@@ -1401,12 +1401,12 @@ function Dashboard({ token, onLogout, region }) {
                 {boundDiscord ? (
                   <div style={{color: 'var(--text-secondary)', fontSize: '0.8rem'}}>
                     <LinkIcon size={12} color="var(--accent-color)" style={{marginRight: '4px'}}/>
-                    已連結 Discord
+                    {t('已連結 Discord')}
                   </div>
                 ) : (
-                  <a href="#" onClick={(e) => { e.preventDefault(); setShowDiscordModal(true); }} style={{fontSize: '0.8rem', color: 'var(--info-color)'}}>
-                    連結 Discord
-                  </a>
+<a href="#" onClick={(e) => { e.preventDefault(); setShowDiscordModal(true); }} style={{fontSize: '0.8rem', color: 'var(--info-color)'}}>
+                     {t('連結 Discord')}
+                   </a>
                 )}
               </div>
             </div>
@@ -1467,18 +1467,18 @@ function Dashboard({ token, onLogout, region }) {
           </div>
 
           <div style={{display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '8px'}}>
-            <div style={{fontSize: '0.8rem', color: '#888', marginBottom: '4px'}}>伺服器：{region === 'asia' ? '亞洲' : region === 'us' ? '美洲' : '歐洲'} | node: {myNode?.userId} | {myNode?.country || '--'}</div>
+            <div style={{fontSize: '0.8rem', color: '#888', marginBottom: '4px'}}>{t('伺服器：')}{region === 'asia' ? t('亞洲') : region === 'us' ? t('美洲') : t('歐洲')} | node: {myNode?.userId} | {myNode?.country || '--'}</div>
             {globalStats.multiplier > 1.0 && (
-              <div style={{fontSize: '0.8rem', color: 'var(--accent-color)'}}>🔥 超載中：{globalStats.activeUsers} / 5 人</div>
+              <div style={{fontSize: '0.8rem', color: 'var(--accent-color)'}}>{t('超載中：')}{globalStats.activeUsers} / 5 {t('人')}</div>
             )}
           </div>
 
           <div style={{ marginTop: 'auto', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(255,215,0,0.1)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.3)'}} onClick={() => setShowLeaderboard(true)}>
-              <Activity size={14} /> 排行榜
+              <Activity size={14} /> {t('排行榜')}
             </button>
             <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'}} onClick={() => setShowAboutModal(true)}>
-              <Info size={14} /> 系統資訊
+              <Info size={14} /> {t('系統資訊')}
             </button>
           </div>
         </aside>
@@ -1489,7 +1489,7 @@ function Dashboard({ token, onLogout, region }) {
             <div className="floating-panel" style={{padding: '15px 25px'}}>
               <div className="overlay-item">
                 <div className="overlay-title" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-                  <Globe2 size={16} /> 全球總掛機時間
+                  <Globe2 size={16} /> {t('全球總掛機時間')}
                 </div>
                 <div className="overlay-value">{formatTime(globalStats.globalProduction)}</div>
               </div>
@@ -1520,37 +1520,37 @@ function Dashboard({ token, onLogout, region }) {
         <div className="modal-overlay">
           <div className="modal-content" style={{maxWidth: '500px'}}>
             <h3 style={{marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--info-color)'}}>
-              <LinkIcon /> 連結 Discord 帳號
+              <LinkIcon /> {t('連結 Discord 帳號')}
             </h3>
             
             {!showManualBind ? (
               <>
                 <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '25px', lineHeight: '1.6'}}>
-                  透過官方驗證安全登入，連結後將即時同步您最新的 Discord 大頭貼與暱稱。<br/>
-                  <span style={{color: 'var(--accent-color)'}}>※ 我們僅會獲取您的公開基本資料，絕對安全。</span>
+                  {t('透過官方驗證安全登入，連結後將即時同步您最新的 Discord 大頭貼與暱稱。')}<br/>
+                  <span style={{color: 'var(--accent-color)'}}>{t('※ 我們僅會獲取您的公開基本資料，絕對安全。')}</span>
                 </p>
                 <div style={{display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center'}}>
-                  <a href="#" onClick={(e) => { e.preventDefault(); setShowManualBind(true); }} style={{color: '#888', fontSize: '0.85rem', marginRight: 'auto', textDecoration: 'underline'}}>無法使用授權？點此手動綁定</a>
-                  <button type="button" onClick={() => setShowDiscordModal(false)} className="terminal-btn" style={{padding: '10px 15px', background: 'rgba(255,255,255,0.1)'}}>取消</button>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setShowManualBind(true); }} style={{color: '#888', fontSize: '0.85rem', marginRight: 'auto', textDecoration: 'underline'}}>{t('無法使用授權？點此手動綁定')}</a>
+                  <button type="button" onClick={() => setShowDiscordModal(false)} className="terminal-btn" style={{padding: '10px 15px', background: 'rgba(255,255,255,0.1)'}}>{t('取消')}</button>
                   <button onClick={handleBindDiscord} className="terminal-btn" style={{padding: '10px 20px', background: 'var(--info-color)', color: '#fff', border: 'none', fontWeight: 'bold'}}>
-                    🔗 前往 Discord 官方授權
+                    {t('🔗 前往 Discord 官方授權')}
                   </button>
                 </div>
               </>
             ) : (
               <form onSubmit={handleBindDiscordManual}>
                 <p style={{color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '15px', lineHeight: '1.6'}}>
-                  手動輸入需開啟開發者模式，請依照下方圖示指示，對著您的頭像點擊右鍵複製。
+                  {t('手動輸入需開啟開發者模式，請依照下方圖示指示，對著您的頭像點擊右鍵複製。')}
                 </p>
                 <div className="discord-mock-menu">
-                  <div className="discord-mock-item">編輯個人資料</div>
-                  <div className="discord-mock-item" style={{color: '#ed4245'}}>請勿打擾</div>
-                  <div className="discord-mock-item">切換帳號</div>
-                  <div className="discord-mock-item discord-mock-highlight">複製使用者 ID</div>
+                  <div className="discord-mock-item">{t('編輯個人資料')}</div>
+                  <div className="discord-mock-item" style={{color: '#ed4245'}}>{t('請勿打擾')}</div>
+                  <div className="discord-mock-item">{t('切換帳號')}</div>
+                  <div className="discord-mock-item discord-mock-highlight">{t('複製使用者 ID')}</div>
                 </div>
                 <input 
                   type="text" 
-                  placeholder="在此貼上您複製的 ID (例如: 123456789012345678)" 
+                  placeholder={t('在此貼上您複製的 ID (例如: 123456789012345678)')} 
                   value={discordId}
                   onChange={e => setDiscordId(e.target.value)}
                   className="terminal-input"
@@ -1558,8 +1558,8 @@ function Dashboard({ token, onLogout, region }) {
                   required
                 />
                 <div style={{display: 'flex', gap: '10px'}}>
-                  <button type="button" className="terminal-btn" style={{flex: 1, background: 'rgba(255,255,255,0.1)'}} onClick={() => setShowManualBind(false)}>返回</button>
-                  <button type="submit" className="terminal-btn" style={{flex: 1}}>確認手動綁定</button>
+                  <button type="button" className="terminal-btn" style={{flex: 1, background: 'rgba(255,255,255,0.1)'}} onClick={() => setShowManualBind(false)}>{t('返回')}</button>
+                  <button type="submit" className="terminal-btn" style={{flex: 1}}>{t('確認手動綁定')}</button>
                 </div>
               </form>
             )}
@@ -2133,53 +2133,53 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
       }}>
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', paddingBottom: '15px', borderBottom: '1px solid rgba(255,255,255,0.06)'}}>
           <h2 style={{margin: 0, display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-color)', fontSize: '1.4rem', fontWeight: '700'}}>
-            <User size={22} color="#3b82f6" /> 帳號設定與安全
+            <User size={22} color="#3b82f6" /> {t('帳號設定與安全')}
           </h2>
           <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
             {!window.electronAPI && (
               <a href="https://earthonline.onrender.com/downloads/EarthOnlineSetup.exe" style={{display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--success-color)', textDecoration: 'none', background: 'rgba(16, 185, 129, 0.1)', padding: '6px 12px', borderRadius: '8px', fontWeight: '600'}}>
-                📥 下載專屬電腦版
+                {t('📥 下載專屬電腦版')}
               </a>
             )}
             <X size={20} style={{cursor: 'pointer', color: 'var(--text-dim)', transition: 'color 0.2s'}} onClick={onClose} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-dim)'} />
           </div>
         </div>
         
-        {error ? <div style={{color: 'var(--danger-color)', padding: '15px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px'}}>{error}</div> : !info ? <div style={{color: 'var(--text-dim)', textAlign: 'center', padding: '30px 0'}}>讀取帳戶資訊中...</div> : (
+        {error ? <div style={{color: 'var(--danger-color)', padding: '15px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px'}}>{error}</div> : !info ? <div style={{color: 'var(--text-dim)', textAlign: 'center', padding: '30px 0'}}>{t('讀取帳戶資訊中...')}</div> : (
           <div style={{display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.95rem'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)'}}>
-              <span style={{color: 'var(--text-dim)'}}>代號 (Subject ID)</span>
+              <span style={{color: 'var(--text-dim)'}}>{t('代號 (Subject ID)')}</span>
               <strong style={{color: 'var(--text-color)'}}>{info.username}</strong>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)'}}>
-              <span style={{color: 'var(--text-dim)'}}>連線建立日 (Joined)</span>
+              <span style={{color: 'var(--text-dim)'}}>{t('連線建立日 (Joined)')}</span>
               <strong style={{color: 'var(--text-color)'}}>{new Date(info.createdAt).toLocaleDateString()}</strong>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)'}}>
-              <span style={{color: 'var(--text-dim)'}}>累積生存時間</span>
+              <span style={{color: 'var(--text-dim)'}}>{t('累積生存時間')}</span>
               <strong style={{color: 'var(--text-color)'}}>{(info.accumulatedTime / 3600).toFixed(1)} 小時</strong>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)'}}>
-              <span style={{color: 'var(--text-dim)'}}>榮譽點數 (PT)</span>
+              <span style={{color: 'var(--text-dim)'}}>{t('榮譽點數 (PT)')}</span>
               <strong style={{color: 'var(--info-color)'}}>{Number(info.accumulatedBonusPoints || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })}</strong>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0'}}>
-              <span style={{color: 'var(--text-dim)'}}>Discord 通訊協定</span>
+              <span style={{color: 'var(--text-dim)'}}>{t('Discord 通訊協定')}</span>
               <strong style={{color: info.discord && info.discord.username ? 'var(--info-color)' : 'var(--text-dim)'}}>
-                {info.discord && info.discord.username ? info.discord.username : '未綁定'}
+                {info.discord && info.discord.username ? info.discord.username : t('未綁定')}
               </strong>
             </div>
             <div style={{marginTop: '25px', padding: '20px', background: 'rgba(239, 68, 68, 0.05)', borderLeft: '4px solid #ef4444', borderRadius: '0 8px 8px 0'}}>
               <div style={{color: 'var(--danger-color)', fontWeight: '600', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px'}}>
-                <ShieldCheck size={18} /> 專屬恢復金鑰 (Recovery Key)
+                <ShieldCheck size={18} /> {t('專屬恢復金鑰 (Recovery Key)')}
               </div>
               <p style={{fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: '15px', lineHeight: '1.5'}}>
-                如果您遺失密碼，這是【唯一】能找回帳號的憑證，請妥善保管並勿洩漏給他人。
+                {t('如果您遺失密碼，這是【唯一】能找回帳號的憑證，請妥善保管並勿洩漏給他人。')}
               </p>
               <div style={{display: 'flex', gap: '10px'}}>
-                {info.recoveryKey === '未產生' ? (
+                {info.recoveryKey === t('未產生') ? (
                   <button disabled={isGenerating} style={{flex: 1, padding: '10px', background: isGenerating ? 'var(--text-dim)' : 'var(--danger-color)', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: isGenerating ? 'not-allowed' : 'pointer', transition: 'background 0.2s'}} onClick={handleGenerateKey} onMouseOver={e => { if(!isGenerating) e.currentTarget.style.background = 'var(--danger-color)'; }} onMouseOut={e => { if(!isGenerating) e.currentTarget.style.background = 'var(--danger-color)'; }}>
-                    {isGenerating ? '生成中...' : '生成專屬金鑰'}
+                    {isGenerating ? t('生成中...') : t('生成專屬金鑰')}
                   </button>
                 ) : (
                   <>
@@ -2190,7 +2190,7 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
                       style={{flex: 1, letterSpacing: showKey ? '1px' : '3px', background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '10px', borderRadius: '6px', outline: 'none'}}
                     />
                     <button style={{padding: '0 15px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger-color)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'}} onClick={() => setShowKey(!showKey)} onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}>
-                      {showKey ? '隱藏' : '顯示'}
+                      {showKey ? t('隱藏') : t('顯示')}
                     </button>
                   </>
                 )}
@@ -2200,33 +2200,33 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
             {/* Email Binding Section */}
             <div style={{marginTop: '15px', padding: '20px', background: 'rgba(16, 185, 129, 0.05)', borderLeft: '4px solid #10b981', borderRadius: '0 8px 8px 0'}}>
               <div style={{color: 'var(--success-color)', fontWeight: '600', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px'}}>
-                <ShieldCheck size={18} /> 安全信箱綁定
+                <ShieldCheck size={18} /> {t('安全信箱綁定')}
               </div>
               <p style={{fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: '15px', lineHeight: '1.5'}}>
-                綁定信箱可獲得額外的帳號保護，若遺失密碼可透過信箱快速找回。
+                {t('綁定信箱可獲得額外的帳號保護，若遺失密碼可透過信箱快速找回。')}
               </p>
               {info.isEmailVerified ? (
                 <div style={{display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--success-color)', background: 'rgba(16,185,129,0.1)', padding: '10px 15px', borderRadius: '6px'}}>
-                  <CheckCircle size={16} /> <span style={{fontWeight: '500'}}>已綁定：{info.email}</span>
+                  <CheckCircle size={16} /> <span style={{fontWeight: '500'}}>{t('已綁定：')}{info.email}</span>
                 </div>
               ) : info.email ? (
                 <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
-                  <span style={{color: 'var(--warning-color)', flex: 1, background: 'rgba(245,158,11,0.1)', padding: '10px', borderRadius: '6px'}}>⏳ 等待驗證：{info.email}</span>
+                  <span style={{color: 'var(--warning-color)', flex: 1, background: 'rgba(245,158,11,0.1)', padding: '10px', borderRadius: '6px'}}>{t('⏳ 等待驗證：')}{info.email}</span>
                   <button style={{padding: '10px 15px', background: 'var(--success-color)', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer'}} onClick={handleSendVerify} disabled={isSendingVerify}>
-                    {isSendingVerify ? '發送中...' : '重發驗證信'}
+                    {isSendingVerify ? t('發送中...') : t('重發驗證信')}
                   </button>
                 </div>
               ) : (
                 <div style={{display: 'flex', gap: '10px'}}>
                   <input 
                     type="email" 
-                    placeholder="輸入電子郵件..." 
+                    placeholder={t('輸入電子郵件...')} 
                     value={emailInput} 
                     onChange={e => setEmailInput(e.target.value)} 
                     style={{flex: 1, background: 'var(--bg-light)', border: '1px solid var(--border-color)', color: 'var(--text-color)', padding: '10px 15px', borderRadius: '6px', outline: 'none'}}
                   />
                   <button style={{padding: '0 20px', background: 'var(--success-color)', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s'}} onClick={handleSendVerify} disabled={isSendingVerify} onMouseOver={e => e.currentTarget.style.background = 'var(--success-color)'} onMouseOut={e => e.currentTarget.style.background = 'var(--success-color)'}>
-                    {isSendingVerify ? '發送中...' : '綁定'}
+                    {isSendingVerify ? t('發送中...') : t('綁定')}
                   </button>
                 </div>
               )}
@@ -2239,7 +2239,7 @@ function AccountInfoModal({ token, apiUrl, onClose, onLogout }) {
                 onMouseOver={e => e.currentTarget.style.color = 'var(--danger-color)'}
                 onMouseOut={e => e.currentTarget.style.color = 'var(--text-dim)'}
               >
-                刪除帳號 (無法恢復)
+                {t('刪除帳號 (無法恢復)')}
               </button>
             </div>
           </div>
@@ -2301,20 +2301,20 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myN
           <X size={24} />
         </button>
         <h2 style={{ color: 'var(--accent-color)', marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Users size={24} /> 社交網路 (Social Matrix)
+          <Users size={24} /> {t('社交網路 (Social Matrix)')}
         </h2>
 
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
-          <button onClick={() => setSocialTab('all')} style={{ flex: 1, padding: '8px', background: socialTab === 'all' ? 'var(--accent-color)' : 'transparent', color: socialTab === 'all' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>全服玩家</button>
-          <button onClick={() => setSocialTab('friends')} style={{ flex: 1, padding: '8px', background: socialTab === 'friends' ? 'var(--accent-color)' : 'transparent', color: socialTab === 'friends' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>好友列表</button>
+          <button onClick={() => setSocialTab('all')} style={{ flex: 1, padding: '8px', background: socialTab === 'all' ? 'var(--accent-color)' : 'transparent', color: socialTab === 'all' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>{t('全服玩家')}</button>
+          <button onClick={() => setSocialTab('friends')} style={{ flex: 1, padding: '8px', background: socialTab === 'friends' ? 'var(--accent-color)' : 'transparent', color: socialTab === 'friends' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>{t('好友列表')}</button>
           <button onClick={() => setSocialTab('requests')} style={{ flex: 1, padding: '8px', background: socialTab === 'requests' ? 'var(--accent-color)' : 'transparent', color: socialTab === 'requests' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-            交友邀請 {socialData.friendRequests?.length > 0 && <span style={{ background: 'var(--danger-color)', color: '#fff', padding: '2px 6px', borderRadius: '10px', fontSize: '0.8rem', marginLeft: '5px' }}>{socialData.friendRequests.length}</span>}
+            {t('交友邀請')} {socialData.friendRequests?.length > 0 && <span style={{ background: 'var(--danger-color)', color: '#fff', padding: '2px 6px', borderRadius: '10px', fontSize: '0.8rem', marginLeft: '5px' }}>{socialData.friendRequests.length}</span>}
           </button>
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {socialTab === 'all' && (
-            sortedPlayers.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>查無資料</div> :
+            sortedPlayers.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>{t('查無資料')}</div> :
             sortedPlayers.map(p => (
               <div key={p.username} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '5px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -2326,14 +2326,14 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myN
                     onClick={(e) => {
                       socket.emit('send_friend_request', { targetUsername: p.username });
                       e.target.disabled = true;
-                      e.target.innerText = '已發送';
+                      e.target.innerText = '✓';
                       e.target.style.background = 'rgba(255,255,255,0.1)';
                       e.target.style.color = '#888';
                       e.target.style.borderColor = '#888';
                     }} 
                     style={{ background: 'rgba(0,255,136,0.2)', border: '1px solid var(--accent-color)', color: 'var(--accent-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
                   >
-                    加好友
+                    {t('加好友')}
                   </button>
                 )}
               </div>
@@ -2341,7 +2341,7 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myN
           )}
 
           {socialTab === 'friends' && (
-            socialData.friends?.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>目前沒有好友</div> :
+            socialData.friends?.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>{t('目前沒有好友')}</div> :
             socialData.friends?.map(f => (
               <div key={f.username} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '5px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -2349,25 +2349,25 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myN
                   <span>{f.username}</span>
                 </div>
                 <div>
-                <button onClick={() => onPmUser && onPmUser(f.username)} style={{ background: 'rgba(0,255,136,0.2)', border: '1px solid var(--accent-color)', color: 'var(--accent-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', marginRight: '5px' }}>💬 私訊</button>
+                <button onClick={() => onPmUser && onPmUser(f.username)} style={{ background: 'rgba(0,255,136,0.2)', border: '1px solid var(--accent-color)', color: 'var(--accent-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', marginRight: '5px' }}>{t('私訊')}</button>
                 <button onClick={() => {
-                  if (window.confirm(`確定要刪除好友 ${f.username} 嗎？`)) {
+                  if (window.confirm(t('confirmDeleteFriend', { username: f.username }))) {
                     socket.emit('remove_friend', { targetUsername: f.username });
                   }
-                }} style={{ background: 'rgba(255,65,108,0.2)', border: '1px solid var(--danger-color)', color: 'var(--danger-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>刪除</button>
+                }} style={{ background: 'rgba(255,65,108,0.2)', border: '1px solid var(--danger-color)', color: 'var(--danger-color)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>{t('刪除')}</button>
                 </div>
               </div>
             ))
           )}
 
           {socialTab === 'requests' && (
-            socialData.friendRequests?.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>目前沒有邀請</div> :
+            socialData.friendRequests?.length === 0 ? <div style={{textAlign: 'center', color: '#888'}}>{t('目前沒有邀請')}</div> :
             socialData.friendRequests?.map(req => (
               <div key={req} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '5px' }}>
-                <span>{req} 想要加您為好友</span>
+                <span>{req}{t('想要加您為好友')}</span>
                 <div style={{ display: 'flex', gap: '5px' }}>
-                  <button onClick={() => socket.emit('accept_friend_request', { targetUsername: req })} style={{ background: 'var(--accent-color)', color: '#000', border: 'none', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>接受</button>
-                  <button onClick={() => socket.emit('reject_friend_request', { targetUsername: req })} style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>拒絕</button>
+                  <button onClick={() => socket.emit('accept_friend_request', { targetUsername: req })} style={{ background: 'var(--accent-color)', color: '#000', border: 'none', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>{t('接受')}</button>
+                  <button onClick={() => socket.emit('reject_friend_request', { targetUsername: req })} style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>{t('拒絕')}</button>
                 </div>
               </div>
             ))
@@ -2403,7 +2403,7 @@ function SocialModal({ onClose, socialTab, setSocialTab, socialData, socket, myN
               {toast.message}
             </div>
             <div style={{ color: '#555', fontSize: '0.8rem', letterSpacing: '1px' }}>
-              視窗將自動關閉...
+              {t('視窗將自動關閉...')}
             </div>
           </div>
         </div>

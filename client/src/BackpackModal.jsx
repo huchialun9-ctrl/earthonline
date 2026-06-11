@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from './LanguageContext';
 
 const ITEM_INFO = {
   liquid_nitrogen: {
@@ -118,6 +119,7 @@ const ITEM_INFO = {
 };
 
 export default function BackpackModal({ onClose, inventory, socket, addLog }) {
+  const { t } = useLanguage();
   const [usingId, setUsingId] = useState(null);
 
   const inventoryItems = inventory
@@ -149,12 +151,12 @@ export default function BackpackModal({ onClose, inventory, socket, addLog }) {
           <div style={css.headerLeft}>
             <span style={css.headerIcon}>🎒</span>
             <div>
-              <div style={css.headerTitle}>裝備背包</div>
+              <div style={css.headerTitle}>{t('裝備背包')}</div>
               <div style={css.headerSub}>INVENTORY_TERMINAL</div>
             </div>
           </div>
           <div style={css.itemCount}>
-            道具 {inventoryItems.length} 種
+            {t('道具')} {inventoryItems.length} {t('種')}
           </div>
           <button style={css.closeBtn} onClick={onClose}>✕</button>
         </div>
@@ -163,8 +165,8 @@ export default function BackpackModal({ onClose, inventory, socket, addLog }) {
           {inventoryItems.length === 0 ? (
             <div style={css.empty}>
               <span style={{ fontSize: '3rem', marginBottom: '12px' }}>📦</span>
-              <div style={css.emptyText}>背包空空如也</div>
-              <div style={css.emptySub}>前往黑市商城購買道具</div>
+              <div style={css.emptyText}>{t('背包空空如也')}</div>
+              <div style={css.emptySub}>{t('前往黑市商城購買道具')}</div>
             </div>
           ) : (
             <div style={css.list}>
@@ -173,21 +175,21 @@ export default function BackpackModal({ onClose, inventory, socket, addLog }) {
                   <div style={css.itemLeft}>
                     <img
                       src={`/assets/items/${info.icon}`}
-                      alt={info.name}
+                      alt={t(info.name)}
                       style={css.itemImg(info)}
                       onError={e => { e.target.style.opacity = '0.3'; }}
                     />
                     <div style={css.itemInfo}>
                       <div style={css.itemName}>
-                        {info.name}
+                        {t(info.name)}
                         <span style={{ ...css.countBadge, color: info.color, borderColor: info.border }}>
                           x{count}
                         </span>
                       </div>
-                      <div style={css.itemShort}>{info.shortDesc}</div>
+                      <div style={css.itemShort}>{t(info.shortDesc)}</div>
                       <div style={css.effects}>
                         {info.effects.map((ef, i) => (
-                          <span key={i} style={css.effectText}>{ef.text}</span>
+                          <span key={i} style={css.effectText}>{t(ef.text)}</span>
                         ))}
                       </div>
                     </div>
@@ -203,7 +205,7 @@ export default function BackpackModal({ onClose, inventory, socket, addLog }) {
                     disabled={!!usingId}
                     onClick={() => handleUse(id)}
                   >
-                    {usingId === id ? '使用中…' : '使用'}
+                    {usingId === id ? t('使用中…') : t('使用')}
                   </button>
                 </div>
               ))}
@@ -212,8 +214,8 @@ export default function BackpackModal({ onClose, inventory, socket, addLog }) {
         </div>
 
         <div style={css.footer}>
-          <span style={css.footerNote}>點擊「使用」立即套用道具效果</span>
-          <span style={css.footerClose} onClick={onClose}>[ESC] 關閉</span>
+          <span style={css.footerNote}>{t('點擊「使用」立即套用道具效果')}</span>
+          <span style={css.footerClose} onClick={onClose}>{t('[ESC] 關閉')}</span>
         </div>
       </div>
     </div>

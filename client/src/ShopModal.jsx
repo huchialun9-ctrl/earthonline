@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from './LanguageContext';
 
 // ─── Item Definitions ────────────────────────────────────────────────────────
 const SHOP_ITEMS = [
@@ -117,6 +118,7 @@ const TYPE_CFG = {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function ShopModal({ onClose, pts, onBuy, onAdRevive, adReviveRemaining }) {
+  const { t } = useLanguage();
   const [buying, setBuying] = useState(null);
   const [selected, setSelected] = useState(null);
   const [flashId, setFlashId] = useState(null);
@@ -144,12 +146,12 @@ export default function ShopModal({ onClose, pts, onBuy, onAdRevive, adReviveRem
           <div style={css.headerLeft}>
             <span style={css.headerIcon}>🏪</span>
             <div>
-              <div style={css.headerTitle}>黑市商城</div>
+              <div style={css.headerTitle}>{t('黑市商城')}</div>
               <div style={css.headerSub}>BLACK_MARKET_TERMINAL</div>
             </div>
           </div>
           <div style={css.walletBadge}>
-            <span style={css.walletLabel}>餘額</span>
+            <span style={css.walletLabel}>{t('餘額')}</span>
             <span style={css.walletValue}>{formattedPts} <span style={css.ptUnit}>PT</span></span>
           </div>
           <button style={css.closeBtn} onClick={onClose}>✕</button>
@@ -184,7 +186,7 @@ export default function ShopModal({ onClose, pts, onBuy, onAdRevive, adReviveRem
                   <div style={css.cardTop}>
                     <img
                       src={`/assets/items/${item.icon}`}
-                      alt={item.name}
+                      alt={t(item.name)}
                       style={css.itemImg(tc)}
                       onError={e => { e.target.style.opacity = '0.3'; }}
                     />
@@ -193,8 +195,8 @@ export default function ShopModal({ onClose, pts, onBuy, onAdRevive, adReviveRem
                     </span>
                   </div>
 
-                  <div style={css.cardName}>{item.name}</div>
-                  <div style={css.cardShort}>{item.shortDesc}</div>
+                  <div style={css.cardName}>{t(item.name)}</div>
+                  <div style={css.cardShort}>{t(item.shortDesc)}</div>
 
                   {/* Cost row */}
                   <div style={css.cardBottom}>
@@ -212,7 +214,7 @@ export default function ShopModal({ onClose, pts, onBuy, onAdRevive, adReviveRem
                       disabled={item.locked || !canAfford || !!buying}
                       onClick={e => { e.stopPropagation(); if (!item.locked) handleBuy(item); }}
                     >
-                      {item.locked ? '🔒 封鎖中' : (buying === item.id ? '處理中…' : '購買')}
+                      {item.locked ? t('🔒 封鎖中') : (buying === item.id ? t('處理中…') : t('購買'))}
                     </button>
                   </div>
                 </div>
@@ -229,42 +231,42 @@ export default function ShopModal({ onClose, pts, onBuy, onAdRevive, adReviveRem
                 <div style={css.detailHeader}>
                   <img
                     src={`/assets/items/${selectedItem.icon}`}
-                    alt={selectedItem.name}
+                    alt={t(selectedItem.name)}
                     style={css.detailImg(tc)}
                     onError={e => { e.target.style.opacity = '0.3'; }}
                   />
                   <div>
-                    <div style={css.detailName}>{selectedItem.name}</div>
+                    <div style={css.detailName}>{t(selectedItem.name)}</div>
                     <span style={{ ...css.typeBadge, color: tc.color, border: `1px solid ${tc.border}`, background: tc.bg }}>
                       {selectedItem.tagLabel}
                     </span>
                   </div>
                 </div>
 
-                <div style={css.detailSection}>效果說明</div>
+                <div style={css.detailSection}>{t('效果說明')}</div>
                 <div style={css.effectList}>
                   {selectedItem.effects.map((ef, i) => (
                     <div key={i} style={css.effectRow}>
                       <span style={css.effectIcon}>{ef.icon}</span>
-                      <span style={css.effectText}>{ef.text}</span>
+                      <span style={css.effectText}>{t(ef.text)}</span>
                     </div>
                   ))}
                 </div>
 
-                <div style={css.detailSection}>{selectedItem.locked ? '🚫 管理員公告' : '💡 使用建議'}</div>
+                <div style={css.detailSection}>{selectedItem.locked ? t('🚫 管理員公告') : t('💡 使用建議')}</div>
                 <div style={{ ...css.tipBox, borderLeft: selectedItem.locked ? '3px solid #ff416c' : '3px solid rgba(251,191,36,0.5)' }}>
-                  {selectedItem.tip}
+                  {t(selectedItem.tip)}
                 </div>
 
                 <div style={css.detailFooter}>
                   <div style={css.detailCost}>
-                    <span style={css.detailCostLabel}>費用</span>
+                    <span style={css.detailCostLabel}>{t('費用')}</span>
                     <span style={{ color: canAfford ? tc.color : '#ef4444', fontWeight: 'bold', fontSize: '1.3rem' }}>
                       {selectedItem.cost.toLocaleString()} PT
                     </span>
                     {!canAfford && (
                       <span style={css.shortage}>
-                        差 {(selectedItem.cost - currentPts).toLocaleString()} PT
+                         {t('差')} {(selectedItem.cost - currentPts).toLocaleString()} PT
                       </span>
                     )}
                   </div>
@@ -279,7 +281,7 @@ export default function ShopModal({ onClose, pts, onBuy, onAdRevive, adReviveRem
                     disabled={selectedItem.locked || !canAfford || !!buying}
                     onClick={() => { if (!selectedItem.locked) handleBuy(selectedItem); }}
                   >
-                    {selectedItem.locked ? '🔒 暫時封鎖' : (buying === selectedItem.id ? '⏳ 處理中…' : '購買')}
+                    {selectedItem.locked ? t('🔒 暫時封鎖') : (buying === selectedItem.id ? t('⏳ 處理中…') : t('購買'))}
                   </button>
                 </div>
               </div>
@@ -292,10 +294,10 @@ export default function ShopModal({ onClose, pts, onBuy, onAdRevive, adReviveRem
               <div style={css.adLeft}>
                 <span style={{ fontSize: '1.5rem' }}>📺</span>
                 <div>
-                  <div style={css.adTitle}>免費廣告復活</div>
+                  <div style={css.adTitle}>{t('免費廣告復活')}</div>
                   <div style={css.adDesc}>
-                    觀看 15 秒廣告，可免費復活已死機的伺服器
-                    <span style={css.adRemain}>（今日剩餘 {adReviveRemaining} 次）</span>
+                     {t('觀看 15 秒廣告，可免費復活已死機的伺服器')}
+                    <span style={css.adRemain}>{t('（今日剩餘')} {adReviveRemaining} {t('次）')}</span>
                   </div>
                 </div>
               </div>
@@ -303,7 +305,7 @@ export default function ShopModal({ onClose, pts, onBuy, onAdRevive, adReviveRem
                 style={css.adBtn}
                 onClick={() => { onAdRevive(); onClose(); }}
               >
-                ▶ 觀看廣告
+                {t('▶ 觀看廣告')}
               </button>
             </div>
           )}
@@ -311,8 +313,8 @@ export default function ShopModal({ onClose, pts, onBuy, onAdRevive, adReviveRem
 
         {/* ── Footer ── */}
         <div style={css.footer}>
-          <span style={css.footerNote}>掛機收益：約 3 pt/min（100% 血量）｜點擊道具卡片查看詳情</span>
-          <span style={css.footerClose} onClick={onClose}>[ESC] 關閉</span>
+          <span style={css.footerNote}>{t('掛機收益：約 3 pt/min（100% 血量）｜點擊道具卡片查看詳情')}</span>
+          <span style={css.footerClose} onClick={onClose}>{t('[ESC] 關閉')}</span>
         </div>
       </div>
 

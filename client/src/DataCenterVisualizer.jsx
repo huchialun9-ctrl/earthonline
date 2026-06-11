@@ -1,7 +1,7 @@
 import React, { useMemo, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { Server, Activity, Cpu, Network, Clock, ShieldCheck, Users, Trophy } from 'lucide-react';
-import EarthGlobe from './EarthGlobe';
+import BackgroundRouter from './components/Backgrounds';
 import { useLanguage } from './LanguageContext';
 import './datacenter.css';
 
@@ -144,9 +144,9 @@ export default function DataCenterVisualizer({ lifespan, bonusPoints, ping, onli
         </div>
         </Draggable>
 
-        {/* Right Side: NASA Earth Globe */}
+        {/* Right Side: Background (swipeable styles) */}
         <div className="dc-visual-area">
-          <EarthGlobe
+          <BackgroundRouter
             onlineCount={onlineCount}
             region={region}
             activeEvent={activeEvent}

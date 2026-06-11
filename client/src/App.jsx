@@ -4,6 +4,7 @@ import { useLanguage } from './LanguageContext';
 import { useTheme } from './ThemeContext';
 import Draggable from 'react-draggable';
 import DataCenterVisualizer from './DataCenterVisualizer';
+import { STYLES, STORAGE_KEY as BG_STORAGE_KEY } from './components/Backgrounds';
 import ShopModal from './ShopModal';
 import BackpackModal from './BackpackModal';
 import LeaderboardModal from './components/Modals/LeaderboardModal';
@@ -2091,6 +2092,31 @@ function Dashboard({ token, onLogout, region }) {
               >
                 {language === 'zh' ? 'English' : t('中文')}
               </button>
+            </div>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '8px' }}>
+                {t('背景風格 (Background)')}
+              </label>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {STYLES.map(s => {
+                  const currentBg = localStorage.getItem(BG_STORAGE_KEY) || 'earth';
+                  return (
+                    <button key={s.id} onClick={() => {
+                      localStorage.setItem(BG_STORAGE_KEY, s.id);
+                      window.dispatchEvent(new Event('storage'));
+                    }} style={{
+                      padding: '8px 12px', borderRadius: '6px', cursor: 'pointer',
+                      background: currentBg === s.id ? 'var(--accent-color)' : 'var(--bg-light)',
+                      color: currentBg === s.id ? '#000' : 'var(--text-color)',
+                      border: currentBg === s.id ? '2px solid var(--accent-color)' : '1px solid var(--border-color)',
+                      fontWeight: currentBg === s.id ? 'bold' : 'normal',
+                      fontSize: '0.85rem', transition: 'all 0.2s',
+                    }}>
+                      {s.icon} {t(s.name)}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{t('通知音效 (Sound Notifications)')}</span>

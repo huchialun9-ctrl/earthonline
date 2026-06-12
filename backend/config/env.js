@@ -15,8 +15,8 @@ if (!JWT_SECRET) {
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || '';
-const BACKEND_URL = process.env.BACKEND_URL || 'https://earthonline.onrender.com';
-const DISCORD_REDIRECT_URI = process.env.DISCORD_REDIRECT_URI || 'http://localhost:3001/api/auth/discord/callback';
+const BACKEND_URL = process.env.BACKEND_URL || 'https://earthonline-7odc.onrender.com';
+const DISCORD_REDIRECT_URI = process.env.DISCORD_REDIRECT_URI || 'https://earthonline-7odc.onrender.com/api/auth/discord/callback';
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || null;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://earthonline.qzz.io';
 

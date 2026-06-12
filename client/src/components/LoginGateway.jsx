@@ -102,7 +102,7 @@ function LoginGateway({ onLogin }) {
 
   const handleDiscordLogin = () => {
     const state = btoa(JSON.stringify({ action: 'login', returnTo: window.location.href.split('?')[0] }));
-    const BACKEND_DOMAIN = import.meta.env.VITE_API_URL ? new URL(import.meta.env.VITE_API_URL).origin : 'https://earthonline-bay7.onrender.com';
+    const BACKEND_DOMAIN = 'https://earthonline-7odc.onrender.com';
     window.location.href = `${BACKEND_DOMAIN}/api/auth/discord?state=${state}`;
   };
 

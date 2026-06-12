@@ -5,7 +5,7 @@ export default {
 
     // Proxy API and socket requests to Render
     if (path.startsWith('/api/') || path.startsWith('/socket.io/')) {
-      const targetUrl = 'https://earthonline.onrender.com' + path + url.search;
+      const targetUrl = 'https://earthonline-bay7.onrender.com' + path + url.search;
       const proxyResponse = await fetch(targetUrl, {
         method: request.method,
         headers: request.headers,

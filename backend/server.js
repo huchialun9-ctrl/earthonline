@@ -179,7 +179,7 @@ app.get('/api/auth/discord/callback', async (req, res) => {
         const frontendHost = FRONTEND_URL ? new URL(FRONTEND_URL).hostname : null;
         const isDev = process.env.NODE_ENV === 'development' || process.env.BACKEND_URL?.includes('localhost');
         const allowedHosts = [
-          ...(isDev ? ['localhost', '127.0.0.1'] : []),
+          'localhost', '127.0.0.1',
           'earthonline.onrender.com', 'earthonline1.pages.dev',
           'earthonline-2m7.pages.dev', 'earthonline.qzz.io',
         ];

@@ -94,15 +94,19 @@ export function GameProvider({ children, token, onLogout, region, SOCKET_URL, AP
     const sendPresence = () => {
       const hrs = Math.floor(survivalTime / 3600);
       const mins = Math.floor((survivalTime % 3600) / 60);
-      window.electronAPI.updatePresence({
-        details: `${myNode.nickname || 'Node'} | ${region.toUpperCase()} | ${pt.toLocaleString()} PT`,
-        state: `存活 ${hrs}h ${mins}m | 健康度 ${Math.round(health)}%`,
-        startTimestamp: Date.now(),
-        smallImageKey: 'user_icon',
-        smallImageText: myNode.nickname || 'Survivor',
-        buttons: [{ label: '加入遊戲', url: 'https://earthonline.qzz.io' }],
-      });
-      window.electronAPI.setProgress(health / 100);
+      if (window.electronAPI?.updatePresence) {
+        window.electronAPI.updatePresence({
+          details: `${myNode.nickname || 'Node'} | ${region.toUpperCase()} | ${pt.toLocaleString()} PT`,
+          state: `存活 ${hrs}h ${mins}m | 健康度 ${Math.round(health)}%`,
+          startTimestamp: Date.now(),
+          smallImageKey: 'user_icon',
+          smallImageText: myNode.nickname || 'Survivor',
+          buttons: [{ label: '加入遊戲', url: 'https://earthonline.qzz.io' }],
+        });
+      }
+      if (window.electronAPI?.setProgress) {
+        window.electronAPI.setProgress(health / 100);
+      }
     };
     sendPresence();
     const interval = setInterval(sendPresence, 20000);

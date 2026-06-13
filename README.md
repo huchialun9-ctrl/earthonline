@@ -6,7 +6,7 @@
 
 ```bash
 # 後端
-cd backend && npm install && node server.js
+cd backend && npm install && npm start
 
 # 前端開發
 cd client && npm install && npm run dev

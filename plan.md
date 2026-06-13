@@ -161,46 +161,46 @@ v2.5.x ── 真實數據 + P2P 聊天 + 反作弊 + 備援節點
 
 > 去 AI 化、純粹回歸復古美式點陣美學。
 
-### v2.2.0 — 登入與導航點陣化
+### v2.2.0 — 登入與導航點陣化 ✅ 已完成
 
-| Task | 說明 | 檔案 |
-|------|------|------|
-| v2.2.0a 登入頁點陣紋理 + 亮綠邊框 | 登入框改為深灰半透明面板 | `index.css`, `LoginGateway.jsx` |
-| v2.2.0b 底部條約點陣條 | 深邃草地綠點陣條背景 | `index.css`, `LoginGateway.jsx` |
-| v2.2.0c 導航欄點陣化 | 深石磚灰紋理，黃色爆裂紋 LOGO | `App.jsx`, `index.css` |
-| v2.2.0d 分類拉頁選單點陣化 | 深灰格子物品欄，懸停青框+音效 | `App.jsx`, `index.css` |
-| v2.2.0e PixelWordArt 元件 | 3D 立體像素藝術字 | `components/PixelWordArt.jsx` |
-| v2.2.0f 全站標題套用 | 陣營名稱、核心標題統一風格 | `App.jsx` |
+| Task | 說明 | 檔案 | 狀態 |
+|------|------|------|------|
+| v2.2.0a 登入頁點陣紋理 + 亮綠邊框 | 登入框改為深灰半透明面板 + 8px 像素網格疊加 | `index.css`, `LoginGateway.jsx` | ✅ |
+| v2.2.0b 底部條約點陣條 | 深邃草地綠點陣條背景，滾動動畫 | `index.css`, `LoginGateway.jsx` | ✅ |
+| v2.2.0c 導航欄點陣化 | 深石磚灰紋理，金色 PixelWordArt LOGO | `App.jsx`, `index.css` | ✅ |
+| v2.2.0d 分類拉頁選單點陣化 | 深灰格子物品欄，懸停青框+立體陰影 | `App.jsx`, `index.css` | ✅ |
+| v2.2.0e PixelWordArt 元件 | 3D 立體像素藝術字（text-shadow 多層次） | `components/PixelWordArt.jsx` | ✅ |
+| v2.2.0f 全站標題套用 | 登入頁「地球在線」+ 導航欄標題 | `App.jsx`, `LoginGateway.jsx` | ✅ |
 
-### v2.2.1 — 登入公約與引導流程
+### v2.2.1 — 登入公約與引導流程 ✅ 已完成
 
-| Task | 說明 | 檔案 |
-|------|------|------|
-| v2.2.1a 強制公約勾選 | Discord 登入前須勾約 | `LoginGateway.jsx`, `i18n.js` |
-| v2.2.1b 公約後端記錄 | covenantAccepted 時間戳 | `User.js`, `auth.js` |
-| v2.2.1c 引導式文檔 | 登入後單頁引導 | `OnboardingGuide.jsx` |
-| v2.2.1d 三大陣營介紹 | 點陣化照片 + 選擇按鈕 | `FactionSelect.jsx` |
+| Task | 說明 | 檔案 | 狀態 |
+|------|------|------|------|
+| v2.2.1a 強制公約勾選 | Discord 登入前須勾選服務條款 | `LoginGateway.jsx`, `i18n.js` | ✅ |
+| v2.2.1b 公約後端記錄 | `covenantAccepted` 時間戳 + API | `User.js`, `auth.js` | ✅ |
+| v2.2.1c 引導式文檔 | 5 步驟入門引導，讀完後顯示陣營選擇 | `OnboardingGuide.jsx` | ✅ |
+| v2.2.1d 三大陣營介紹 | 矢量化矩陣/紅石共合體/幽靈協議，點陣化卡片 | `FactionSelect.jsx` | ✅ |
 
 ---
 
 ## 七、v2.3.x — 滿版世界地圖 + 派遣掛機
 
-### v2.3.0 — 像素世界地圖
+### v2.3.0 — 像素世界地圖 ✅ 已完成
 
-| Task | 說明 | 檔案 |
-|------|------|------|
-| v2.3.0a 2D 像素世界地圖 | 滿畫面地圖，支援拖曳縮放 | `WorldMap.jsx`（新建） |
-| v2.3.0b 地圖點陣紋理疊加 | pixel-art 濾鏡 + 粗邊框 | `WorldMap.jsx` |
+| Task | 說明 | 檔案 | 狀態 |
+|------|------|------|------|
+| v2.3.0a 2D 像素世界地圖 | 滿畫面地圖，支援拖曳縮放 | `WorldMap.jsx`（新建） | ✅ |
+| v2.3.0b 地圖點陣紋理疊加 | pixel-art 濾鏡 + 粗邊框 | `WorldMap.jsx` | ✅ |
 
-### v2.3.1 — 跨國派遣 + 礦層
+### v2.3.1 — 跨國派遣 + 礦層 ✅ 已完成
 
-| Task | 說明 | 檔案 |
-|------|------|------|
-| v2.3.1a 國家情報窗 | 在線人數/GDP/進駐玩家 | `CountryInfoPanel.jsx` |
-| v2.3.1b 派遣建立礦場 | 點擊國家建立礦場，自動跳錢 | `App.jsx`, `gameHandler.js` |
-| v2.3.1c 五大礦層升級邏輯 | Lv.1 碎石→Lv.5 星核，指數產出 | `constants.js`, `mineService.js` |
-| v2.3.1d 礦層升級 UI | 升級按鈕 + 點陣爆炸動畫 | `MinePanel.jsx` |
-| v2.3.1e 十字鎬敲擊動畫 | 進駐國家上方實時動畫 | `PickaxeAnimation.jsx` |
+| Task | 說明 | 檔案 | 狀態 |
+|------|------|------|------|
+| v2.3.1a 國家情報窗 | 在線人數/GDP/進駐玩家 | `CountryInfoPanel.jsx` | ✅ |
+| v2.3.1b 派遣建立礦場 | 點擊國家建立礦場，自動跳錢 | `App.jsx`, `server.js`, `mineService.js` | ✅ |
+| v2.3.1c 五大礦層升級邏輯 | Lv.1 碎石→Lv.5 星核，指數產出 | `mineService.js`, `constants.js` | ✅ |
+| v2.3.1d 礦層升級 UI | 升級按鈕 + 點陣爆炸動畫 | `MinePanel.jsx` | ✅ |
+| v2.3.1e 十字鎬敲擊動畫 | 進駐國家上方實時動畫 | `PickaxeAnimation.jsx` | ✅ |
 
 ---
 
@@ -285,14 +285,14 @@ v2.5.x ── 真實數據 + P2P 聊天 + 反作弊 + 備援節點
 | v1.14.0e-f | 文件更新 (README/CHANGELOG/AGENTS) | 2 天 | — | Medium | ✅ |
 | v2.1.0a-c | Electron 發布管道 | 3 天 | v2.0.0 | High | ✅ |
 | v2.1.1a-b | Discord RPC 強化 + 視窗管理 | 2 天 | v2.1.0 | Low |
-| v2.2.0a-f | Pixel Art 登入+導航 | 5 天 | — | Medium |
-| v2.2.1a-d | 登入公約+引導流程 | 4 天 | v2.2.0 | Medium |
-| v2.3.0a-b | 像素世界地圖 | 4 天 | v2.2.1 | High |
-| v2.3.1a-e | 跨國派遣+礦層 | 6 天 | v2.3.0 | High |
-| v2.4.0a-d | 抽獎系統核心 | 4 天 | v2.3.1 | High |
-| v2.4.1a-b | 轉生+FOMO | 3 天 | v2.4.0 | Medium |
-| v2.5.0a-c | Redis+GDP+氣運 | 4 天 | v2.3.1 | Medium |
-| v2.5.1a-d | P2P 聊天 | 4 天 | v2.0.0 | Low |
+| v2.2.0a-f | Pixel Art 登入+導航 | 5 天 | — | Medium | ✅ |
+| v2.2.1a-d | 登入公約+引導流程 | 4 天 | v2.2.0 | Medium | ✅ |
+| v2.3.0a-b | 像素世界地圖 | 4 天 | v2.2.1 | High | ✅ |
+| v2.3.1a-e | 跨國派遣+礦層 | 6 天 | v2.3.0 | High | ✅ |
+| v2.4.0a-d | 抽獎系統核心 | 4 天 | v2.3.1 | High | ✅ |
+| v2.4.1a-b | 轉生+FOMO | 3 天 | v2.4.0 | Medium | ✅ |
+| v2.5.0a-c | Redis+GDP+氣運 | 4 天 | v2.3.1 | Medium | ✅ |
+| v2.5.1a-d | P2P 聊天 | 4 天 | v2.0.0 | Low | ✅ |
 | v2.5.2a-b | 反作弊 (後端資產驗證 + 安全抽獎) | 3 天 | v2.4.1 | Medium |
 | v2.5.3a-c | 備援節點輕量版 | 3 天 | v2.5.1 | Low |
 

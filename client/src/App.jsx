@@ -20,6 +20,15 @@ import LoginGateway from './components/LoginGateway';
 import FourPetalSpiral from './components/FourPetalSpiral';
 import DocumentationOverlay from './components/DocumentationOverlay';
 import GameBackground from './components/GameBackground';
+import PixelWordArt from './components/PixelWordArt';
+import OnboardingGuide from './components/OnboardingGuide';
+import FactionSelect from './components/FactionSelect';
+import WorldMap from './components/WorldMap';
+import CountryInfoPanel from './components/CountryInfoPanel';
+import MinePanel from './components/MinePanel';
+import LotteryModal from './components/LotteryModal';
+import DispatchAnimation from './components/DispatchAnimation';
+import MobileLayout from './components/Mobile/MobileLayout';
 import './index.css';
 
 const VITE_API = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';
@@ -72,8 +81,25 @@ function Dashboard({ token, onLogout, region }) {
   const [discordId, setDiscordId] = useState('');
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try { return localStorage.getItem('eo_onboarding_done') !== 'true'; } catch { return true; }
+  });
+  const [showFactionSelect, setShowFactionSelect] = useState(false);
+  const [showWorldMap, setShowWorldMap] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [showDispatchAnim, setShowDispatchAnim] = useState(false);
+  const [dispatchedCountry, setDispatchedCountry] = useState(null);
+  const [mine, setMine] = useState(null);
+  const [showLottery, setShowLottery] = useState(false);
+  const [lotteryInventory, setLotteryInventory] = useState([]);
+  const [lastLotteryResult, setLastLotteryResult] = useState(null);
   const [toast, setToast] = useState(null); // { message, type } for non-blocking notifications
   const toastTimerRef = useRef(null);
+  const showToast = (msg, type) => {
+    setToast({ message: msg, type });
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast(null), 5000);
+  };
   const { theme, setTheme, themeData: currentThemeData, themes } = useTheme();
   
   const pingStartRef = useRef(0);
@@ -228,6 +254,63 @@ function Dashboard({ token, onLogout, region }) {
       logEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [logs]);
+
+  // Mine socket handlers
+  useEffect(() => {
+    if (!socket) return;
+    const hMineState = (data) => {
+      if (data) {
+        setMine(data);
+        showToast(`🚀 已在 ${data.country} 建立礦場！Lv.${data.level} 開始自動挖礦`, 'success');
+        addLog(`[SYS] ✅ 已在 ${data.country} 建立礦場（Lv.${data.level}）`);
+      }
+    };
+    const hMineUpgrade = (data) => {
+      if (data.success) {
+        addLog(`[SYS] 礦場升級至 Lv.${data.level}（${data.name}）`);
+        showToast(`⛏️ 礦場升級成功！Lv.${data.level} ${data.name}`, 'success');
+      } else {
+        addLog(`[SYS] 礦場升級失敗：${data.error}`);
+        showToast(`❌ 礦場升級失敗：${data.error}`, 'error');
+      }
+    };
+    const hMineEstablished = (data) => {
+      addLog(`[SYS] ${data.username} 已在 ${data.country} 建立礦場！`);
+    };
+    socket.on('mine_state', hMineState);
+    socket.on('mine_upgrade_result', hMineUpgrade);
+    socket.on('mine_established', hMineEstablished);
+    return () => {
+      socket.off('mine_state', hMineState);
+      socket.off('mine_upgrade_result', hMineUpgrade);
+      socket.off('mine_established', hMineEstablished);
+    };
+  }, [socket]);
+
+  // Lottery socket handlers
+  useEffect(() => {
+    if (!socket) return;
+    const hResult = (data) => {
+      setLastLotteryResult(data);
+      if (data.success && data.artifact) {
+        addLog(`[SYS] 抽中【${data.artifact.rarity}】遺物 (×${data.artifact.multiplier})`);
+      }
+    };
+    const hInv = (data) => setLotteryInventory(data || []);
+    const hSmelt = (data) => {
+      if (data.success) addLog(`[SYS] 熔煉遺物回收 ${data.refund} PT`);
+      else addLog(`[SYS] 熔煉失敗：${data.error}`);
+      if (socket) socket.emit('lottery_inventory');
+    };
+    socket.on('lottery_result', hResult);
+    socket.on('lottery_inventory', hInv);
+    socket.on('lottery_smelt_result', hSmelt);
+    return () => {
+      socket.off('lottery_result', hResult);
+      socket.off('lottery_inventory', hInv);
+      socket.off('lottery_smelt_result', hSmelt);
+    };
+  }, [socket]);
 
   // Fetch online users when admin panel opens
   useEffect(() => {
@@ -384,12 +467,6 @@ function Dashboard({ token, onLogout, region }) {
     s.on('all_players_list', (list) => {
       setAllPlayersList(list || []);
     });
-
-    const showToast = (msg, type) => {
-      setToast({ message: msg, type });
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-      toastTimerRef.current = setTimeout(() => setToast(null), 5000);
-    };
 
     s.on('buy_result', (data) => {
       if (data.success) {
@@ -819,8 +896,8 @@ function Dashboard({ token, onLogout, region }) {
       {/* Header Panel */}
       <header className="system-header">
         <div className="system-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Globe2 color="#3b82f6" size={24} /> 
-          <span style={{fontWeight: '900', fontSize: '1.3rem', letterSpacing: '0'}}>{t('地球在線')}</span> 
+          <Globe2 color="#f59e0b" size={24} /> 
+          <PixelWordArt text={t('地球在線')} size={20} color="#f59e0b" depth={2} />
           <span style={{color: '#64748b', fontSize: '0.9rem', marginLeft: '10px'}}>{t('伺服器')}: {region.toUpperCase()} | {t('你的位置')}: {myNode?.country || t('連線中..')}</span>
         </div>
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
@@ -872,6 +949,9 @@ function Dashboard({ token, onLogout, region }) {
               <button className="dropdown-item" onClick={() => { setShowThemeMenu(!showThemeMenu); setDropdownOpen(false); }}>
                 <Palette size={16} /> {t('主題配色 (Themes)')}
               </button>
+              <button className="dropdown-item" style={{color: '#f59e0b'}} onClick={() => { setShowLottery(true); setDropdownOpen(false); if (socket?.connected) socket.emit('lottery_inventory'); }}>
+                🎲 {t('秘寶抽獎')}
+              </button>
               <button className="dropdown-item" onClick={() => { setShowSettings(true); setDropdownOpen(false); }}>
                 <Settings size={16} /> {t('設定 (Settings)')}
               </button>
@@ -890,6 +970,9 @@ function Dashboard({ token, onLogout, region }) {
             </div>
           </div>
 
+          <button onClick={() => setShowWorldMap(true)} style={{padding: '5px 12px', borderRadius: '8px', background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)', color: '#4ade80', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'monospace'}}>
+            🌍 {t('世界地圖')}
+          </button>
           <button onClick={toggleBgm} style={{padding: '5px 12px', borderRadius: '8px', background: bgmEnabled ? 'rgba(0,255,136,0.1)' : 'rgba(255,50,50,0.1)', border: bgmEnabled ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,50,50,0.3)', color: bgmEnabled ? 'var(--success-color)' : 'var(--danger-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'monospace'}} title={bgmEnabled ? t('關閉背景音樂') : t('開啟背景音樂')}>
 {bgmEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
 {bgmEnabled ? 'BGM ON' : 'BGM OFF'}
@@ -1671,6 +1754,128 @@ function Dashboard({ token, onLogout, region }) {
               </select>
             </div>
           </div>
+        </div>
+      )}
+
+      {showOnboarding && myNode && (
+        <OnboardingGuide onClose={() => {
+          setShowOnboarding(false);
+          localStorage.setItem('eo_onboarding_done', 'true');
+          setShowFactionSelect(true);
+        }} />
+      )}
+
+      {showFactionSelect && myNode && (
+        <div className="modal-overlay" onClick={() => setShowFactionSelect(false)} style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9998,
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: '#1a1a2e', border: '2px solid #00ff41', padding: '30px',
+            maxWidth: '420px', width: '90%', borderRadius: '0',
+            boxShadow: '0 0 40px rgba(0,255,65,0.15)',
+          }}>
+            <FactionSelect
+              existingFaction={null}
+              onSelect={(faction) => {
+                setShowFactionSelect(false);
+                if (window.electronAPI) {
+                  window.electronAPI.updatePresence({ details: `陣營: ${faction}`, state: '探索地球在線' });
+                }
+              }}
+              onSkip={() => setShowFactionSelect(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showWorldMap && myNode && (
+        <div className="modal-overlay" onClick={() => setShowWorldMap(false)} style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9998,
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            width: '90vw', height: '80vh', maxWidth: '800px',
+            background: '#0a1628', border: '2px solid #00ff41',
+            position: 'relative', overflow: 'hidden',
+          }}>
+            <div style={{ position: 'absolute', top: 8, right: 12, zIndex: 10, cursor: 'pointer', color: '#64748b', fontSize: '1.2rem' }}
+              onClick={() => setShowWorldMap(false)}>✕</div>
+            <WorldMap
+              players={nodes || []}
+              onCountryClick={(c) => setSelectedCountry(c)}
+              style={{ width: '100%', height: '100%' }}
+            />
+            {selectedCountry && (
+              <CountryInfoPanel
+                country={selectedCountry}
+                hasMine={!!mine}
+                dispatching={dispatchedCountry === selectedCountry.name}
+                onEstablish={(countryName) => {
+                  if (!mine && socket?.connected) {
+                    setDispatchedCountry(countryName);
+                    setShowDispatchAnim(true);
+                    socket.emit('establish_mine');
+                  }
+                  setShowWorldMap(false);
+                  setSelectedCountry(null);
+                  if (mine) setTimeout(() => {
+                    if (socket?.connected) {
+                      socket.emit('get_mine');
+                      showToast('⛏️ 前往礦場', 'success');
+                    }
+                  }, 300);
+                }}
+                onClose={() => setSelectedCountry(null)}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      {mine && socket?.connected && (
+        <MinePanel
+          mine={mine}
+          pt={myNode?.accumulatedBonusPoints || 0}
+          onUpgrade={() => socket.emit('upgrade_mine')}
+          onClose={() => setMine(null)}
+        />
+      )}
+
+      {showLottery && (
+        <LotteryModal
+          pt={myNode?.accumulatedBonusPoints || 0}
+          artifacts={lotteryInventory}
+          onDraw={() => { if (socket?.connected) socket.emit('lottery_draw'); }}
+          onSmelt={(id) => { if (socket?.connected) socket.emit('lottery_smelt', id); }}
+          onClose={() => setShowLottery(false)}
+        />
+      )}
+
+      {showDispatchAnim && dispatchedCountry && (
+        <DispatchAnimation
+          country={dispatchedCountry}
+          onComplete={() => setShowDispatchAnim(false)}
+        />
+      )}
+
+      {toast && (
+        <div style={{
+          position: 'fixed', top: 20, right: 20, zIndex: 99999,
+          background: toast.type === 'success' ? 'rgba(0,255,65,0.12)' : 'rgba(255,65,100,0.12)',
+          border: `1px solid ${toast.type === 'success' ? 'rgba(0,255,65,0.4)' : 'rgba(255,65,100,0.4)'}`,
+          borderRadius: '8px', padding: '12px 20px',
+          color: toast.type === 'success' ? '#00ff41' : '#ff416c',
+          fontFamily: 'monospace', fontSize: '0.85rem',
+          backdropFilter: 'blur(8px)',
+          boxShadow: toast.type === 'success'
+            ? '0 0 20px rgba(0,255,65,0.2)'
+            : '0 0 20px rgba(255,65,100,0.2)',
+          animation: 'popIn 0.3s ease-out',
+          maxWidth: '360px',
+          pointerEvents: 'none',
+        }}>
+          {toast.message}
         </div>
       )}
     </div>

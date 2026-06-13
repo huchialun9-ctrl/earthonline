@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Globe2 } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
+import PixelWordArt from './PixelWordArt';
 import '../index.css';
 
 function LoginGateway({ onLogin }) {
@@ -38,6 +39,9 @@ function LoginGateway({ onLogin }) {
   
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [covenantAccepted, setCovenantAccepted] = useState(() => {
+    try { return localStorage.getItem('eo_covenant') === 'true'; } catch { return false; }
+  });
 
   const getAudioCtx = () => {
     if (!window.__eoAudioCtx) window.__eoAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -167,6 +171,7 @@ function LoginGateway({ onLogin }) {
     <div className="login-gateway">
       <div className="login-bg">
         <div className="nasa-bg"></div>
+        <div className="login-pixel-grid"></div>
         <div className="nasa-stars">
           {Array.from({ length: 80 }, (_, i) => (
             <div key={i} className="nasa-star" style={{
@@ -184,11 +189,13 @@ function LoginGateway({ onLogin }) {
         <div className="nasa-glow"></div>
       </div>
 
+      <div className="login-pixel-bar"></div>
+
       <div className="login-box">
         <div style={{textAlign: 'center', marginBottom: '25px', zIndex: 10, position: 'relative'}}>
           <div className="login-earth"></div>
           <h2 style={{fontFamily: 'var(--font-sans)', color: 'var(--text-main)', fontSize: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}}>
-            <Globe2 className="icon-glow icon-spin" size={32} /> {t('地球在線')}
+            <Globe2 className="icon-glow icon-spin" size={32} /> <PixelWordArt text={t('地球在線')} size={28} color="#00ff41" depth={3} />
           </h2>
           <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '5px'}}>{t('全球節點觀測與管理中心')}</p>
         </div>
@@ -210,9 +217,25 @@ function LoginGateway({ onLogin }) {
             <span style={{color: '#00ffaa', fontSize: '0.85rem'}}>{t('帳號/密碼 或 Discord 均可登入')}</span>
           </div>
 
+          <label style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', cursor: 'pointer', padding: '8px 12px', background: 'rgba(0,255,65,0.05)', border: '1px solid rgba(0,255,65,0.15)', borderRadius: '4px', fontSize: '0.82rem', color: 'var(--text-secondary)'}}>
+            <input
+              type="checkbox"
+              checked={covenantAccepted}
+              onChange={e => {
+                setCovenantAccepted(e.target.checked);
+                localStorage.setItem('eo_covenant', e.target.checked);
+              }}
+              style={{accentColor: 'var(--accent-color)', width: '16px', height: '16px', cursor: 'pointer', flexShrink: 0}}
+            />
+            {t('我已閱讀並同意《地球在線服務條款》')}
+          </label>
+
           <button 
             type="button" 
-            onClick={handleDiscordLogin}
+            onClick={() => {
+              if (!covenantAccepted) { setError(t('請先同意服務條款')); return; }
+              handleDiscordLogin();
+            }}
             style={{
               width: '100%', padding: '14px', background: '#5865F2', color: '#fff',
               border: 'none', borderRadius: '6px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer',

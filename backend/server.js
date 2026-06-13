@@ -42,6 +42,7 @@ const { registerAchievementHandlers } = require('./socket/achievementHandler');
 const { registerSettlementHandlers } = require('./socket/settlementHandler');
 const { registerTalentHandlers } = require('./socket/talentHandler');
 const { checkTalentPointEarn } = require('./services/talentService');
+const { tickMines } = require('./services/mineService');
 
 const REINCARNATE_COUNTRIES = [
   { code: 'US', name: '美國', lat: 39.8, lon: -98.6, spread: 15 },
@@ -366,6 +367,9 @@ regions.forEach(regionName => {
       console.error('[SYS] Game logic error:', err);
     }
 
+    // Tick mines (cross-region)
+    try { tickMines(); } catch (err) { console.error('[SYS] Mine tick error:', err); }
+
     // Stats emission — always runs regardless of game logic errors
     try {
       let comp = '1.000';
@@ -539,6 +543,16 @@ regions.forEach(regionName => {
         }
       } else {
         console.log(`[SYS] Role sync: ${decoded.username} has no Discord linked`);
+      }
+
+      // Dev mode: promote usernames from DEV_ADMIN_USERNAMES
+      if (process.env.NODE_ENV === 'development') {
+        const devAdmins = (process.env.DEV_ADMIN_USERNAMES || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (devAdmins.includes(decoded.username)) {
+          await User.updateOne({ username: decoded.username }, { $set: { role: 'admin' } });
+          if (dbUser) dbUser.role = 'admin';
+          console.log(`[SYS] Dev admin promoted: ${decoded.username}`);
+        }
       }
       
       // Ban check — reject banned users
@@ -757,6 +771,57 @@ regions.forEach(regionName => {
   registerAchievementHandlers(socket, connectedUsers);
   registerSettlementHandlers(socket, connectedUsers);
   registerTalentHandlers(socket, connectedUsers);
+
+  // Mine handlers
+  const { initMine, getMine, upgradeMine, getCountryMines } = require('./services/mineService');
+  socket.on('establish_mine', () => {
+    if (!socket.user) return;
+    const username = socket.user.username;
+    const dbUser = connectedUsers.get(username);
+    if (!dbUser) return;
+    const mine = initMine(username, dbUser.country || 'UNKNOWN');
+    socket.emit('mine_state', mine);
+    nspIo.emit('mine_established', { username, country: dbUser.country });
+  });
+  socket.on('get_mine', () => {
+    if (!socket.user) return;
+    const mine = getMine(socket.user.username);
+    socket.emit('mine_state', mine || null);
+  });
+  socket.on('upgrade_mine', async () => {
+    if (!socket.user) return;
+    const result = await upgradeMine(socket.user.username);
+    socket.emit('mine_upgrade_result', result);
+    if (result.success) {
+      const updated = getMine(socket.user.username);
+      socket.emit('mine_state', updated);
+    }
+  });
+  socket.on('get_country_mines', (country) => {
+    const mines = getCountryMines(country);
+    socket.emit('country_mines', mines);
+  });
+
+  // Lottery handlers
+  const { draw: lotteryDraw, getArtifacts, smelt } = require('./services/lotteryService');
+  socket.on('lottery_draw', async () => {
+    if (!socket.user) return;
+    const result = await lotteryDraw(socket.user.username);
+    socket.emit('lottery_result', result);
+    if (result.success && result.artifact.rarity === '神話') {
+      nspIo.emit('system_message', { text: `🎉 ${socket.user.username} 抽中了神話遺物！`, time: Date.now() });
+    }
+  });
+  socket.on('lottery_inventory', () => {
+    if (!socket.user) return;
+    const list = getArtifacts(socket.user.username);
+    socket.emit('lottery_inventory', list);
+  });
+  socket.on('lottery_smelt', async (artifactId) => {
+    if (!socket.user) return;
+    const result = await smelt(socket.user.username, artifactId);
+    socket.emit('lottery_smelt_result', result);
+  });
   socket.on('get_war_stats', () => {
     socket.emit('war_stats', getWarStats());
   });
@@ -769,6 +834,31 @@ regions.forEach(regionName => {
     } catch (err) {
       socket.emit('region_switched', { success: false, message: '切換失敗' });
     }
+  });
+
+  // Reincarnation
+  const { reincarnate } = require('./services/lotteryService');
+  socket.on('lottery_reincarnate', async () => {
+    if (!socket.user) return;
+    const result = await reincarnate(socket.user.username);
+    socket.emit('lottery_reincarnate_result', result);
+    if (result.success) {
+      nspIo.emit('system_message', { text: `🌟 ${socket.user.username} 進行了遺物轉生！`, time: Date.now() });
+    }
+  });
+
+  // Luck leaderboard
+  const { getLuckLeaderboard } = require('./services/luckService');
+  socket.on('get_luck_leaderboard', () => {
+    const lb = getLuckLeaderboard();
+    socket.emit('luck_leaderboard', lb);
+  });
+
+  // P2P signaling
+  socket.on('signal', (data) => {
+    if (!socket.user) return;
+    const signalData = { ...data, from: socket.user.username };
+    socket.to(data.target).emit('signal', signalData);
   });
 // Handle Disconnect
   socket.on('disconnect', async () => {
@@ -816,6 +906,10 @@ async function syncAllOfflineRoles() {
         } else {
           const discordRole = await discordBot.getHighestRole(u.discord?.id);
           if (discordRole?.includes('地球管理團隊')) newRole = 'admin';
+        }
+        if (newRole !== 'admin' && process.env.NODE_ENV === 'development') {
+          const devAdmins = (process.env.DEV_ADMIN_USERNAMES || '').split(',').map(s => s.trim()).filter(Boolean);
+          if (devAdmins.includes(u.username)) newRole = 'admin';
         }
         if (newRole !== (u.role || 'user')) {
           await User.updateOne({ _id: u._id }, { $set: { role: newRole } });

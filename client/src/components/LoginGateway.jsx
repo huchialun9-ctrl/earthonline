@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Globe2 } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
+import PixelWordArt from './PixelWordArt';
 import '../index.css';
 
 function LoginGateway({ onLogin }) {
@@ -167,6 +168,7 @@ function LoginGateway({ onLogin }) {
     <div className="login-gateway">
       <div className="login-bg">
         <div className="nasa-bg"></div>
+        <div className="login-pixel-grid"></div>
         <div className="nasa-stars">
           {Array.from({ length: 80 }, (_, i) => (
             <div key={i} className="nasa-star" style={{
@@ -184,11 +186,13 @@ function LoginGateway({ onLogin }) {
         <div className="nasa-glow"></div>
       </div>
 
+      <div className="login-pixel-bar"></div>
+
       <div className="login-box">
         <div style={{textAlign: 'center', marginBottom: '25px', zIndex: 10, position: 'relative'}}>
           <div className="login-earth"></div>
           <h2 style={{fontFamily: 'var(--font-sans)', color: 'var(--text-main)', fontSize: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}}>
-            <Globe2 className="icon-glow icon-spin" size={32} /> {t('地球在線')}
+            <Globe2 className="icon-glow icon-spin" size={32} /> <PixelWordArt text={t('地球在線')} size={28} color="#00ff41" depth={3} />
           </h2>
           <p style={{color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '5px'}}>{t('全球節點觀測與管理中心')}</p>
         </div>

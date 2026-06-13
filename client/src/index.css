@@ -72,13 +72,23 @@ body {
 .system-header {
   min-height: 60px;
   background-color: var(--panel-bg);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 3px solid var(--accent-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
   font-family: var(--font-sans);
   font-size: 0.95rem;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,0.02) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.02) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.02) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.02) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 100;
 }
 
 .header-left, .header-right {
@@ -285,6 +295,18 @@ body {
   background-image: radial-gradient(circle at center, var(--surface-color) 0%, var(--bg-color) 100%);
 }
 
+/* Pixel grid overlay */
+.login-pixel-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+  background-size: 8px 8px;
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* Login Background - NASA Space */
 .login-bg {
   position: absolute;
@@ -396,14 +418,46 @@ body {
   to { transform: rotate(360deg); }
 }
 
+/* Bottom pixel bar */
+.login-pixel-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 16px;
+  z-index: 20;
+  background: repeating-linear-gradient(
+    90deg,
+    #1a4a1a 0px, #1a4a1a 8px,
+    #0d3310 8px, #0d3310 16px,
+    #1a5a1a 16px, #1a5a1a 24px,
+    #0f3a0f 24px, #0f3a0f 32px
+  );
+  background-size: 32px 100%;
+  box-shadow: 0 -2px 8px rgba(0, 255, 65, 0.15);
+  image-rendering: pixelated;
+}
+
+@keyframes pixelBarScroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 32px 0; }
+}
+.login-pixel-bar {
+  animation: pixelBarScroll 2s linear infinite;
+}
+
 .login-box {
-  background: var(--surface-color);
-  border: 1px solid var(--accent-color);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  border: 3px solid var(--accent-color);
   padding: 40px;
   width: 400px;
-  box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+  box-shadow:
+    0 0 30px rgba(0, 255, 204, 0.15),
+    inset 0 0 30px rgba(0, 255, 204, 0.03);
   position: relative;
   z-index: 10;
+  image-rendering: pixelated;
 }
 
 .form-group {
@@ -765,14 +819,21 @@ body {
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: var(--surface-color);
+  background-color: #1a1a2e;
   min-width: 180px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border: 2px solid var(--accent-color);
+  border-radius: 0;
   z-index: 2000;
-  padding: 8px 0;
+  padding: 4px 0;
   margin-top: 10px;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,0.015) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.015) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.015) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.015) 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
 }
 
 /* Support hover but also add a gap-filling invisible block so mouse doesn't fall off */
@@ -812,11 +873,14 @@ body {
   width: 100%;
   text-align: left;
   font-family: var(--font-sans);
+  border-left: 3px solid transparent;
 }
 
 .dropdown-item:hover {
   background-color: var(--bg-light);
   color: var(--text-color);
+  border-left: 3px solid #22d3ee;
+  box-shadow: inset 0 0 12px rgba(34, 211, 238, 0.06);
 }
 
 /* =========================================

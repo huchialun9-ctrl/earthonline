@@ -161,16 +161,16 @@ v2.5.x ── 真實數據 + P2P 聊天 + 反作弊 + 備援節點
 
 > 去 AI 化、純粹回歸復古美式點陣美學。
 
-### v2.2.0 — 登入與導航點陣化
+### v2.2.0 — 登入與導航點陣化 ✅ 已完成
 
-| Task | 說明 | 檔案 |
-|------|------|------|
-| v2.2.0a 登入頁點陣紋理 + 亮綠邊框 | 登入框改為深灰半透明面板 | `index.css`, `LoginGateway.jsx` |
-| v2.2.0b 底部條約點陣條 | 深邃草地綠點陣條背景 | `index.css`, `LoginGateway.jsx` |
-| v2.2.0c 導航欄點陣化 | 深石磚灰紋理，黃色爆裂紋 LOGO | `App.jsx`, `index.css` |
-| v2.2.0d 分類拉頁選單點陣化 | 深灰格子物品欄，懸停青框+音效 | `App.jsx`, `index.css` |
-| v2.2.0e PixelWordArt 元件 | 3D 立體像素藝術字 | `components/PixelWordArt.jsx` |
-| v2.2.0f 全站標題套用 | 陣營名稱、核心標題統一風格 | `App.jsx` |
+| Task | 說明 | 檔案 | 狀態 |
+|------|------|------|------|
+| v2.2.0a 登入頁點陣紋理 + 亮綠邊框 | 登入框改為深灰半透明面板 + 8px 像素網格疊加 | `index.css`, `LoginGateway.jsx` | ✅ |
+| v2.2.0b 底部條約點陣條 | 深邃草地綠點陣條背景，滾動動畫 | `index.css`, `LoginGateway.jsx` | ✅ |
+| v2.2.0c 導航欄點陣化 | 深石磚灰紋理，金色 PixelWordArt LOGO | `App.jsx`, `index.css` | ✅ |
+| v2.2.0d 分類拉頁選單點陣化 | 深灰格子物品欄，懸停青框+立體陰影 | `App.jsx`, `index.css` | ✅ |
+| v2.2.0e PixelWordArt 元件 | 3D 立體像素藝術字（text-shadow 多層次） | `components/PixelWordArt.jsx` | ✅ |
+| v2.2.0f 全站標題套用 | 登入頁「地球在線」+ 導航欄標題 | `App.jsx`, `LoginGateway.jsx` | ✅ |
 
 ### v2.2.1 — 登入公約與引導流程
 

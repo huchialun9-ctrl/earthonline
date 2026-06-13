@@ -20,6 +20,7 @@ import LoginGateway from './components/LoginGateway';
 import FourPetalSpiral from './components/FourPetalSpiral';
 import DocumentationOverlay from './components/DocumentationOverlay';
 import GameBackground from './components/GameBackground';
+import PixelWordArt from './components/PixelWordArt';
 import './index.css';
 
 const VITE_API = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';
@@ -819,8 +820,8 @@ function Dashboard({ token, onLogout, region }) {
       {/* Header Panel */}
       <header className="system-header">
         <div className="system-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Globe2 color="#3b82f6" size={24} /> 
-          <span style={{fontWeight: '900', fontSize: '1.3rem', letterSpacing: '0'}}>{t('地球在線')}</span> 
+          <Globe2 color="#f59e0b" size={24} /> 
+          <PixelWordArt text={t('地球在線')} size={20} color="#f59e0b" depth={2} />
           <span style={{color: '#64748b', fontSize: '0.9rem', marginLeft: '10px'}}>{t('伺服器')}: {region.toUpperCase()} | {t('你的位置')}: {myNode?.country || t('連線中..')}</span>
         </div>
         <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>

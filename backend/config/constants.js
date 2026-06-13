@@ -1,15 +1,15 @@
 const FILTERED_WORDS = ['fuck', 'shit', 'asshole', 'bitch', 'damn', 'cao', '幹', '靠北', '操你媽', 'fucking', 'stupid', 'idiot', 'nigger', 'bastard', 'piss off', 'suck my', 'motherfucker'];
 
 const SHOP_ITEMS = {
-  liquid_nitrogen:  { cost: 150,  effect: 'buff',     type: 'cooling',     duration: 2400000 },
-  quantum_cooler:   { cost: 400,  effect: 'health',   value: 60 },
-  overclock_chip:   { cost: 800,  effect: 'buff',     type: 'overclock',  duration: 1800000 },
-  firewall:         { cost: 600,  effect: 'buff',     type: 'firewall',   duration: 2700000 },
-  generator:        { cost: 600,  effect: 'revive',   value: 35 },
-  neon_strip:       { cost: 800,  effect: 'cosmetic' },
-  flash_drive:      { cost: 500,  effect: 'random' },
-  speed_drive:      { cost: 1200, effect: 'buff',     type: 'speed',      duration: 3600000 },
-  backup_node:      { cost: 1500, effect: 'passive',  type: 'backup',     value: 30 }
+  liquid_nitrogen:  { cost: 5000,  effect: 'buff',     type: 'cooling',     duration: 2400000 },
+  quantum_cooler:   { cost: 15000, effect: 'health',   value: 60 },
+  overclock_chip:   { cost: 30000, effect: 'buff',     type: 'overclock',  duration: 1800000 },
+  firewall:         { cost: 20000, effect: 'buff',     type: 'firewall',   duration: 2700000 },
+  generator:        { cost: 10000, effect: 'revive',   value: 35 },
+  neon_strip:       { cost: 8000,  effect: 'cosmetic' },
+  flash_drive:      { cost: 5000,  effect: 'random' },
+  speed_drive:      { cost: 25000, effect: 'buff',     type: 'speed',      duration: 3600000 },
+  backup_node:      { cost: 50000, effect: 'passive',  type: 'backup',     value: 30 }
 };
 
 const ITEM_NAMES = {

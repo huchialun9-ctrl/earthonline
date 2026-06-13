@@ -833,4 +833,19 @@ setTimeout(syncAllOfflineRoles, 15000);
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`[SYS] Earth Online Backend Core initialized on port ${PORT}`);
+  // Broadcast price adjustment announcement after 5 seconds (when sockets are ready)
+  setTimeout(() => {
+    const msg = '📢 【黑市價格調整公告】由於全球經濟通膨，所有道具價格已調升。液態氮 5000PT、超頻晶片 30000PT、備份節點 50000PT 等，請各節點合理安排預算。';
+    console.log(`[SYS] ${msg}`);
+    for (const r of regions) {
+      const nsp = io.of(`/${r}`);
+      const state = regionStates[r];
+      if (state && state.connectedUsers) {
+        nsp.emit('chat_system_message', { message: msg });
+      }
+    }
+    if (DISCORD_WEBHOOK_URL) {
+      sendDiscordWebhook(`🌐 **${msg}**`).catch(() => {});
+    }
+  }, 5000);
 });

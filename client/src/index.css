@@ -903,27 +903,8 @@ body {
     overflow-x: hidden;
   }
 
-  /* Header compact on mobile */
-  .system-header {
-    flex-direction: column;
-    gap: 4px;
-    padding: 6px 10px;
-    height: auto;
-    min-height: auto;
-  }
-  .system-title {
-    width: 100%;
-    justify-content: center;
-    font-size: 0.75rem;
-  }
-  .system-title span { display: none; }
-  .header-right {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .header-right > a { display: none !important; }
+  /* Hide header on mobile - MobileLayout has its own nav */
+  .system-header { display: none !important; }
   .system-stats {
     font-size: 0.7rem;
     padding: 3px 6px;

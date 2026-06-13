@@ -28,6 +28,7 @@ import CountryInfoPanel from './components/CountryInfoPanel';
 import MinePanel from './components/MinePanel';
 import LotteryModal from './components/LotteryModal';
 import DispatchAnimation from './components/DispatchAnimation';
+import MobileLayout from './components/Mobile/MobileLayout';
 import './index.css';
 
 const VITE_API = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';

@@ -19,7 +19,7 @@
 | 手機 UI Redesign (v2.0.1) | ✅ | 底部 4 Tab 導航 (Dashboard/Globe/Chat/Profile) |
 | 管理員判定修復 | ✅ | 角色同步搬到 init_data 之前 |
 
-### v1.14.0 已完成
+### v1.14.0 ✅ 全部完成
 
 | Task | 狀態 |
 |------|------|
@@ -27,8 +27,8 @@
 | 修復 /api/global/stats 硬編碼 region=asia (改為所有 region 聚合) | ✅ |
 | 修復 heartbeatTimestamps 重啟消失 (fallback 到 DB lastHeartbeat) | ✅ |
 | App.jsx 元件拆分 (-556 行，抽出 5 個 Modal 到獨立檔案) | ✅ |
-| 更新 README + CHANGELOG | ⬜ |
-| 更新 AGENTS.md | ⬜ |
+| 更新 README + CHANGELOG | ✅ |
+| 更新 AGENTS.md | ✅ |
 
 ---
 
@@ -351,7 +351,7 @@ desktop/
 |------|------|---------|--------|--------|
 | v2.0.1a-e | 行動版 UI Redesign (底部 Tab) | 5 天 | v2.0.0 | High | ✅ |
 | v1.14.0a-d | 問題修正 + App.jsx 拆分 -556 行 | 4 天 | — | High | ✅ |
-| v1.14.0e-f | 文件更新 (README/CHANGELOG/AGENTS) | 2 天 | — | Medium |
+| v1.14.0e-f | 文件更新 (README/CHANGELOG/AGENTS) | 2 天 | — | Medium | ✅ |
 | v2.1.0a-c | Electron 發布管道 | 3 天 | v2.0.0 | High |
 | v2.1.1a-c | Steamworks 整合 | 5 天 | v2.1.0 | Medium |
 | v2.1.2a-b | Discord RPC 強化 + 視窗管理 | 2 天 | v2.1.0 | Low |

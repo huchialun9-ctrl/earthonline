@@ -1621,3 +1621,132 @@ body {
   0% { transform: translateY(0) scale(1); opacity: 0.8; }
   100% { transform: translateY(-60vh) scale(0.2); opacity: 0; }
 }
+
+/* Dispatch Animation */
+.dispatch-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5,5,10,0.92);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.dispatch-box {
+  text-align: center;
+  padding: 40px;
+  border: 2px solid #00ff41;
+  background: rgba(10,14,23,0.95);
+  box-shadow: 0 0 60px rgba(0,255,65,0.15), inset 0 0 40px rgba(0,255,65,0.03);
+  min-width: 320px;
+}
+
+.dispatch-title {
+  font-size: 1.1rem;
+  color: #00ff41;
+  font-family: var(--font-mono);
+  margin-bottom: 30px;
+  animation: dispatchPulse 0.6s ease-in-out;
+  letter-spacing: 2px;
+}
+
+.dispatch-animation-area {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dispatch-pickaxe {
+  font-size: 48px;
+  z-index: 2;
+  filter: drop-shadow(0 0 10px rgba(0,255,65,0.5));
+  transition: none;
+}
+
+.dispatch-pickaxe.swinging {
+  animation: dispatchSwing 0.35s ease-in-out infinite alternate;
+}
+
+.dispatch-target {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: #f59e0b;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  animation: dispatchPulse 1s ease-in-out infinite;
+}
+
+.dispatch-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: #00ff41;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: dispatchBurst 0.6s ease-out infinite;
+  animation-delay: var(--delay, 0s);
+  transform-origin: center;
+}
+
+.dispatch-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.dispatch-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease-in-out, background 0.3s;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.dispatch-progress-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+}
+
+@keyframes dispatchSwing {
+  0% { transform: rotate(-30deg) translateX(-5px); }
+  100% { transform: rotate(30deg) translateX(5px); }
+}
+
+@keyframes dispatchBurstUp { 0% { opacity: 1; } 100% { transform: translateY(-50px); opacity: 0; } }
+@keyframes dispatchBurstDown { 0% { opacity: 1; } 100% { transform: translateY(50px); opacity: 0; } }
+@keyframes dispatchBurstLeft { 0% { opacity: 1; } 100% { transform: translateX(-50px); opacity: 0; } }
+@keyframes dispatchBurstRight { 0% { opacity: 1; } 100% { transform: translateX(50px); opacity: 0; } }
+@keyframes dispatchBurstUpLeft { 0% { opacity: 1; } 100% { transform: translate(-35px,-35px); opacity: 0; } }
+@keyframes dispatchBurstUpRight { 0% { opacity: 1; } 100% { transform: translate(35px,-35px); opacity: 0; } }
+@keyframes dispatchBurstDownLeft { 0% { opacity: 1; } 100% { transform: translate(-35px,35px); opacity: 0; } }
+@keyframes dispatchBurstDownRight { 0% { opacity: 1; } 100% { transform: translate(35px,35px); opacity: 0; } }
+
+.dispatch-particle.dir-up { animation: dispatchBurstUp 0.5s ease-out infinite; }
+.dispatch-particle.dir-down { animation: dispatchBurstDown 0.5s ease-out infinite; }
+.dispatch-particle.dir-left { animation: dispatchBurstLeft 0.5s ease-out infinite; }
+.dispatch-particle.dir-right { animation: dispatchBurstRight 0.5s ease-out infinite; }
+.dispatch-particle.dir-up-left { animation: dispatchBurstUpLeft 0.5s ease-out infinite; }
+.dispatch-particle.dir-up-right { animation: dispatchBurstUpRight 0.5s ease-out infinite; }
+.dispatch-particle.dir-down-left { animation: dispatchBurstDownLeft 0.5s ease-out infinite; }
+.dispatch-particle.dir-down-right { animation: dispatchBurstDownRight 0.5s ease-out infinite; }
+
+@keyframes dispatchPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@media (max-width: 480px) {
+  .dispatch-box { padding: 24px; min-width: auto; width: 90%; }
+  .dispatch-pickaxe { font-size: 36px; }
+  .dispatch-title { font-size: 0.9rem; }
+}

@@ -27,6 +27,7 @@ import WorldMap from './components/WorldMap';
 import CountryInfoPanel from './components/CountryInfoPanel';
 import MinePanel from './components/MinePanel';
 import LotteryModal from './components/LotteryModal';
+import DispatchAnimation from './components/DispatchAnimation';
 import './index.css';
 
 const VITE_API = import.meta.env.VITE_API_URL || 'https://earthonline.onrender.com';
@@ -85,6 +86,7 @@ function Dashboard({ token, onLogout, region }) {
   const [showFactionSelect, setShowFactionSelect] = useState(false);
   const [showWorldMap, setShowWorldMap] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [showDispatchAnim, setShowDispatchAnim] = useState(false);
   const [dispatchedCountry, setDispatchedCountry] = useState(null);
   const [mine, setMine] = useState(null);
   const [showLottery, setShowLottery] = useState(false);
@@ -1811,8 +1813,8 @@ function Dashboard({ token, onLogout, region }) {
                 onEstablish={(countryName) => {
                   if (!mine && socket?.connected) {
                     setDispatchedCountry(countryName);
+                    setShowDispatchAnim(true);
                     socket.emit('establish_mine');
-                    setTimeout(() => setDispatchedCountry(null), 3000);
                   }
                   setShowWorldMap(false);
                   setSelectedCountry(null);
@@ -1846,6 +1848,13 @@ function Dashboard({ token, onLogout, region }) {
           onDraw={() => { if (socket?.connected) socket.emit('lottery_draw'); }}
           onSmelt={(id) => { if (socket?.connected) socket.emit('lottery_smelt', id); }}
           onClose={() => setShowLottery(false)}
+        />
+      )}
+
+      {showDispatchAnim && dispatchedCountry && (
+        <DispatchAnimation
+          country={dispatchedCountry}
+          onComplete={() => setShowDispatchAnim(false)}
         />
       )}
 

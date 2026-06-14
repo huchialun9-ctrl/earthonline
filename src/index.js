@@ -35,13 +35,10 @@ export default {
       });
     }
 
-    // Manifest.json: Cloudflare blocks .json static files, serve with explicit content type
+    // Manifest.json: Cloudflare ASSETS blocks .json, so serve inline
     if (path === '/manifest.json') {
-      const manifestRes = await env.ASSETS.fetch(new Request(new URL('/manifest.json', request.url)));
-      return new Response(manifestRes.body, {
-        status: manifestRes.status,
-        headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' },
-      });
+      const manifest = { name: "Earth Online", short_name: "EarthOnline", description: "全球節點觀測與管理中心", start_url: "/", display: "standalone", background_color: "#0a0e17", theme_color: "#00ff41", lang: "en", scope: "/", icons: [{ src: "/favicon.ico", sizes: "64x64", type: "image/x-icon" }] };
+      return new Response(JSON.stringify(manifest), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
     }
 
     // Serve static assets — SPA fallback: serve index.html for unknown paths

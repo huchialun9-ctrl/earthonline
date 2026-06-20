@@ -27,7 +27,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,ttf,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/earthonline\.onrender\.com\/.*/i,
+            urlPattern: /^https:\/\/earthonline-7odc\.onrender\.com\/.*/i,
             handler: 'NetworkFirst',
             options: { cacheName: 'api-cache', expiration: { maxEntries: 50, maxAgeSeconds: 300 } }
           }

@@ -42,7 +42,7 @@ export default {
 
       return;
     } catch (err) {
-      if (path?.startsWith('/api/')) {
+      if (path.startsWith('/api/') || path.startsWith('/socket.io/')) {
         return new Response(JSON.stringify({ error: 'Backend unavailable' }), {
           status: 502, headers: { 'content-type': 'application/json' },
         });

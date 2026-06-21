@@ -1,45 +1,52 @@
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
-    const path = url.pathname;
+    try {
+      const url = new URL(request.url);
+      const path = url.pathname;
 
-    // Proxy API and socket requests to Render
-    if (path.startsWith('/api/') || path.startsWith('/socket.io/')) {
-      const targetUrl = 'https://earthonline-7odc.onrender.com' + path + url.search;
-      const proxyResponse = await fetch(targetUrl, {
-        method: request.method,
-        headers: request.headers,
-        body: request.body,
-      });
-      // Add CORS headers to proxied responses
-      const corsHeaders = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      };
-      const response = new Response(proxyResponse.body, proxyResponse);
-      for (const [key, value] of Object.entries(corsHeaders)) {
-        response.headers.set(key, value);
-      }
-      return response;
-    }
+      const BACKEND_URL = env.TUNNEL_URL || 'https://earthonline-7odc.onrender.com';
 
-    // Handle preflight OPTIONS request
-    if (request.method === 'OPTIONS') {
-      return new Response(null, {
-        headers: {
+      if (path.startsWith('/api/') || path.startsWith('/socket.io/')) {
+        const targetUrl = BACKEND_URL + path + url.search;
+        const proxyResponse = await fetch(targetUrl, {
+          method: request.method,
+          headers: request.headers,
+          body: request.body,
+        });
+        const corsHeaders = {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        },
-      });
-    }
+        };
+        const response = new Response(proxyResponse.body, proxyResponse);
+        for (const [key, value] of Object.entries(corsHeaders)) {
+          response.headers.set(key, value);
+        }
+        return response;
+      }
 
-    // Serve static assets — SPA fallback: serve index.html for unknown paths
-    const response = await env.ASSETS.fetch(request);
-    if (response.status === 404) {
-      return env.ASSETS.fetch(new Request(new URL('/index.html', request.url)));
+      if (request.method === 'OPTIONS') {
+        return new Response(null, {
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          },
+        });
+      }
+
+      if (path === '/manifest.json' || path === '/manifest.pwa') {
+        const manifest = { name: "Earth Online", short_name: "EarthOnline", description: "全球節點觀測與管理中心", start_url: "/", display: "standalone", background_color: "#0a0e17", theme_color: "#00ff41", lang: "en", scope: "/", icons: [{ src: "/favicon.ico", sizes: "64x64", type: "image/x-icon" }] };
+        return new Response(JSON.stringify(manifest), { headers: { 'content-type': 'application/json', 'access-control-allow-origin': '*' } });
+      }
+
+      return;
+    } catch (err) {
+      if (path?.startsWith('/api/')) {
+        return new Response(JSON.stringify({ error: 'Backend unavailable' }), {
+          status: 502, headers: { 'content-type': 'application/json' },
+        });
+      }
     }
-    return response;
   },
 };

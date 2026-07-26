@@ -21,14 +21,12 @@ router.get('/leaderboard', async (req, res) => {
     return res.json(lbCache.data);
   }
   try {
-    const users = await User.find({}, 'username accumulatedTime accumulatedBonusPoints discord country role')
-      .sort({ accumulatedTime: -1 }).limit(100).lean();
+    const users = await User.find({}, 'username money totalEarned discord country role incomePerMinute')
+      .sort({ totalEarned: -1 }).limit(100).lean();
     const leaderboard = await Promise.all(users.map(async u => {
-      const idleTimeSeconds = Math.floor((u.accumulatedTime || 0) / 1000);
-      const points = u.accumulatedBonusPoints || 0;
-      return { username: u.username, discordId: u.discord?.id || '無', discordName: u.discord?.username || '未綁定', avatar: u.discord?.avatar || null, country: u.country || 'UNKNOWN', idleTime: idleTimeSeconds, points, role: u.role || 'user' };
+      return { username: u.username, discordId: u.discord?.id || '無', discordName: u.discord?.username || '未綁定', avatar: u.discord?.avatar || null, country: u.country || 'UNKNOWN', money: u.money || 0, totalEarned: u.totalEarned || 0, incomePerMinute: u.incomePerMinute || 1, role: u.role || 'user' };
     }));
-    leaderboard.sort((a, b) => b.points - a.points);
+    leaderboard.sort((a, b) => b.totalEarned - a.totalEarned);
     lbCache = { data: leaderboard, ts: Date.now() };
     res.json(leaderboard);
   } catch (err) { console.error('[SYS] /leaderboard error:', err); res.status(500).json({ error: 'Failed to fetch leaderboard' }); }

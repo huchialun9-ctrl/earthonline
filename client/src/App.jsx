@@ -1,15 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
-import { Globe2, Activity, User, Link as LinkIcon, ShieldCheck, Shield, Info, Database, X, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Tornado, Coins, Satellite, Settings, AlertTriangle, CheckCircle, MapPin, Monitor, ShoppingCart, Palette, Trophy } from 'lucide-react';
+import { Globe2, Activity, User, Link as LinkIcon, ShieldCheck, Shield, Info, Database, X, Star, Clock, Volume2, VolumeX, Coffee, Users, ChevronDown, Zap, Coins, Satellite, Settings, AlertTriangle, CheckCircle, MapPin, Monitor, ShoppingCart, Palette, Trophy, FileText, TrendingUp, Building2, Briefcase, Percent, ArrowUp, ArrowDown } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import { useTheme } from './ThemeContext';
 import Draggable from 'react-draggable';
 import DataCenterVisualizer from './DataCenterVisualizer';
-import ShopModal from './ShopModal';
-import BackpackModal from './BackpackModal';
 import LeaderboardModal from './components/Modals/LeaderboardModal';
-import WarPanelModal from './components/Modals/WarPanelModal';
-import TalentModal from './components/Modals/TalentModal';
-import AchievementModal from './components/Modals/AchievementModal';
 import SocialModal from './components/Modals/SocialModal';
 import AccountInfoModal from './components/Modals/AccountInfoModal';
 import Console from './components/Dashboard/Console';
@@ -19,20 +14,19 @@ import DonateBanner from './components/DonateBanner';
 import LoginGateway from './components/LoginGateway';
 import FourPetalSpiral from './components/FourPetalSpiral';
 import DocumentationOverlay from './components/DocumentationOverlay';
+import ContentPages from './components/ContentPages';
 import GameBackground from './components/GameBackground';
 import PixelWordArt from './components/PixelWordArt';
-import OnboardingGuide from './components/OnboardingGuide';
-import FactionSelect from './components/FactionSelect';
-import WorldMap from './components/WorldMap';
-import CountryInfoPanel from './components/CountryInfoPanel';
-import MinePanel from './components/MinePanel';
-import LotteryModal from './components/LotteryModal';
-import DispatchAnimation from './components/DispatchAnimation';
 import MobileLayout from './components/Mobile/MobileLayout';
+import UpgradeModal from './components/Modals/UpgradeModal';
+import InvestmentModal from './components/Modals/InvestmentModal';
+import StockModal from './components/Modals/StockModal';
+import CompanyModal from './components/Modals/CompanyModal';
+import ContractModal from './components/Modals/ContractModal';
 import './index.css';
 
-const PROD_API = 'https://earthonline-7odc.onrender.com';
-const VITE_API = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:3001' : PROD_API);
+const PROD_API = '';
+const VITE_API = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:3001' : '');
 
 
 
@@ -43,30 +37,15 @@ function Dashboard({ token, onLogout, region }) {
   const API_URL = `${BASE_URL}/api/${region}`;
   const SOCKET_URL = BASE_URL;
   const game = useGame();
-  const { socket, isConnected, ping, nodes, myNode, setMyNode, myRole, globalStats, hubStats, leaderboard, currentEvent, lifespan, sessionTime, logs, addLog, isOfflineMode, engineReady, getEngineState } = game;
-  const [eventVote, setEventVote] = useState(null); // { options, endTime }
+  const { socket, isConnected, ping, nodes, myNode, setMyNode, myRole, globalStats, hubStats, leaderboard, logs, addLog } = game;
+  const [currentEvent, setCurrentEvent] = useState(null);
+  const [eventVote, setEventVote] = useState(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [adminTarget, setAdminTarget] = useState('');
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [allPlayersList, setAllPlayersList] = useState([]);
   const [playerSearch, setPlayerSearch] = useState('');
   const [adminPlayerFilter, setAdminPlayerFilter] = useState('all');
-  const [showAdRevive, setShowAdRevive] = useState(false);
-  const [adCountdown, setAdCountdown] = useState(0);
-  const [adReviveRemaining, setAdReviveRemaining] = useState(3);
-  const AD_SLOGANS = [
-    { title: '🔥 子熙 Casino — 百萬獎金等你拿', lines: ['註冊即送 1000 籌碼', '邀請好友再拿 500'] },
-    { title: '📱 子熙生態系 APP', lines: ['一鍵管理所有節點', '即時通知 + 遠端監控'] },
-    { title: '⚡ 高速 VPS 限時優惠', lines: ['全球節點延遲 <20ms', '使用折扣碼 EARTH20'] },
-    { title: '🎰 每日免費轉輪盤', lines: ['子熙 Casino 每天送', '最高 10000 籌碼！'] },
-  ];
-  const AD_LINKS = {
-    '/ads/zixi_casino.png': 'https://zixi-casino.vercel.app/landing',
-    '/ads/zixi_app.png': 'https://zixi-casino.vercel.app/app',
-  };
-  const [currentAd, setCurrentAd] = useState('');
-  const [adPlaying, setAdPlaying] = useState(false);
-  const [adSlogan, setAdSlogan] = useState('');
   // 管理員面板開啟時自動載入全部玩家名單
   useEffect(() => {
     if (showAdminPanel && socket?.connected) {
@@ -76,35 +55,16 @@ function Dashboard({ token, onLogout, region }) {
 
   const [show100Celebration, setShow100Celebration] = useState(false);
   const [showDiscordModal, setShowDiscordModal] = useState(false);
+  const [showContentPages, setShowContentPages] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showManualBind, setShowManualBind] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAccountInfo, setShowAccountInfo] = useState(false);
   const [showSocialModal, setShowSocialModal] = useState(false);
-  const [showShopModal, setShowShopModal] = useState(false);
-  const [showBackpack, setShowBackpack] = useState(false);
-  const [showAchievements, setShowAchievements] = useState(false);
-  const [achievementData, setAchievementData] = useState({ unlocked: [], total: 0, all: [] });
-  const [showTalentModal, setShowTalentModal] = useState(false);
-  const [talentData, setTalentData] = useState({ points: 0, spent: 0, talents: {}, all: {} });
-  const [showWarPanel, setShowWarPanel] = useState(false);
-  const [warStats, setWarStats] = useState(null);
   const [discordId, setDiscordId] = useState('');
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    try { return localStorage.getItem('eo_onboarding_done') !== 'true'; } catch { return true; }
-  });
-  const [showFactionSelect, setShowFactionSelect] = useState(false);
-  const [showWorldMap, setShowWorldMap] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState(null);
-  const [showDispatchAnim, setShowDispatchAnim] = useState(false);
-  const [dispatchedCountry, setDispatchedCountry] = useState(null);
-  const [mines, setMines] = useState([]);
-  const [showLottery, setShowLottery] = useState(false);
-  const [lotteryInventory, setLotteryInventory] = useState([]);
-  const [lastLotteryResult, setLastLotteryResult] = useState(null);
-  const [toast, setToast] = useState(null); // { message, type } for non-blocking notifications
+  const [toast, setToast] = useState(null);
   const toastTimerRef = useRef(null);
   const showToast = (msg, type) => {
     setToast({ message: msg, type });
@@ -112,58 +72,12 @@ function Dashboard({ token, onLogout, region }) {
     toastTimerRef.current = setTimeout(() => setToast(null), 5000);
   };
   const { theme, setTheme, themeData: currentThemeData, themes } = useTheme();
-  
-  const pingStartRef = useRef(0);
-  const [socialTab, setSocialTab] = useState('friends'); // 'friends', 'all', 'requests'
-  const [socialData, setSocialData] = useState({ allPlayers: [], friends: [], friendRequests: [] });
-  const [sortMode, setSortMode] = useState('points');
 
-  // Ref for react-draggable
-  const [bgmEnabled, setBgmEnabled] = useState(() => {
-    const saved = localStorage.getItem('eo_bgm');
-    return saved === null ? true : saved === 'true';
-  });
-  const audioRef = useRef(null);
-
-  const toggleBgm = () => {
-    const newVal = !bgmEnabled;
-    setBgmEnabled(newVal);
-    localStorage.setItem('eo_bgm', String(newVal));
-    if (audioRef.current) {
-      if (newVal) {
-        audioRef.current.play().catch(() => {});
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  };
-
-  const audioCtxRef = useRef(null);
-  const [notificationEnabled, setNotificationEnabled] = useState(() => {
-    const val = localStorage.getItem('eo_notifications');
-    return val === null ? true : val === 'true';
-  });
-  const [bgStyle, setBgStyle] = useState(() => localStorage.getItem('eo_bg_style') || 'globe');
-  const getAudioCtx = () => {
-    if (!audioCtxRef.current) audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    return audioCtxRef.current;
-  };
-  const playBeep = (freq = 800, duration = 100, type = 'sine') => {
-    if (!notificationEnabled) return;
-    try {
-      const ctx = getAudioCtx();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = type;
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.15, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration / 1000);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + duration / 1000);
-    } catch(e) {}
-  };
+  const [showUpgrades, setShowUpgrades] = useState(false);
+  const [showInvestments, setShowInvestments] = useState(false);
+  const [showStocks, setShowStocks] = useState(false);
+  const [showCompany, setShowCompany] = useState(false);
+  const [showContracts, setShowContracts] = useState(false);
 
   const [mobileTab, setMobileTab] = useState('dashboard');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -173,15 +87,41 @@ function Dashboard({ token, onLogout, region }) {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const [offlineState, setOfflineState] = useState(null);
-  useEffect(() => {
-    if (!isOfflineMode || !engineReady) { setOfflineState(null); return; }
-    const id = setInterval(() => {
-      const st = getEngineState?.();
-      if (st) setOfflineState(st);
-    }, 1000);
-    return () => clearInterval(id);
-  }, [isOfflineMode, engineReady, getEngineState]);
+  const lifespan = myNode?.health != null ? 86400 * 30 : 86400;
+  const sessionTime = 0;
+  const [notificationEnabled, setNotificationEnabled] = useState(true);
+  const [bgStyle, setBgStyle] = useState('globe');
+  const [socialData, setSocialData] = useState(null);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [showShopModal, setShowShopModal] = useState(false);
+  const [showBackpack, setShowBackpack] = useState(false);
+  const [showWorldMap, setShowWorldMap] = useState(false);
+  const [showLottery, setShowLottery] = useState(false);
+  const [showTalentModal, setShowTalentModal] = useState(false);
+  const [showWarPanel, setShowWarPanel] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showFactionSelect, setShowFactionSelect] = useState(false);
+  const [showDispatchAnim, setShowDispatchAnim] = useState(false);
+  const [dispatchedCountry, setDispatchedCountry] = useState(null);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [mines, setMines] = useState([]);
+  const [adCountdown, setAdCountdown] = useState(0);
+  const [adPlaying, setAdPlaying] = useState(false);
+  const [adReviveRemaining, setAdReviveRemaining] = useState(3);
+  const [adSlogan, setAdSlogan] = useState(null);
+  const [currentAd, setCurrentAd] = useState(null);
+  const [showAdRevive, setShowAdRevive] = useState(false);
+  const isOfflineMode = false;
+  const offlineState = null;
+  const [achievementData, setAchievementData] = useState(null);
+  const [talentData, setTalentData] = useState(null);
+  const [warStats, setWarStats] = useState(null);
+  const [sortMode, setSortMode] = useState('points');
+
+  const pingStartRef = useRef(0);
+  const audioRef = useRef(null);
+  const [bgmEnabled, setBgmEnabled] = useState(true);
+  const toggleBgm = () => setBgmEnabled(v => !v);
 
   const muteDurationRef = useRef(null);
   const banDurationRef = useRef(null);
@@ -238,19 +178,23 @@ function Dashboard({ token, onLogout, region }) {
       }
       if (e.key === 'Escape') {
         if (showLeaderboard) setShowLeaderboard(false);
+        else if (showContentPages) setShowContentPages(false);
         else if (showDiscordModal) setShowDiscordModal(false);
         else if (showAboutModal) setShowAboutModal(false);
         else if (showSocialModal) setShowSocialModal(false);
-        else if (showShopModal) setShowShopModal(false);
-        else if (showBackpack) setShowBackpack(false);
         else if (showAccountInfo) setShowAccountInfo(false);
         else if (showThemeMenu) setShowThemeMenu(false);
         else if (showAdminPanel) setShowAdminPanel(false);
+        else if (showUpgrades) setShowUpgrades(false);
+        else if (showInvestments) setShowInvestments(false);
+        else if (showStocks) setShowStocks(false);
+        else if (showCompany) setShowCompany(false);
+        else if (showContracts) setShowContracts(false);
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [showLeaderboard, showDiscordModal, showAboutModal, showSocialModal, showShopModal, showAccountInfo, showThemeMenu, showAdminPanel, showBackpack]);
+  }, [showLeaderboard, showContentPages, showDiscordModal, showAboutModal, showSocialModal, showAccountInfo, showThemeMenu, showAdminPanel, showUpgrades, showInvestments, showStocks, showCompany, showContracts]);
 
   // Scroll terminal to bottom
   useEffect(() => {
@@ -266,70 +210,48 @@ function Dashboard({ token, onLogout, region }) {
     }
   }, [logs]);
 
-  // Mine socket handlers
+  // New game system socket handlers
   useEffect(() => {
     if (!socket) return;
-    const hMinesState = (data) => {
-      setDispatchedCountry(null);
-      if (Array.isArray(data)) {
-        setMines(data);
-        const newest = data.reduce((a, b) => a.startedAt > b.startedAt ? a : b, data[0]);
-        if (newest) {
-          showToast(`🚀 已在 ${newest.country} 建立礦場！Lv.${newest.level} 開始自動挖礦`, 'success');
-          addLog(`[SYS] ✅ 已在 ${newest.country} 建立礦場（Lv.${newest.level}）`);
-        }
-      } else if (data) {
-        setMines([data]);
-        showToast(`🚀 已在 ${data.country} 建立礦場！Lv.${data.level} 開始自動挖礦`, 'success');
-        addLog(`[SYS] ✅ 已在 ${data.country} 建立礦場（Lv.${data.level}）`);
-      }
-    };
-    const hMineUpgrade = (data) => {
+    const hUpgradeResult = (data) => {
       if (data.success) {
-        addLog(`[SYS] 礦場升級至 Lv.${data.level}（${data.name}）`);
-        showToast(`⛏️ 礦場升級成功！Lv.${data.level} ${data.name}`, 'success');
+        showToast(`⬆️ ${data.upgradeId} 升至 Lv.${data.level}`, 'success');
+        setMyNode(prev => prev ? { ...prev, money: data.money, incomePerMinute: data.incomePerMinute } : prev);
       } else {
-        addLog(`[SYS] 礦場升級失敗：${data.error}`);
-        showToast(`❌ 礦場升級失敗：${data.error}`, 'error');
+        showToast(`❌ ${data.error}`, 'error');
       }
     };
-    const hMineEstablished = (data) => {
-      addLog(`[SYS] ${data.username} 已在 ${data.country} 建立礦場！`);
-    };
-    socket.on('mines_state', hMinesState);
-    socket.on('mine_state', hMinesState);
-    socket.on('mine_upgrade_result', hMineUpgrade);
-    socket.on('mine_established', hMineEstablished);
-    return () => {
-      socket.off('mines_state', hMinesState);
-      socket.off('mine_state', hMinesState);
-      socket.off('mine_upgrade_result', hMineUpgrade);
-      socket.off('mine_established', hMineEstablished);
-    };
-  }, [socket]);
-
-  // Lottery socket handlers
-  useEffect(() => {
-    if (!socket) return;
-    const hResult = (data) => {
-      setLastLotteryResult(data);
-      if (data.success && data.artifact) {
-        addLog(`[SYS] 抽中【${data.artifact.rarity}】遺物 (×${data.artifact.multiplier})`);
+    const hInvestResult = (data) => {
+      if (data.success) {
+        setMyNode(prev => prev ? { ...prev, money: data.money } : prev);
       }
     };
-    const hInv = (data) => setLotteryInventory(data || []);
-    const hSmelt = (data) => {
-      if (data.success) addLog(`[SYS] 熔煉遺物回收 ${data.refund} PT`);
-      else addLog(`[SYS] 熔煉失敗：${data.error}`);
-      if (socket) socket.emit('lottery_inventory');
+    const hCompanyResult = (data) => {
+      if (data.success) {
+        showToast('🏢 公司創建成功！', 'success');
+      } else if (data.error) {
+        showToast(`❌ ${data.error}`, 'error');
+      }
     };
-    socket.on('lottery_result', hResult);
-    socket.on('lottery_inventory', hInv);
-    socket.on('lottery_smelt_result', hSmelt);
+    const hContractResult = (data) => {
+      if (data.success) showToast('📋 合約已接受！', 'success');
+      else if (data.error) showToast(`❌ ${data.error}`, 'error');
+    };
+    const hOrderResult = (data) => {
+      if (data.success) showToast('📊 訂單已提交', 'success');
+      else if (data.error) showToast(`❌ ${data.error}`, 'error');
+    };
+    socket.on('upgrade_result', hUpgradeResult);
+    socket.on('invest_result', hInvestResult);
+    socket.on('company_result', hCompanyResult);
+    socket.on('contract_result', hContractResult);
+    socket.on('order_result', hOrderResult);
     return () => {
-      socket.off('lottery_result', hResult);
-      socket.off('lottery_inventory', hInv);
-      socket.off('lottery_smelt_result', hSmelt);
+      socket.off('upgrade_result', hUpgradeResult);
+      socket.off('invest_result', hInvestResult);
+      socket.off('company_result', hCompanyResult);
+      socket.off('contract_result', hContractResult);
+      socket.off('order_result', hOrderResult);
     };
   }, [socket]);
 
@@ -399,16 +321,6 @@ function Dashboard({ token, onLogout, region }) {
       } else {
         setBoundDiscord(null);
       }
-      s.emit('get_achievements');
-    });
-    s.on('achievement_data', (data) => {
-      setAchievementData(data);
-    });
-    s.on('talent_data', (data) => {
-      setTalentData(data);
-    });
-    s.on('war_stats', (data) => {
-      setWarStats(data);
     });
 
     s.on('terminal_response', (msg) => {
@@ -974,6 +886,9 @@ function Dashboard({ token, onLogout, region }) {
                   <Shield size={16} /> {t('管理員功能 (Admin)')}
                 </button>
               )}
+              <button className="dropdown-item" onClick={() => { setShowContentPages(true); setDropdownOpen(false); }}>
+                <FileText size={16} /> {t('政策與指南')}
+              </button>
               <a href="https://discord.gg/6P6NG49Mus" target="_blank" rel="noreferrer" className="dropdown-item" style={{color: 'var(--info-color)'}} onClick={() => setDropdownOpen(false)}>
                 <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a67.58,67.58,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.12,53,91.08,65.69,84.69,65.69Z"/></svg>
                 {t('官方 Discord')}
@@ -1095,74 +1010,48 @@ function Dashboard({ token, onLogout, region }) {
               <div style={{fontSize: '1.3rem', fontWeight: 'bold', color: 'var(--success-color)'}}>{globalStats.activeUsers}</div>
             </div>
             <div className="metric-group" style={{flex: 1, padding: '10px 12px'}}>
-              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>{t('倍率')}</div>
-              {(() => {
-                const isOverclock = myNode?.activeBuffs?.overclock > Date.now();
-                const baseMult = globalStats.multiplier || 1.0;
-                const effMult = isOverclock ? baseMult * 2 : baseMult;
-                const color = effMult > 1.0 ? 'var(--accent-color)' : 'var(--text-main)';
-                const personal = isOverclock ? '⚡' : '';
-                return (
-                  <div style={{fontSize: '1.3rem', fontWeight: 'bold', color}}>
-                    {personal}{effMult.toFixed(1)}x
-                  </div>
-                );
-              })()}
-            </div>
-            <div className="metric-group" style={{flex: 1, padding: '10px 12px'}}>
-              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>{t('生命')}</div>
-              <div style={{fontSize: '1.3rem', fontWeight: 'bold', color: calculateHealthPercentage(lifespan) > 30 ? 'var(--accent-color)' : 'var(--danger-color)'}}>{Math.floor(calculateHealthPercentage(lifespan))}%</div>
+              <div style={{fontSize: '0.75rem', color: '#888', marginBottom: '4px'}}>{t('session')}</div>
+              <div style={{fontSize: '1.3rem', fontWeight: 'bold', color: 'var(--accent-color)'}}>{formatTime(sessionTime)}</div>
             </div>
           </div>
 
           <div className="metric-group" style={{padding: '10px 12px', marginBottom: '8px'}}>
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px'}}>
-              <span style={{fontSize: '0.8rem', color: '#888'}}>{t('節點等級')}</span>
-              <span style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--accent-color)'}}>
-                Lv.{myNode?.level || 1}
-                {myNode?.levelProgress?.nextSec && <span style={{fontSize:'0.75rem', color:'#888', marginLeft:'5px'}}>(+{(myNode.levelProgress.progress * 100).toFixed(0)}%)</span>}
-              </span>
-            </div>
-            {myNode?.levelProgress?.nextSec > 0 && (
-              <div style={{width:'100%', height:'4px', background:'rgba(255,255,255,0.1)', borderRadius:'2px', marginTop:'4px', overflow:'hidden'}}>
-                <div style={{width:`${(myNode.levelProgress.progress * 100).toFixed(1)}%`, height:'100%', background:'var(--accent-color)', borderRadius:'2px', transition:'width 0.3s'}} />
-              </div>
-            )}
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px'}}>
-              <span style={{fontSize: '0.8rem', color: '#888'}}>{t('總生存時間')}</span>
-              <span style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--accent-color)'}}>
-                {isOfflineMode && offlineState ? formatTime(offlineState.accumulatedTime) : formatTime(lifespan)}
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px'}}>
+              <span style={{fontSize: '0.8rem', color: '#888'}}>{t('💰 現金')}</span>
+              <span style={{fontSize: '1.3rem', fontWeight: 'bold', color: 'var(--accent-color)'}}>
+                ${(myNode?.money || 0).toLocaleString()}
               </span>
             </div>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-              <span style={{fontSize: '0.8rem', color: '#888'}}>{t('累積點數')}</span>
-              <span style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--text-main)'}}>
-                {isOfflineMode && offlineState ? Math.floor(offlineState.accumulatedBonusPoints).toLocaleString() : (myNode?.accumulatedBonusPoints || 0).toLocaleString()}
+              <span style={{fontSize: '0.8rem', color: '#888'}}>{t('💹 收入/分')}</span>
+              <span style={{fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--success-color)'}}>
+                +${(myNode?.incomePerMinute || 1).toLocaleString()}
               </span>
             </div>
           </div>
 
           <div style={{display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '8px'}}>
-            <div style={{fontSize: '0.8rem', color: '#888', marginBottom: '4px'}}>{t('伺服器：')}{region === 'asia' ? t('亞洲') : region === 'us' ? t('美洲') : t('歐洲')} | node: {myNode?.userId} | {myNode?.country || '--'}</div>
-            {globalStats.multiplier > 1.0 && (
-              <div style={{fontSize: '0.8rem', color: 'var(--accent-color)'}}>{t('超載中：')}{globalStats.activeUsers} / 5 {t('人')}</div>
-            )}
+            <div style={{fontSize: '0.8rem', color: '#888', marginBottom: '4px'}}>{t('伺服器：')}{region === 'asia' ? t('亞洲') : region === 'us' ? t('美洲') : t('歐洲')} | {myNode?.country || '--'}</div>
           </div>
 
           <div style={{ marginTop: 'auto', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(0,200,255,0.1)', color: '#00CCFF', border: '1px solid rgba(0,200,255,0.3)'}} onClick={() => { setShowUpgrades(true); if (socket?.connected) socket.emit('get_upgrade_data'); }}>
+              <TrendingUp size={14} /> {t('升級')}
+            </button>
             <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(255,215,0,0.1)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.3)'}} onClick={() => setShowLeaderboard(true)}>
               <Activity size={14} /> {t('排行榜')}
             </button>
-            <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(255,215,0,0.05)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.2)'}} onClick={() => setShowAchievements(true)}>
-              <Trophy size={14} /> {t('成就')}
+            <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(34,197,94,0.1)', color: '#22C55E', border: '1px solid rgba(34,197,94,0.3)'}} onClick={() => { setShowInvestments(true); if (socket?.connected) socket.emit('get_investment_data'); }}>
+              <Percent size={14} /> {t('投資')}
             </button>
-            {(myNode?.level || 1) >= 10 && (
-              <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(147,51,234,0.1)', color: '#9333EA', border: '1px solid rgba(147,51,234,0.3)'}} onClick={() => { setShowTalentModal(true); if (socket?.connected) socket.emit('get_talent_data'); }}>
-                <Zap size={14} /> {t('天賦')}
-              </button>
-            )}
-            <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)'}} onClick={() => { setShowWarPanel(true); if (socket?.connected) socket.emit('get_war_stats'); }}>
-              <Globe2 size={14} /> {t('區域對抗')}
+            <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(147,51,234,0.1)', color: '#9333EA', border: '1px solid rgba(147,51,234,0.3)'}} onClick={() => { setShowStocks(true); if (socket?.connected) { socket.emit('get_market_data'); socket.emit('get_portfolio'); } }}>
+              <ArrowUp size={14} /> {t('股票')}
+            </button>
+            <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(59,130,246,0.1)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.3)'}} onClick={() => { setShowCompany(true); if (socket?.connected) socket.emit('get_my_company'); }}>
+              <Building2 size={14} /> {t('公司')}
+            </button>
+            <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(255,159,67,0.1)', color: '#FF9F43', border: '1px solid rgba(255,159,67,0.3)'}} onClick={() => { setShowContracts(true); if (socket?.connected) socket.emit('get_contracts'); }}>
+              <Briefcase size={14} /> {t('合約')}
             </button>
             <button className="terminal-btn" style={{padding: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'}} onClick={() => setShowAboutModal(true)}>
               <Info size={14} /> {t('系統資訊')}
@@ -1261,15 +1150,15 @@ function Dashboard({ token, onLogout, region }) {
 
       {/* Full Page About Documentation */}
       {showAboutModal && <DocumentationOverlay onClose={() => setShowAboutModal(false)} />}
+      {showContentPages && <ContentPages onClose={() => setShowContentPages(false)} />}
       {showSocialModal && <SocialModal onClose={() => setShowSocialModal(false)} socialTab={socialTab} setSocialTab={setSocialTab} socialData={socialData} socket={socket} myNode={myNode} onPmUser={(username) => { setPmTarget(username); setShowPm(true); setShowSocialModal(false); }} toast={toast} />}
-      {showShopModal && <ShopModal onClose={() => setShowShopModal(false)} pts={myNode?.accumulatedBonusPoints} onBuy={(id) => { if (socket?.connected) { socket.emit('buy_item', id); } else { alert('連線未就緒，無法購買'); } }} onAdRevive={() => setShowAdRevive(true)} adReviveRemaining={adReviveRemaining} />}
-      {showBackpack && <BackpackModal onClose={() => setShowBackpack(false)} inventory={myNode?.inventory} socket={socket} addLog={addLog} />}
-
-      {showAchievements && <AchievementModal data={achievementData} onClose={() => setShowAchievements(false)} />}
-      {showTalentModal && <TalentModal data={talentData} onClose={() => setShowTalentModal(false)} socket={socket} />}
-      {showWarPanel && <WarPanelModal data={warStats} onClose={() => setShowWarPanel(false)} region={region} />}
-
       {showAccountInfo && <AccountInfoModal token={token} apiUrl={API_URL} onClose={() => setShowAccountInfo(false)} onLogout={onLogout} />}
+
+      {showUpgrades && <UpgradeModal onClose={() => setShowUpgrades(false)} socket={socket} myNode={myNode} setMyNode={setMyNode} />}
+      {showInvestments && <InvestmentModal onClose={() => setShowInvestments(false)} socket={socket} myNode={myNode} setMyNode={setMyNode} />}
+      {showStocks && <StockModal onClose={() => setShowStocks(false)} socket={socket} />}
+      {showCompany && <CompanyModal onClose={() => setShowCompany(false)} socket={socket} myNode={myNode} />}
+      {showContracts && <ContractModal onClose={() => setShowContracts(false)} socket={socket} />}
 
       {/* Admin Panel Modal — Full Side Drawer */}
       {showAdminPanel && (() => {
@@ -1903,24 +1792,38 @@ function Dashboard({ token, onLogout, region }) {
   );
 }
 
+function getCookie(name) {
+  const m = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+  return m ? m[1] : null;
+}
+
 function App() {
   const { t, language, setLanguage } = useLanguage();
-  const [token, setToken] = useState(localStorage.getItem('eo_token'));
+  const [token, setToken] = useState(localStorage.getItem('eo_token') || getCookie('eo_token'));
   const [region, setRegion] = useState(localStorage.getItem('eo_region') || 'asia');
   const APP_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : PROD_API;
 
-  const handleLogin = (newToken, username, selectedRegion) => {
-    localStorage.setItem('eo_token', newToken);
-    if (selectedRegion) {
-      localStorage.setItem('eo_region', selectedRegion);
-      setRegion(selectedRegion);
+  useEffect(() => {
+    const cookieToken = getCookie('eo_token');
+    if (cookieToken && !localStorage.getItem('eo_token')) {
+      localStorage.setItem('eo_token', cookieToken);
+      document.cookie = 'eo_token=; Path=/; Max-Age=0';
     }
+    if (token) {
+      localStorage.setItem('eo_token', token);
+    }
+  }, [token]);
+
+  const handleLogin = (newToken) => {
+    localStorage.setItem('eo_token', newToken);
+    document.cookie = 'eo_token=; Path=/; Max-Age=0';
     setToken(newToken);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('eo_token');
     localStorage.removeItem('eo_region');
+    document.cookie = 'eo_token=; Path=/; Max-Age=0';
     setToken(null);
   };
 

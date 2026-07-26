@@ -66,80 +66,31 @@ async function updateUserDiscord(username, discordData) {
   return !!result;
 }
 
-async function getGlobalProduction() {
-  const result = await User.aggregate([
-    {
-      $group: {
-        _id: null,
-        totalProduction: { $sum: "$accumulatedTime" }
-      }
-    }
-  ]);
-  return result.length > 0 ? Math.floor(result[0].totalProduction / 1000) : 0;
-}
-
-async function getRegionProduction(region) {
-  try {
-    const result = await User.aggregate([
-      { $match: { homeRegion: region } },
-      {
-        $group: {
-          _id: null,
-          totalProduction: { $sum: "$accumulatedTime" }
-        }
-      }
-    ]);
-    if (result.length > 0 && result[0].totalProduction > 0) {
-      return Math.floor(result[0].totalProduction / 1000);
-    }
-    // If aggregation returned 0 but users exist, try summing directly
-    const count = await User.countDocuments({ homeRegion: region });
-    if (count > 0) {
-      const users = await User.find({ homeRegion: region }, 'accumulatedTime').lean();
-      const total = users.reduce((sum, u) => sum + (u.accumulatedTime || 0), 0);
-      return Math.floor(total / 1000);
-    }
-  } catch (err) {
-    console.error('[DB] getRegionProduction error:', err);
-  }
-  return 0;
-}
-
 async function migrateOfflineTime() {
   try {
-    const now = Date.now();
-    
-    // Perform bulk updates which are safer and bypass individual document validation errors
-    
-    // 1. Set missing homeRegion to 'asia'
     const regionResult = await User.updateMany(
       { homeRegion: { $exists: false } },
       { $set: { homeRegion: 'asia' } }
     );
     
-    // 2. Set missing country to 'TW'
     const countryResult = await User.updateMany(
       { $or: [{ country: { $exists: false } }, { country: 'UNKNOWN' }] },
       { $set: { country: 'TW' } }
     );
     
-    // 3. Set missing accumulatedBonusPoints to 0
     await User.updateMany(
-      { accumulatedBonusPoints: { $exists: false } },
-      { $set: { accumulatedBonusPoints: 0 } }
+      { money: { $exists: false } },
+      { $set: { money: 0, incomePerMinute: 1, totalEarned: 0, upgrades: {}, investments: {} } }
     );
     
-    // 4. Set missing recoveryKey
     await User.updateMany(
       { recoveryKey: { $exists: false } },
       { $set: { recoveryKey: '未產生' } }
     );
     
-    // 5. Cleanup Fake Bot Accounts
     const botFilter = {
       'discord.id': { $exists: false },
       $or: [
-        { accumulatedTime: 0 },
         { username: { $regex: /^[a-zA-Z0-9]{15,35}$/ } }
       ]
     };
@@ -150,13 +101,8 @@ async function migrateOfflineTime() {
   }
 }
 
-// Generic wrappers to centralize User operations
 async function updateUser(username, updates) {
   return await User.updateOne({ username }, updates);
-}
-
-async function incrementUser(username, incFields) {
-  return await User.updateOne({ username }, { $inc: incFields });
 }
 
 async function findUsersWithDiscord() {

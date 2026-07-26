@@ -1,5 +1,7 @@
 const CACHE = 'earthonline-v3';
 
+const NAVIGATION_URLS = ['/', '/index.html'];
+
 self.addEventListener('install', (e) => {
   self.skipWaiting();
   e.waitUntil(
@@ -26,6 +28,12 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  const url = new URL(e.request.url);
+
+  // Never cache navigation or API requests
+  if (url.pathname.startsWith('/api/')) return;
+  if (e.request.mode === 'navigate') return;
+
   e.respondWith(
     (async () => {
       const cached = await caches.match(e.request);

@@ -1,15 +1,39 @@
 {
   "name": "earthonline",
-  "compatibility_date": "2026-06-10",
+  "compatibility_date": "2026-07-26",
   "main": "src/index.js",
   "assets": {
     "directory": "client/dist",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
   },
-  "compatibility_flags": [
-    "nodejs_compat"
+  "routes": [
+    {
+      "pattern": "twonline.dpdns.org",
+      "custom_domain": true
+    }
   ],
+  "compatibility_flags": ["nodejs_compat"],
   "build": {
     "command": "cd client && npm install && npm run build"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "earthonline-db",
+      "database_id": "32e628cf-5038-46c9-8689-5d7f8c9a5a4d"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "GAME_ROOM", "class_name": "GameRoom" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["GameRoom"] }
+  ],
+  "vars": {
+    "DISCORD_CLIENT_ID": "1513563333985304596",
+    "FRONTEND_URL": "https://twonline.dpdns.org"
   }
 }

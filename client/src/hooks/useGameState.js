@@ -4,10 +4,9 @@ export default function useGameState(socket, API_URL, BASE_URL) {
   const [nodes, setNodes] = useState([]);
   const [myNode, setMyNode] = useState(null);
   const [myRole, setMyRole] = useState('user');
-  const [globalStats, setGlobalStats] = useState({ activeUsers: 0, totalPopulation: 0, globalProduction: 0, socialCompression: '1.000' });
+  const [globalStats, setGlobalStats] = useState({ activeUsers: 0, totalPopulation: 0 });
   const [hubStats, setHubStats] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
-  const [currentEvent, setCurrentEvent] = useState(null);
 
   useEffect(() => {
     let reqId = 0;
@@ -19,7 +18,7 @@ export default function useGameState(socket, API_URL, BASE_URL) {
       } catch (e) { console.error('[HUB]', e); }
     };
     fetchHub();
-    const inv = setInterval(fetchHub, 5000);
+    const inv = setInterval(fetchHub, 30000);
     return () => clearInterval(inv);
   }, [BASE_URL]);
 
@@ -33,7 +32,7 @@ export default function useGameState(socket, API_URL, BASE_URL) {
       } catch (e) { console.error('[LB]', e); }
     };
     fetchLB();
-    const intv = setInterval(fetchLB, 5000);
+    const intv = setInterval(fetchLB, 30000);
     return () => clearInterval(intv);
   }, [API_URL]);
 
@@ -44,26 +43,13 @@ export default function useGameState(socket, API_URL, BASE_URL) {
     s.on('init_data', (data) => {
       setMyNode(data);
       setMyRole(data.role || 'user');
-      if (data.currentGlobalEvent) setCurrentEvent(data.currentGlobalEvent);
-      if (data.offlineEarnings && data.offlineEarnings.pts > 0) {
-        setTimeout(() => {
-          alert(`離線收益：${data.offlineEarnings.minutes} 分鐘，獲得 ${data.offlineEarnings.pts} PT`);
-        }, 500);
-      }
     });
 
     s.on('user_state_update', (data) => {
-      const normalized = { ...data };
-      if ('pts' in normalized) {
-        normalized.accumulatedBonusPoints = normalized.pts;
-        delete normalized.pts;
-      }
-      setMyNode(prev => prev ? { ...prev, ...normalized } : normalized);
+      setMyNode(prev => prev ? { ...prev, ...data } : data);
     });
 
     s.on('global_stats', (stats) => setGlobalStats(stats));
-    s.on('global_event_started', (eventData) => setCurrentEvent(eventData));
-    s.on('global_event_ended', () => setCurrentEvent(null));
 
     s.on('all_nodes', (data) => setNodes(data));
     s.on('node_connected', (node) => {
@@ -77,13 +63,11 @@ export default function useGameState(socket, API_URL, BASE_URL) {
       s.off('init_data');
       s.off('user_state_update');
       s.off('global_stats');
-      s.off('global_event_started');
-      s.off('global_event_ended');
       s.off('all_nodes');
       s.off('node_connected');
       s.off('node_disconnected');
     };
   }, [socket]);
 
-  return { nodes, myNode, setMyNode, myRole, globalStats, hubStats, leaderboard, currentEvent };
+  return { nodes, myNode, setMyNode, myRole, globalStats, hubStats, leaderboard };
 }

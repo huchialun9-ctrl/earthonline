@@ -373,7 +373,12 @@ const translations = {
     "區域對抗": "區域對抗",
     "在線時間": "在線時間",
     "平均在線": "平均在線",
-    "事件完成率": "事件完成率"
+    "事件完成率": "事件完成率",
+    "政策與指南": "政策與指南",
+    "隱私權政策": "隱私權政策",
+    "服務條款": "服務條款",
+    "遊戲指南": "遊戲指南",
+    "常見問題": "常見問題"
   },
   "en": {
     "EARTH ONLINE": "EARTH ONLINE",
@@ -774,7 +779,12 @@ const translations = {
     "遊戲公約": "Game Covenant",
     "歡迎加入地球在線": "Welcome to Earth Online",
     "世界地圖": "World Map",
-    "秘寶抽獎": "Artifact Draw"
+    "秘寶抽獎": "Artifact Draw",
+    "政策與指南": "Policies & Guide",
+    "隱私權政策": "Privacy Policy",
+    "服務條款": "Terms of Service",
+    "遊戲指南": "Game Guide",
+    "常見問題": "FAQ"
   }
 };
 
